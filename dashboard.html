@@ -10,9 +10,9 @@
         .navbar{background:#2d6a1a;color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
         .container{max-width:1400px;margin:20px auto;padding:0 20px}
         .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-        .tab-btn{padding:12px 24px;background:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+        .tab-btn{padding:12px 24px;background:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
         .tab-btn.active{background:#2d6a1a;color:white}
-        .tab-content{display:none;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+        .tab-content{display:none;background:white;padding:30px;border-radius:12px}
         .tab-content.active{display:block}
         .form-section{margin-bottom:30px;padding:20px;background:#f9f9f9;border-radius:8px}
         .form-section h3{margin-bottom:15px;color:#2d6a1a}
@@ -20,18 +20,13 @@
         .form-group{margin-bottom:15px}
         .form-group label{display:block;margin-bottom:5px;font-weight:bold}
         .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
-        .btn-primary{background:#2d6a1a;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
-        .btn-primary:hover{background:#1a4a0e}
+        .btn-primary{background:#2d6a1a;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer}
         .btn-danger{background:#dc3545;color:white;padding:5px 10px;border:none;border-radius:4px;cursor:pointer}
         .member-card{border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:8px;background:#fafafa}
-        .member-card strong{color:#2d6a1a;font-size:1.1em}
+        .member-card strong{color:#2d6a1a}
         .search-bar{margin-bottom:20px}
-        .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
-        .stat-card{background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white;padding:20px;border-radius:10px;text-align:center}
-        .stat-value{font-size:28px;font-weight:bold}
+        .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px}
         .logout-btn{background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
-        .image-preview img{max-width:80px;max-height:80px;border-radius:5px;margin-top:5px}
         @media(max-width:768px){.form-row{grid-template-columns:1fr}}
     </style>
 </head>
@@ -48,11 +43,9 @@
             <button class="tab-btn active" onclick="showTab('register')">📝 Register Member</button>
             <button class="tab-btn" onclick="showTab('list')">📋 Members List</button>
             <button class="tab-btn" onclick="showTab('sales')">💰 Record Sale</button>
-            <button class="tab-btn" onclick="showTab('transfer')">🔄 Name Transfer</button>
             <button class="tab-btn" onclick="showTab('search')">🔍 Search</button>
         </div>
         
-        <!-- Register Tab -->
         <div id="register" class="tab-content active">
             <h2>📝 Register New Member</h2>
             <form id="memberForm">
@@ -71,49 +64,25 @@
                         <div class="form-group"><label>Phone *</label><input type="tel" id="phone" required></div>
                         <div class="form-group"><label>Role/Position *</label><input type="text" id="role" required></div>
                     </div>
-                    <div class="form-group"><label>📸 Member Photo</label><input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')"><div id="memberPhotoPreview" class="image-preview"></div></div>
-                </div>
-                <div class="form-section">
-                    <h3>Beneficiary Information</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Beneficiary Name</label><input type="text" id="beneficiaryName"></div>
-                        <div class="form-group"><label>Beneficiary Address</label><textarea id="beneficiaryAddress" rows="2"></textarea></div>
-                    </div>
-                    <div class="form-group"><label>📸 Beneficiary Photo</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this, 'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
-                </div>
-                <div class="form-section">
-                    <h3>Legal Representative</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Representative Name</label><input type="text" id="legalRepName"></div>
-                        <div class="form-group"><label>Representative Phone</label><input type="tel" id="legalRepPhone"></div>
-                    </div>
-                    <div class="form-group"><label>Representative Address</label><textarea id="legalRepAddress" rows="2"></textarea></div>
-                    <div class="form-group"><label>📸 Representative Photo</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this, 'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
-                </div>
-                <div class="form-section">
-                    <h3>Documents</h3>
-                    <div class="form-group"><label>🆔 Tax ID Document</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this, 'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
-                    <div class="form-group"><label>📄 Hard Copy Form Photo</label><input type="file" id="hardCopyForm" accept="image/*" onchange="previewImage(this, 'hardCopyPreview')"><div id="hardCopyPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>📸 Member Photo</label><input type="file" id="memberPhoto" accept="image/*"></div>
                 </div>
                 <button type="submit" class="btn-primary">✅ Register Member</button>
             </form>
         </div>
         
-        <!-- Members List Tab -->
         <div id="list" class="tab-content">
             <h2>📋 Members List</h2>
             <div class="search-bar"><input type="text" id="searchInput" placeholder="Search by name or phone..." onkeyup="loadMembers()"></div>
             <div id="membersList"></div>
         </div>
         
-        <!-- Sales Tab -->
         <div id="sales" class="tab-content">
             <h2>💰 Record Coffee Sale</h2>
             <div class="form-section">
                 <div class="form-group"><label>Select Member</label><select id="saleMemberId"></select></div>
                 <div class="form-row">
                     <div class="form-group"><label>Date</label><input type="date" id="saleDate"></div>
-                    <div class="form-group"><label>Product Type</label><select id="productType"><option>Forest Coffee</option><option>Garden Coffee</option><option>Organic Coffee</option></select></div>
+                    <div class="form-group"><label>Product Type</label><select id="productType"><option>Forest Coffee</option><option>Garden Coffee</option></select></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Quantity (kg)</label><input type="number" id="quantity" step="0.01"></div>
@@ -121,40 +90,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Total Amount</label><input type="text" id="totalAmount" readonly style="background:#e9ecef"></div>
-                    <div class="form-group"><label>Payment Method</label><select id="paymentMethod"><option>Cash</option><option>Bank Transfer</option><option>Check</option></select></div>
+                    <div class="form-group"><label>Payment Method</label><select id="paymentMethod"><option>Cash</option><option>Bank Transfer</option></select></div>
                 </div>
-                <div class="form-group"><label>🧾 Receipt Photo</label><input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this, 'receiptPreview')"><div id="receiptPreview" class="image-preview"></div></div>
                 <button onclick="recordSale()" class="btn-primary">💾 Record Sale</button>
             </div>
             <div id="salesHistory"></div>
         </div>
         
-        <!-- Transfer Tab -->
-        <div id="transfer" class="tab-content">
-            <h2>🔄 Name Transfer</h2>
-            <div class="form-section">
-                <div class="form-group"><label>Select Current Member</label><select id="oldMemberId" onchange="loadOldMemberInfo()"></select></div>
-                <div id="oldMemberInfo" style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px"></div>
-                <div class="form-group"><label>New Member Full Name *</label><input type="text" id="newMemberName" placeholder="Enter new member name"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>New Member ID Number</label><input type="text" id="newMemberIdNumber"></div>
-                    <div class="form-group"><label>New Member Phone</label><input type="tel" id="newMemberPhone"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Transfer Date</label><input type="date" id="transferDate"></div>
-                    <div class="form-group"><label>Transfer Fee (ETB)</label><input type="number" id="transferFee" step="0.01"></div>
-                </div>
-                <div class="form-group"><label>Transfer Reason</label><textarea id="transferReason" rows="2"></textarea></div>
-                <div class="form-group"><label>📄 Transfer Document</label><input type="file" id="transferDocument" accept="image/*" onchange="previewImage(this, 'transferDocPreview')"><div id="transferDocPreview" class="image-preview"></div></div>
-                <button onclick="processNameTransfer()" class="btn-primary">🔄 Process Transfer</button>
-            </div>
-            <div id="transferHistoryList"></div>
-        </div>
-        
-        <!-- Search Tab -->
         <div id="search" class="tab-content">
             <h2>🔍 Search Member</h2>
-            <div class="form-group"><input type="text" id="searchTerm" placeholder="Enter name or phone number..." onkeyup="searchMembers()" style="width:100%;padding:12px"></div>
+            <div class="form-group"><input type="text" id="searchTerm" placeholder="Enter name or phone..." onkeyup="searchMembers()" style="width:100%;padding:12px"></div>
             <div id="searchResults"></div>
         </div>
     </div>
@@ -163,27 +108,11 @@
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/';
         
-        let members = [];
-        let sales = [];
-        let transfers = [];
-        
-        async function apiCall(endpoint, options = {}) {
-            const response = await fetch(`/api${endpoint}`, {
+        function apiCall(endpoint, options = {}) {
+            return fetch(`/api${endpoint}`, {
                 ...options,
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
-            });
-            if (response.status === 401) { localStorage.clear(); window.location.href = '/'; }
-            return response.json();
-        }
-        
-        function previewImage(input, previewId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" style="max-width:80px">`;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+            }).then(res => res.json());
         }
         
         function fileToBase64(file) {
@@ -191,53 +120,44 @@
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                reader.onerror = reject;
             });
         }
         
         async function loadMembers() {
-            members = await apiCall('/members');
+            let members = await apiCall('/members');
             const search = document.getElementById('searchInput')?.value || '';
-            let filtered = members;
             if (search) {
-                filtered = members.filter(m => m.fullName.toLowerCase().includes(search.toLowerCase()) || m.phone.includes(search));
+                members = members.filter(m => m.fullName.toLowerCase().includes(search.toLowerCase()) || m.phone.includes(search));
             }
             const container = document.getElementById('membersList');
-            if (!filtered.length) { container.innerHTML = '<p>No members found</p>'; return; }
-            container.innerHTML = filtered.map(m => `
+            if (!members.length) { container.innerHTML = '<p>No members found</p>'; return; }
+            container.innerHTML = members.map(m => `
                 <div class="member-card">
-                    <strong>👤 ${escapeHtml(m.fullName)}</strong><br>
-                    📞 ${escapeHtml(m.phone)}<br>
-                    👔 ${escapeHtml(m.role)}<br>
-                    📍 ${escapeHtml(m.address)}<br>
-                    ${m.memberPhoto ? `<img src="${m.memberPhoto}" style="width:40px;height:40px;border-radius:50%;margin-top:10px">` : ''}
+                    <strong>👤 ${m.fullName}</strong><br>
+                    📞 ${m.phone}<br>
+                    👔 ${m.role}<br>
+                    📍 ${m.address}<br>
                     <button onclick="deleteMember('${m.id}')" class="btn-danger" style="margin-top:10px">🗑️ Delete</button>
                 </div>
             `).join('');
             
             const saleSelect = document.getElementById('saleMemberId');
-            const transferSelect = document.getElementById('oldMemberId');
-            if (saleSelect) saleSelect.innerHTML = members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-            if (transferSelect) transferSelect.innerHTML = '<option value="">Select Member</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+            if (saleSelect) {
+                saleSelect.innerHTML = members.map(m => `<option value="${m.id}">${m.fullName} - ${m.phone}</option>`).join('');
+            }
         }
         
         async function deleteMember(id) {
-            if (confirm('Delete this member permanently?')) {
+            if (confirm('Delete this member?')) {
                 await apiCall(`/members/${id}`, { method: 'DELETE' });
                 loadMembers();
-                alert('Member deleted');
             }
         }
         
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const memberPhoto = document.getElementById('memberPhoto').files[0];
-            const beneficiaryPhoto = document.getElementById('beneficiaryPhoto').files[0];
-            const repPhoto = document.getElementById('repPhoto').files[0];
-            const memberTaxDoc = document.getElementById('memberTaxDoc').files[0];
-            const hardCopyForm = document.getElementById('hardCopyForm').files[0];
-            
+            const photoFile = document.getElementById('memberPhoto').files[0];
             const member = {
                 fullName: document.getElementById('fullName').value,
                 gender: document.getElementById('gender').value,
@@ -246,23 +166,12 @@
                 address: document.getElementById('address').value,
                 phone: document.getElementById('phone').value,
                 role: document.getElementById('role').value,
-                beneficiaryName: document.getElementById('beneficiaryName').value,
-                beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
-                legalRepName: document.getElementById('legalRepName').value,
-                legalRepAddress: document.getElementById('legalRepAddress').value,
-                legalRepPhone: document.getElementById('legalRepPhone').value,
                 nationality: 'Ethiopian',
-                memberPhoto: memberPhoto ? await fileToBase64(memberPhoto) : null,
-                beneficiaryPhoto: beneficiaryPhoto ? await fileToBase64(beneficiaryPhoto) : null,
-                repPhoto: repPhoto ? await fileToBase64(repPhoto) : null,
-                memberTaxDoc: memberTaxDoc ? await fileToBase64(memberTaxDoc) : null,
-                hardCopyForm: hardCopyForm ? await fileToBase64(hardCopyForm) : null
+                memberPhoto: photoFile ? await fileToBase64(photoFile) : null
             };
-            
             await apiCall('/members', { method: 'POST', body: JSON.stringify(member) });
-            alert('✅ Member registered successfully!');
+            alert('✅ Member registered!');
             e.target.reset();
-            document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             loadMembers();
             showTab('list');
         });
@@ -270,8 +179,6 @@
         async function recordSale() {
             const qty = parseFloat(document.getElementById('quantity').value);
             const price = parseFloat(document.getElementById('pricePerKg').value);
-            const receiptFile = document.getElementById('receiptPhoto').files[0];
-            
             const sale = {
                 memberId: document.getElementById('saleMemberId').value,
                 date: document.getElementById('saleDate').value,
@@ -279,9 +186,7 @@
                 quantity: qty,
                 pricePerKg: price,
                 totalAmount: qty * price,
-                paymentMethod: document.getElementById('paymentMethod').value,
-                notes: document.getElementById('saleNotes')?.value || '',
-                receiptPhoto: receiptFile ? await fileToBase64(receiptFile) : null
+                paymentMethod: document.getElementById('paymentMethod').value
             };
             if (!sale.memberId || !sale.quantity || !sale.pricePerKg) {
                 alert('Please fill all fields');
@@ -292,86 +197,23 @@
             document.getElementById('quantity').value = '';
             document.getElementById('pricePerKg').value = '';
             document.getElementById('totalAmount').value = '';
-            document.getElementById('receiptPhoto').value = '';
-            document.getElementById('receiptPreview').innerHTML = '';
             loadSalesHistory();
         }
         
         async function loadSalesHistory() {
-            sales = await apiCall('/sales');
-            if (!sales.length) { document.getElementById('salesHistory').innerHTML = '<p>No sales recorded yet</p>'; return; }
-            document.getElementById('salesHistory').innerHTML = `<h3 style="margin-top:20px">Recent Sales</h3>${sales.slice(0, 20).map(s => `
-                <div class="member-card">📅 ${new Date(s.date).toLocaleDateString()} | ${s.quantity} kg | ${s.totalAmount} ETB | 💳 ${s.paymentMethod}</div>
-            `).join('')}`;
-        }
-        
-        async function loadOldMemberInfo() {
-            const memberId = document.getElementById('oldMemberId').value;
-            const member = members.find(m => m.id === memberId);
-            if (member) {
-                document.getElementById('oldMemberInfo').innerHTML = `<h4>📋 Current Member: ${member.fullName}</h4><p>📞 ${member.phone} | 📍 ${member.address}</p>`;
-            } else {
-                document.getElementById('oldMemberInfo').innerHTML = '';
-            }
-        }
-        
-        async function processNameTransfer() {
-            const oldMemberId = document.getElementById('oldMemberId').value;
-            const newMemberName = document.getElementById('newMemberName').value;
-            const transferDate = document.getElementById('transferDate').value;
-            const transferDoc = document.getElementById('transferDocument').files[0];
-            
-            if (!oldMemberId || !newMemberName || !transferDate) {
-                alert('Please fill required fields');
-                return;
-            }
-            
-            const oldMember = members.find(m => m.id === oldMemberId);
-            const transfer = {
-                oldMemberId: oldMemberId,
-                oldMemberName: oldMember.fullName,
-                newMemberName: newMemberName,
-                newMemberIdNumber: document.getElementById('newMemberIdNumber').value,
-                newMemberPhone: document.getElementById('newMemberPhone').value,
-                transferDate: transferDate,
-                transferFee: parseFloat(document.getElementById('transferFee').value) || 0,
-                transferReason: document.getElementById('transferReason').value,
-                transferDocument: transferDoc ? await fileToBase64(transferDoc) : null
-            };
-            
-            await apiCall('/transfers', { method: 'POST', body: JSON.stringify(transfer) });
-            
-            if (confirm('Update member name in the system?')) {
-                await apiCall(`/members/${oldMemberId}`, { method: 'PUT', body: JSON.stringify({ ...oldMember, fullName: newMemberName }) });
-                loadMembers();
-            }
-            
-            alert('✅ Name transfer recorded!');
-            document.getElementById('newMemberName').value = '';
-            document.getElementById('newMemberIdNumber').value = '';
-            document.getElementById('newMemberPhone').value = '';
-            document.getElementById('transferFee').value = '';
-            document.getElementById('transferReason').value = '';
-            document.getElementById('transferDocument').value = '';
-            document.getElementById('transferDocPreview').innerHTML = '';
-            loadTransfers();
-        }
-        
-        async function loadTransfers() {
-            transfers = await apiCall('/transfers');
-            const container = document.getElementById('transferHistoryList');
-            if (!transfers.length) { container.innerHTML = '<p>No transfers yet</p>'; return; }
-            container.innerHTML = `<h3>Transfer History</h3>${transfers.map(t => `
-                <div class="member-card">📅 ${new Date(t.transferDate).toLocaleDateString()} | From: ${t.oldMemberName} → To: ${t.newMemberName}</div>
+            const sales = await apiCall('/sales');
+            if (!sales.length) { document.getElementById('salesHistory').innerHTML = '<p>No sales yet</p>'; return; }
+            document.getElementById('salesHistory').innerHTML = `<h3>Recent Sales</h3>${sales.slice(0, 20).map(s => `
+                <div class="member-card">📅 ${new Date(s.date).toLocaleDateString()} | ${s.quantity} kg | ${s.totalAmount} ETB</div>
             `).join('')}`;
         }
         
         async function searchMembers() {
             const term = document.getElementById('searchTerm').value;
             if (!term) { document.getElementById('searchResults').innerHTML = ''; return; }
-            const results = members.filter(m => m.fullName.toLowerCase().includes(term.toLowerCase()) || m.phone.includes(term));
-            document.getElementById('searchResults').innerHTML = results.map(m => `
-                <div class="member-card"><strong>👤 ${escapeHtml(m.fullName)}</strong><br>📞 ${escapeHtml(m.phone)}<br>📍 ${escapeHtml(m.address)}<br>👔 ${escapeHtml(m.role)}</div>
+            const members = await apiCall(`/members/search/${term}`);
+            document.getElementById('searchResults').innerHTML = members.map(m => `
+                <div class="member-card"><strong>${m.fullName}</strong><br>📞 ${m.phone}<br>📍 ${m.address}</div>
             `).join('');
         }
         
@@ -388,24 +230,19 @@
             event.target.classList.add('active');
             if (tab === 'list') loadMembers();
             if (tab === 'sales') loadSalesHistory();
-            if (tab === 'transfer') loadTransfers();
         }
         
         function logout() { localStorage.clear(); window.location.href = '/'; }
         
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; }); }
-        
         document.getElementById('quantity')?.addEventListener('input', calculateTotal);
         document.getElementById('pricePerKg')?.addEventListener('input', calculateTotal);
         document.getElementById('saleDate').valueAsDate = new Date();
-        document.getElementById('transferDate').valueAsDate = new Date();
         
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        document.getElementById('userName').innerHTML = `👤 ${escapeHtml(user.fullName) || 'User'}`;
+        document.getElementById('userName').innerHTML = `👤 ${user.fullName || 'User'}`;
         
         loadMembers();
         loadSalesHistory();
-        loadTransfers();
     </script>
 </body>
 </html>
