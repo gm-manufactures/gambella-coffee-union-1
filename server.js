@@ -79,27 +79,6 @@ function writeTransfers(transfers) {
     fs.writeFileSync(TRANSFERS_FILE, JSON.stringify(transfers, null, 2));
 }
 
-// Generate random password
-function generateRandomPassword() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
-    let password = '';
-    for (let i = 0; i < 8; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-}
-
-// Generate username from full name
-function generateUsername(fullName, phone) {
-    // Remove special characters and spaces
-    let base = fullName.toLowerCase().replace(/[^a-z]/g, '');
-    // Take first 6 characters
-    base = base.substring(0, 6);
-    // Add last 4 digits of phone number
-    const phoneSuffix = phone.slice(-4);
-    return `${base}${phoneSuffix}`;
-}
-
 // ==================== CREATE DEFAULT ADMIN ====================
 
 const createDefaultAdmin = async () => {
@@ -115,7 +94,6 @@ const createDefaultAdmin = async () => {
             password: hashedPassword,
             fullName: 'System Administrator',
             role: 'admin',
-            memberId: null,
             isActive: true,
             createdAt: new Date().toISOString()
         };
@@ -124,6 +102,8 @@ const createDefaultAdmin = async () => {
         console.log('✅ Default admin created!');
         console.log('   Username: admin');
         console.log('   Password: Admin123!');
+    } else {
+        console.log('✅ Admin user already exists');
     }
 };
 
@@ -143,71 +123,11 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// Member only middleware (for member portal)
-const memberOnlyMiddleware = (req, res, next) => {
-    if (req.user.role !== 'member' && req.user.role !== 'admin') {
-        return res.status(403).json({ message: 'Access denied. Members only.' });
-    }
-    next();
-};
-
 // ==================== AUTH ROUTES ====================
 
-// Member Login
-app.post('/api/auth/member-login', async (req, res) => {
-    console.log('Member login attempt:', req.body.username);
-    try {
-        const { username, password } = req.body;
-        
-        if (!username || !password) {
-            return res.status(400).json({ message: 'Username and password required' });
-        }
-        
-        const users = readUsers();
-        const user = users.find(u => u.username === username && u.role === 'member');
-        
-        if (!user) {
-            console.log('Member not found:', username);
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-        
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            console.log('Password incorrect for:', username);
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-        
-        if (!user.isActive) {
-            return res.status(401).json({ message: 'Account is disabled' });
-        }
-        
-        const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role, memberId: user.memberId },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        );
-        
-        console.log('Member login successful:', username);
-        res.json({
-            success: true,
-            token,
-            user: {
-                id: user.id,
-                username: user.username,
-                fullName: user.fullName,
-                role: user.role,
-                memberId: user.memberId
-            }
-        });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-// Admin Login
+// Login
 app.post('/api/auth/login', async (req, res) => {
-    console.log('Admin login attempt:', req.body.username);
+    console.log('Login attempt:', req.body.username);
     try {
         const { username, password } = req.body;
         
@@ -216,10 +136,10 @@ app.post('/api/auth/login', async (req, res) => {
         }
         
         const users = readUsers();
-        const user = users.find(u => u.username === username && u.role === 'admin');
+        const user = users.find(u => u.username === username);
         
         if (!user) {
-            console.log('Admin not found:', username);
+            console.log('User not found:', username);
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         
@@ -234,18 +154,19 @@ app.post('/api/auth/login', async (req, res) => {
         }
         
         const token = jwt.sign(
-            { id: user.id, username: user.username, role: user.role, memberId: user.memberId },
+            { id: user.id, username: user.username, role: user.role },
             JWT_SECRET,
             { expiresIn: '30d' }
         );
         
-        console.log('Admin login successful:', username);
+        console.log('Login successful:', username);
         res.json({
             success: true,
             token,
             user: {
                 id: user.id,
                 username: user.username,
+                email: user.email,
                 fullName: user.fullName,
                 role: user.role
             }
@@ -271,73 +192,156 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
     }
 });
 
-// ==================== MEMBER ROUTES ====================
-
-// Register Member (creates both member record and user account)
-app.post('/api/members/register', async (req, res) => {
+// Update user profile
+app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
     try {
-        const members = readMembers();
+        const { oldPassword, fullName, username, email, newPassword } = req.body;
         const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === req.user.id);
         
-        // Check if phone number already exists
-        if (members.find(m => m.phone === req.body.phone)) {
-            return res.status(400).json({ message: 'Phone number already registered' });
+        if (userIndex === -1) {
+            return res.status(404).json({ message: 'User not found' });
         }
         
-        // Create member record
-        const newMember = {
-            id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            ...req.body,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        members.push(newMember);
-        writeMembers(members);
+        const user = users[userIndex];
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
         
-        // Generate username and password for member
-        const username = generateUsername(newMember.fullName, newMember.phone);
-        const plainPassword = generateRandomPassword();
-        const hashedPassword = await bcrypt.hash(plainPassword, 10);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
         
-        // Create user account for member
-        const newUser = {
-            id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-            username: username,
-            email: newMember.phone + '@member.gambellacoffee.com',
-            password: hashedPassword,
-            fullName: newMember.fullName,
-            role: 'member',
-            memberId: newMember.id,
-            isActive: true,
-            createdAt: new Date().toISOString()
-        };
-        users.push(newUser);
-        writeUsers(users);
-        
-        res.status(201).json({
-            success: true,
-            message: 'Member registered successfully',
-            member: newMember,
-            credentials: {
-                username: username,
-                password: plainPassword
+        if (fullName) user.fullName = fullName;
+        if (username) {
+            // Check if username is taken
+            const usernameExists = users.find(u => u.username === username && u.id !== user.id);
+            if (usernameExists) {
+                return res.status(400).json({ message: 'Username already taken' });
             }
-        });
+            user.username = username;
+        }
+        if (email) user.email = email;
+        if (newPassword && newPassword.length >= 6) {
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+        
+        writeUsers(users);
+        res.json({ success: true, message: 'Profile updated successfully' });
     } catch (error) {
-        console.error('Registration error:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Get all members (admin only)
-app.get('/api/members', authMiddleware, async (req, res) => {
+// Get all users (admin only)
+app.get('/api/auth/users', authMiddleware, async (req, res) => {
     try {
-        // Members can only see count, not the list
-        if (req.user.role === 'member') {
-            const members = readMembers();
-            return res.json({ count: members.length, members: [] });
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        const users = readUsers();
+        const usersWithoutPassword = users.map(({ password, ...rest }) => rest);
+        res.json(usersWithoutPassword);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Create new user (admin only)
+app.post('/api/auth/register', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
         }
         
+        const { username, email, password, fullName, role } = req.body;
+        
+        if (!username || !email || !password || !fullName) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+        
+        const users = readUsers();
+        
+        if (users.find(u => u.username === username)) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+        
+        if (users.find(u => u.email === email)) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = {
+            id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            username,
+            email,
+            password: hashedPassword,
+            fullName,
+            role: role || 'staff',
+            isActive: true,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        writeUsers(users);
+        
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.json({ success: true, message: 'User created successfully', user: userWithoutPassword });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete user (admin only)
+app.delete('/api/auth/users/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        if (req.params.id === req.user.id) {
+            return res.status(400).json({ message: 'Cannot delete your own account' });
+        }
+        
+        let users = readUsers();
+        users = users.filter(u => u.id !== req.params.id);
+        writeUsers(users);
+        res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Reset user password (admin only)
+app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        const { newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
+        
+        const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === req.params.id);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        users[userIndex].password = await bcrypt.hash(newPassword, 10);
+        writeUsers(users);
+        res.json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== MEMBER ROUTES ====================
+
+// Get all members
+app.get('/api/members', authMiddleware, (req, res) => {
+    try {
         const members = readMembers();
         res.json(members);
     } catch (error) {
@@ -345,65 +349,42 @@ app.get('/api/members', authMiddleware, async (req, res) => {
     }
 });
 
-// Get member count (accessible by members)
-app.get('/api/members/count', authMiddleware, async (req, res) => {
-    try {
-        const members = readMembers();
-        res.json({ count: members.length });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// Get single member (members can only see their own profile)
+// Get single member
 app.get('/api/members/:id', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
         const member = members.find(m => m.id === req.params.id);
-        
         if (!member) {
             return res.status(404).json({ message: 'Member not found' });
         }
-        
-        // Check if member is accessing their own profile
-        if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
-            return res.status(403).json({ message: 'Access denied. You can only view your own profile.' });
-        }
-        
         res.json(member);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Get member by user ID (for member portal)
-app.get('/api/members/profile/my', authMiddleware, (req, res) => {
+// Create member
+app.post('/api/members', authMiddleware, async (req, res) => {
     try {
-        if (req.user.role !== 'member' || !req.user.memberId) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
-        
         const members = readMembers();
-        const member = members.find(m => m.id === req.user.memberId);
-        
-        if (!member) {
-            return res.status(404).json({ message: 'Member not found' });
-        }
-        
-        res.json(member);
+        const newMember = {
+            id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            ...req.body,
+            createdBy: req.user.id,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        members.push(newMember);
+        writeMembers(members);
+        res.status(201).json(newMember);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error: ' + error.message });
     }
 });
 
-// Update member (admin only - members cannot edit)
+// Update member
 app.put('/api/members/:id', authMiddleware, (req, res) => {
     try {
-        // Members cannot edit profiles
-        if (req.user.role === 'member') {
-            return res.status(403).json({ message: 'Access denied. Members cannot edit profiles.' });
-        }
-        
         const members = readMembers();
         const index = members.findIndex(m => m.id === req.params.id);
         if (index === -1) {
@@ -417,35 +398,21 @@ app.put('/api/members/:id', authMiddleware, (req, res) => {
     }
 });
 
-// Delete member (admin only)
+// Delete member
 app.delete('/api/members/:id', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         let members = readMembers();
         members = members.filter(m => m.id !== req.params.id);
         writeMembers(members);
-        
-        // Also delete associated user account
-        let users = readUsers();
-        users = users.filter(u => u.memberId !== req.params.id);
-        writeUsers(users);
-        
         res.json({ message: 'Member deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Search members (admin only)
+// Search members
 app.get('/api/members/search/:query', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         const members = readMembers();
         const query = req.params.query.toLowerCase();
         const filtered = members.filter(m => 
@@ -461,13 +428,9 @@ app.get('/api/members/search/:query', authMiddleware, (req, res) => {
 
 // ==================== SALE ROUTES ====================
 
-// Get all sales (admin only)
+// Get all sales
 app.get('/api/sales', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         const sales = readSales();
         const members = readMembers();
         const salesWithMember = sales.map(sale => ({
@@ -480,16 +443,10 @@ app.get('/api/sales', authMiddleware, (req, res) => {
     }
 });
 
-// Get sales by member (members can see their own sales)
+// Get sales by member
 app.get('/api/sales/member/:memberId', authMiddleware, (req, res) => {
     try {
         const sales = readSales();
-        
-        // Check if member is accessing their own sales
-        if (req.user.role === 'member' && req.user.memberId !== req.params.memberId) {
-            return res.status(403).json({ message: 'Access denied. You can only view your own sales.' });
-        }
-        
         const memberSales = sales.filter(s => s.memberId === req.params.memberId);
         res.json(memberSales);
     } catch (error) {
@@ -497,13 +454,9 @@ app.get('/api/sales/member/:memberId', authMiddleware, (req, res) => {
     }
 });
 
-// Create sale (admin only)
+// Create sale
 app.post('/api/sales', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         const sales = readSales();
         const newSale = {
             id: 'sale_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -519,13 +472,9 @@ app.post('/api/sales', authMiddleware, (req, res) => {
     }
 });
 
-// Delete sale (admin only)
+// Delete sale
 app.delete('/api/sales/:id', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         let sales = readSales();
         sales = sales.filter(s => s.id !== req.params.id);
         writeSales(sales);
@@ -535,14 +484,11 @@ app.delete('/api/sales/:id', authMiddleware, (req, res) => {
     }
 });
 
-// ==================== TRANSFER ROUTES (Admin only) ====================
+// ==================== TRANSFER ROUTES ====================
 
+// Get all transfers
 app.get('/api/transfers', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         const transfers = readTransfers();
         res.json(transfers);
     } catch (error) {
@@ -550,12 +496,9 @@ app.get('/api/transfers', authMiddleware, (req, res) => {
     }
 });
 
+// Create transfer
 app.post('/api/transfers', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         const transfers = readTransfers();
         const newTransfer = {
             id: 'transfer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -572,12 +515,9 @@ app.post('/api/transfers', authMiddleware, (req, res) => {
     }
 });
 
+// Delete transfer
 app.delete('/api/transfers/:id', authMiddleware, (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Admin only.' });
-        }
-        
         let transfers = readTransfers();
         transfers = transfers.filter(t => t.id !== req.params.id);
         writeTransfers(transfers);
@@ -619,10 +559,6 @@ app.get('/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-app.get('/member-portal.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'member-portal.html'));
-});
-
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -634,8 +570,7 @@ const PORT = process.env.PORT || 10000;
 createDefaultAdmin().then(() => {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Server running on port ${PORT}`);
-        console.log(`📱 Admin Login: http://localhost:${PORT}`);
-        console.log(`👤 Admin: admin / Admin123!`);
-        console.log(`📱 Member Portal: http://localhost:${PORT}/member-portal.html`);
+        console.log(`📱 Login at: http://localhost:${PORT}`);
+        console.log(`👤 Default: admin / Admin123!`);
     });
 });
