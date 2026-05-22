@@ -1,0 +1,4 @@
+cp /path/to/your/logo.jpg gambella-coffee-union/
+git add logo.jpg
+git commit -m "Add union logo"
+git push
