@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gambella Coffee Union</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e,#2d5a1a);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-container{max-width:450px;width:100%;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden}
+        .login-header{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:30px;text-align:center}
+        .logo{width:80px;height:80px;background:#f5c542;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:45px;margin:0 auto 15px;border:3px solid #ffd700}
+        .login-form{padding:30px}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;font-weight:bold}
+        .form-group input{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:14px}
+        .form-group input:focus{outline:none;border-color:#2d6a1a}
+        .btn-login{width:100%;padding:12px;background:#2d6a1a;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer}
+        .btn-login:hover{background:#1a4a0e}
+        .error-message{background:#f8d7da;color:#721c24;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
+        .demo-info{background:#e8f5e9;padding:15px;border-radius:8px;margin-top:20px;font-size:0.85em}
+        .demo-info strong{color:#2d6a1a}
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">🌿☕</div>
+            <h2>Gambella Majang Forest Coffee</h2>
+            <p>Producer & Exporter Union</p>
+        </div>
+        <div class="login-form">
+            <div id="errorMessage" class="error-message"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn-login"> Login</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/dashboard.html';
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Make sure server is running.';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
