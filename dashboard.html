@@ -709,6 +709,11 @@
             loadMembers();
             showTab('list');
         });
+        // After successful registration, show credentials
+const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
+if (result.credentials) {
+    alert(`✅ አባል በሚገባ ተመዝግቧል!\n\nየአባሉ መግቢያ መረጃ:\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}\n\nእባክዎ ይህን መረጃ ለአባሉ ያሳውቁ።`);
+}
         
         // Sales functions
         function searchMemberForSales() {
