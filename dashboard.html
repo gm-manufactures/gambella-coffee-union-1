@@ -52,13 +52,19 @@
         
         .member-card,.sale-card,.transfer-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
         .member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
-        .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px}
+        .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
         .member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
         .member-role{background:#2d6a1a;color:white;padding:5px 10px;border-radius:5px;font-size:0.85em}
-        .member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
-        .detail-item{display:flex;gap:10px}
-        .detail-label{font-weight:bold;color:#555}
+        .member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
+        .detail-item{display:flex;gap:10px;flex-wrap:wrap}
+        .detail-label{font-weight:bold;color:#555;min-width:180px}
         .member-actions{margin-top:15px;display:flex;gap:10px}
+        
+        /* Payment Status Badge */
+        .payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
+        .status-paid{background:#d4edda;color:#155724}
+        .status-partial{background:#fff3cd;color:#856404}
+        .status-pending{background:#f8d7da;color:#721c24}
         
         /* Sales Stats */
         .sales-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px}
@@ -82,7 +88,6 @@
 <body>
     <nav class="navbar">
         <div class="logo-area">
-            <!-- Your Logo Image - Save as "logo.jpg" in the same folder -->
             <img src="logo.jpg" alt="Union Logo" class="union-logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f5c542%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23333%22%3E🌿%3C/text%3E%3C/svg%3E';">
             <div class="logo-text">
                 <h3>የጋምቤላ ማጃንግ የጫካ ቡና</h3>
@@ -126,7 +131,7 @@
                     <div class="form-group"><label>የአባሉ አድራሻ *</label><textarea id="address" rows="2" required></textarea></div>
                     <div class="form-row">
                         <div class="form-group"><label>ስልክ ቁጥር *</label><input type="tel" id="phone" required></div>
-                        <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
+                        <div class="form-group"><label>የታክስ ተመዝጋቢ ቁጥር (TIN)</label><input type="text" id="taxId"></div>
                     </div>
                     <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት/ የስራ ድርሻ *</label><input type="text" id="role" required></div>
                     
@@ -135,6 +140,24 @@
                         <div class="form-group"><label>📊 የአክሲዬን ብዛት (Number of Shares)</label><input type="number" id="shareCount" step="1" min="0" value="0"></div>
                         <div class="form-group"><label>📈 የአክሲዬን ድርሻ በ% (Share Percentage)</label><input type="number" id="sharePercentage" step="0.01" min="0" max="100" value="0"></div>
                     </div>
+                    
+                    <!-- NEW: Financial Fields -->
+                    <h4>💰 የአክሲዬን ክፍያ መረጃ</h4>
+                    <div class="form-row">
+                        <div class="form-group"><label>💵 የአንድ አክሲዬን ዋጋ የተከፈለ (ብር)</label><input type="number" id="sharePricePaid" step="0.01" min="0" value="0"></div>
+                        <div class="form-group"><label>💰 ቀሪ ገንዘብ (ብር)</label><input type="number" id="remainingBalance" step="0.01" min="0" value="0" readonly style="background:#e9ecef"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>📋 የክፍያ ሁኔታ</label>
+                            <select id="paymentStatus">
+                                <option value="ተከፍሏል">✅ ተከፍሏል (Paid)</option>
+                                <option value="በከፊል ተከፍሏል">⚠️ በከፊል ተከፍሏል (Partial)</option>
+                                <option value="አልተከፈለም">❌ አልተከፈለም (Pending)</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>🏦 የባንክ ሂሳብ ቁጥር (ለትርፍ ክፍፍል)</label><input type="text" id="bankAccountNumber" placeholder="Bank Account Number"></div>
+                    </div>
+                    <div class="form-group"><label>📝 ማስታወሻ (Notes)</label><textarea id="financialNotes" rows="2" placeholder="ተጨማሪ መረጃ..."></textarea></div>
                     
                     <div class="form-group"><label>📸 የአባሉ ፎቶ</label><input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this,'memberPhotoPreview')"><div id="memberPhotoPreview" class="image-preview"></div></div>
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
@@ -316,6 +339,33 @@
             document.getElementById('lightbox').style.display = 'none';
         }
         
+        // Calculate remaining balance
+        function calculateRemainingBalance() {
+            const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+            // Assuming each share costs 1000 ETB (you can change this value)
+            const TOTAL_SHARE_VALUE = 1000;
+            const totalSharesValue = shareCount * TOTAL_SHARE_VALUE;
+            const remaining = totalSharesValue - sharePricePaid;
+            document.getElementById('remainingBalance').value = remaining > 0 ? remaining.toFixed(2) : '0.00';
+            
+            // Auto-update payment status based on remaining balance
+            if (remaining <= 0) {
+                document.getElementById('paymentStatus').value = 'ተከፍሏል';
+            } else if (sharePricePaid > 0 && remaining > 0) {
+                document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
+            } else {
+                document.getElementById('paymentStatus').value = 'አልተከፈለም';
+            }
+        }
+        
+        // Get payment status badge class
+        function getPaymentStatusClass(status) {
+            if (status === 'ተከፍሏል') return 'status-paid';
+            if (status === 'በከፊል ተከፍሏል') return 'status-partial';
+            return 'status-pending';
+        }
+        
         // Load all members
         async function loadMembers() {
             members = await apiCall('/members');
@@ -337,6 +387,7 @@
                             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="openLightbox('${m.memberPhoto}')">` : '👤'}
                             ${escapeHtml(m.fullName)}
                             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን | ${m.sharePercentage || 0}%</span>` : ''}
+                            <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
                         </div>
                         <div class="member-role">${escapeHtml(m.role)}</div>
                     </div>
@@ -348,6 +399,10 @@
                         <div class="detail-item"><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
                         ${m.shareCount ? `<div class="detail-item"><span class="detail-label">📊 አክሲዬን ብዛት:</span> ${m.shareCount}</div>` : ''}
                         ${m.sharePercentage ? `<div class="detail-item"><span class="detail-label">📈 የአክሲዬን ድርሻ:</span> ${m.sharePercentage}%</div>` : ''}
+                        ${m.sharePricePaid ? `<div class="detail-item"><span class="detail-label">💵 የተከፈለ:</span> ${parseFloat(m.sharePricePaid).toFixed(2)} ብር</div>` : ''}
+                        ${m.remainingBalance ? `<div class="detail-item"><span class="detail-label">💰 ቀሪ ገንዘብ:</span> ${parseFloat(m.remainingBalance).toFixed(2)} ብር</div>` : ''}
+                        ${m.bankAccountNumber ? `<div class="detail-item"><span class="detail-label">🏦 ባንክ ሂሳብ:</span> ${escapeHtml(m.bankAccountNumber)}</div>` : ''}
+                        ${m.financialNotes ? `<div class="detail-item"><span class="detail-label">📝 ማስታወሻ:</span> ${escapeHtml(m.financialNotes)}</div>` : ''}
                         ${m.beneficiaryName ? `<div class="detail-item"><span class="detail-label">👨‍👦 ወራሽ:</span> ${escapeHtml(m.beneficiaryName)}</div>` : ''}
                         ${m.legalRepName ? `<div class="detail-item"><span class="detail-label">⚖️ ተወካይ:</span> ${escapeHtml(m.legalRepName)}</div>` : ''}
                     </div>
@@ -385,6 +440,11 @@
             const repTaxDoc = document.getElementById('repTaxDoc').files[0];
             const hardCopyForm = document.getElementById('hardCopyForm').files[0];
             
+            const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+            const TOTAL_SHARE_VALUE = 1000;
+            const remainingBalance = (shareCount * TOTAL_SHARE_VALUE) - sharePricePaid;
+            
             const member = {
                 fullName: document.getElementById('fullName').value,
                 gender: document.getElementById('gender').value,
@@ -396,8 +456,13 @@
                 phone: document.getElementById('phone').value,
                 taxId: document.getElementById('taxId').value,
                 role: document.getElementById('role').value,
-                shareCount: parseInt(document.getElementById('shareCount').value) || 0,
+                shareCount: shareCount,
                 sharePercentage: parseFloat(document.getElementById('sharePercentage').value) || 0,
+                sharePricePaid: sharePricePaid,
+                remainingBalance: remainingBalance > 0 ? remainingBalance : 0,
+                paymentStatus: document.getElementById('paymentStatus').value,
+                bankAccountNumber: document.getElementById('bankAccountNumber').value,
+                financialNotes: document.getElementById('financialNotes').value,
                 beneficiaryName: document.getElementById('beneficiaryName').value,
                 beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
                 legalRepName: document.getElementById('legalRepName').value,
@@ -418,6 +483,8 @@
             document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             document.getElementById('shareCount').value = '0';
             document.getElementById('sharePercentage').value = '0';
+            document.getElementById('sharePricePaid').value = '0';
+            document.getElementById('remainingBalance').value = '0';
             loadMembers();
             showTab('list');
         });
@@ -445,6 +512,7 @@
                     <h4>✅ ${escapeHtml(member.fullName)}</h4>
                     <p>📞 ${member.phone} | 📍 ${member.role}</p>
                     ${member.shareCount ? `<p>📊 ${member.shareCount} አክሲዬን (${member.sharePercentage || 0}% ድርሻ)</p>` : ''}
+                    ${member.sharePricePaid ? `<p>💰 የተከፈለ: ${parseFloat(member.sharePricePaid).toFixed(2)} ብር | ቀሪ: ${parseFloat(member.remainingBalance || 0).toFixed(2)} ብር</p>` : ''}
                 `;
             }
             
@@ -547,6 +615,7 @@
                     <h4>📋 ${escapeHtml(member.fullName)}</h4>
                     <p>📞 ${member.phone} | 📍 ${member.address}<br>👔 ${member.role}</p>
                     ${member.shareCount ? `<p>📊 ${member.shareCount} አክሲዬን (${member.sharePercentage || 0}% ድርሻ)</p>` : ''}
+                    ${member.sharePricePaid ? `<p>💰 የተከፈለ: ${parseFloat(member.sharePricePaid).toFixed(2)} ብር | ቀሪ: ${parseFloat(member.remainingBalance || 0).toFixed(2)} ብር</p>` : ''}
                 `;
             } else {
                 document.getElementById('oldMemberInfo').innerHTML = '';
@@ -641,6 +710,7 @@
                         <div><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
                         <div><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
                         ${m.shareCount ? `<div><span class="detail-label">📊 አክሲዬን:</span> ${m.shareCount} (${m.sharePercentage}%)</div>` : ''}
+                        ${m.paymentStatus ? `<div><span class="detail-label">💰 ክፍያ ሁኔታ:</span> ${m.paymentStatus}</div>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -654,8 +724,13 @@
         // Export to CSV
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'ወራሽ', 'ተወካይ'];
-            const rows = members.map(m => [m.fullName, m.gender, m.age, m.motherName, m.address, m.phone, m.role, m.shareCount || 0, m.sharePercentage || 0, m.beneficiaryName || '', m.legalRepName || '']);
+            const headers = ['ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ (ብር)', 'ቀሪ ገንዘብ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'ወራሽ', 'ተወካይ', 'ማስታወሻ'];
+            const rows = members.map(m => [
+                m.fullName, m.gender, m.age, m.motherName, m.address, m.phone, m.role, 
+                m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0,
+                m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.legalRepName || '',
+                m.financialNotes || ''
+            ]);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement('a');
@@ -684,6 +759,10 @@
         document.getElementById('saleDate').valueAsDate = new Date();
         document.getElementById('transferDate').valueAsDate = new Date();
         
+        // Share calculation event listeners
+        document.getElementById('shareCount')?.addEventListener('input', calculateRemainingBalance);
+        document.getElementById('sharePricePaid')?.addEventListener('input', calculateRemainingBalance);
+        
         // Load user info
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         document.getElementById('userName').innerHTML = `👤 ${escapeHtml(user.fullName) || 'User'}`;
@@ -709,6 +788,7 @@
         window.closeLightbox = closeLightbox;
         window.previewImage = previewImage;
         window.logout = logout;
+        window.calculateRemainingBalance = calculateRemainingBalance;
     </script>
 </body>
 </html>
