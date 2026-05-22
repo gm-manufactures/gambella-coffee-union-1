@@ -18,16 +18,15 @@ const JWT_SECRET = 'gambella-secret-key-2024';
 
 // ==================== FILE STORAGE SETUP ====================
 
-// Data directory
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR);
 }
 
-// File paths
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const MEMBERS_FILE = path.join(DATA_DIR, 'members.json');
 const SALES_FILE = path.join(DATA_DIR, 'sales.json');
+const TRANSFERS_FILE = path.join(DATA_DIR, 'transfers.json');
 
 // Initialize data files
 if (!fs.existsSync(USERS_FILE)) {
@@ -39,8 +38,11 @@ if (!fs.existsSync(MEMBERS_FILE)) {
 if (!fs.existsSync(SALES_FILE)) {
     fs.writeFileSync(SALES_FILE, JSON.stringify([]));
 }
+if (!fs.existsSync(TRANSFERS_FILE)) {
+    fs.writeFileSync(TRANSFERS_FILE, JSON.stringify([]));
+}
 
-// Helper functions to read/write data
+// Helper functions
 function readUsers() {
     const data = fs.readFileSync(USERS_FILE);
     return JSON.parse(data);
@@ -66,6 +68,15 @@ function readSales() {
 
 function writeSales(sales) {
     fs.writeFileSync(SALES_FILE, JSON.stringify(sales, null, 2));
+}
+
+function readTransfers() {
+    const data = fs.readFileSync(TRANSFERS_FILE);
+    return JSON.parse(data);
+}
+
+function writeTransfers(transfers) {
+    fs.writeFileSync(TRANSFERS_FILE, JSON.stringify(transfers, null, 2));
 }
 
 // ==================== CREATE DEFAULT ADMIN ====================
@@ -96,7 +107,7 @@ const createDefaultAdmin = async () => {
     }
 };
 
-// ==================== MIDDLEWARE ====================
+// ==================== AUTH MIDDLEWARE ====================
 
 const authMiddleware = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -112,9 +123,9 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// ==================== API ROUTES ====================
+// ==================== AUTH ROUTES ====================
 
-// LOGIN ROUTE
+// Login
 app.post('/api/auth/login', async (req, res) => {
     console.log('Login attempt:', req.body.username);
     try {
@@ -136,6 +147,10 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) {
             console.log('Password incorrect for:', username);
             return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        
+        if (!user.isActive) {
+            return res.status(401).json({ message: 'Account is disabled' });
         }
         
         const token = jwt.sign(
@@ -162,7 +177,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// GET CURRENT USER
+// Get current user
 app.get('/api/auth/me', authMiddleware, (req, res) => {
     try {
         const users = readUsers();
@@ -177,7 +192,154 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
     }
 });
 
-// GET ALL MEMBERS
+// Update user profile
+app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
+    try {
+        const { oldPassword, fullName, username, email, newPassword } = req.body;
+        const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === req.user.id);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        const user = users[userIndex];
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+        
+        if (fullName) user.fullName = fullName;
+        if (username) {
+            // Check if username is taken
+            const usernameExists = users.find(u => u.username === username && u.id !== user.id);
+            if (usernameExists) {
+                return res.status(400).json({ message: 'Username already taken' });
+            }
+            user.username = username;
+        }
+        if (email) user.email = email;
+        if (newPassword && newPassword.length >= 6) {
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+        
+        writeUsers(users);
+        res.json({ success: true, message: 'Profile updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get all users (admin only)
+app.get('/api/auth/users', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        const users = readUsers();
+        const usersWithoutPassword = users.map(({ password, ...rest }) => rest);
+        res.json(usersWithoutPassword);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Create new user (admin only)
+app.post('/api/auth/register', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        const { username, email, password, fullName, role } = req.body;
+        
+        if (!username || !email || !password || !fullName) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+        
+        const users = readUsers();
+        
+        if (users.find(u => u.username === username)) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+        
+        if (users.find(u => u.email === email)) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = {
+            id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            username,
+            email,
+            password: hashedPassword,
+            fullName,
+            role: role || 'staff',
+            isActive: true,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        writeUsers(users);
+        
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.json({ success: true, message: 'User created successfully', user: userWithoutPassword });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete user (admin only)
+app.delete('/api/auth/users/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        if (req.params.id === req.user.id) {
+            return res.status(400).json({ message: 'Cannot delete your own account' });
+        }
+        
+        let users = readUsers();
+        users = users.filter(u => u.id !== req.params.id);
+        writeUsers(users);
+        res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Reset user password (admin only)
+app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        const { newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
+        
+        const users = readUsers();
+        const userIndex = users.findIndex(u => u.id === req.params.id);
+        
+        if (userIndex === -1) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        users[userIndex].password = await bcrypt.hash(newPassword, 10);
+        writeUsers(users);
+        res.json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== MEMBER ROUTES ====================
+
+// Get all members
 app.get('/api/members', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
@@ -187,7 +349,7 @@ app.get('/api/members', authMiddleware, (req, res) => {
     }
 });
 
-// GET SINGLE MEMBER
+// Get single member
 app.get('/api/members/:id', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
@@ -201,7 +363,7 @@ app.get('/api/members/:id', authMiddleware, (req, res) => {
     }
 });
 
-// CREATE MEMBER
+// Create member
 app.post('/api/members', authMiddleware, async (req, res) => {
     try {
         const members = readMembers();
@@ -209,7 +371,8 @@ app.post('/api/members', authMiddleware, async (req, res) => {
             id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
             ...req.body,
             createdBy: req.user.id,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
         members.push(newMember);
         writeMembers(members);
@@ -219,7 +382,7 @@ app.post('/api/members', authMiddleware, async (req, res) => {
     }
 });
 
-// UPDATE MEMBER
+// Update member
 app.put('/api/members/:id', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
@@ -235,26 +398,27 @@ app.put('/api/members/:id', authMiddleware, (req, res) => {
     }
 });
 
-// DELETE MEMBER
+// Delete member
 app.delete('/api/members/:id', authMiddleware, (req, res) => {
     try {
         let members = readMembers();
         members = members.filter(m => m.id !== req.params.id);
         writeMembers(members);
-        res.json({ message: 'Member deleted' });
+        res.json({ message: 'Member deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// SEARCH MEMBERS
+// Search members
 app.get('/api/members/search/:query', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
         const query = req.params.query.toLowerCase();
         const filtered = members.filter(m => 
             m.fullName.toLowerCase().includes(query) || 
-            m.phone.includes(query)
+            m.phone.includes(query) ||
+            (m.role && m.role.toLowerCase().includes(query))
         );
         res.json(filtered);
     } catch (error) {
@@ -262,14 +426,15 @@ app.get('/api/members/search/:query', authMiddleware, (req, res) => {
     }
 });
 
-// GET ALL SALES
+// ==================== SALE ROUTES ====================
+
+// Get all sales
 app.get('/api/sales', authMiddleware, (req, res) => {
     try {
         const sales = readSales();
         const members = readMembers();
         const salesWithMember = sales.map(sale => ({
             ...sale,
-            memberId: sale.memberId,
             member: members.find(m => m.id === sale.memberId)
         }));
         res.json(salesWithMember);
@@ -278,7 +443,7 @@ app.get('/api/sales', authMiddleware, (req, res) => {
     }
 });
 
-// GET SALES BY MEMBER
+// Get sales by member
 app.get('/api/sales/member/:memberId', authMiddleware, (req, res) => {
     try {
         const sales = readSales();
@@ -289,7 +454,7 @@ app.get('/api/sales/member/:memberId', authMiddleware, (req, res) => {
     }
 });
 
-// CREATE SALE
+// Create sale
 app.post('/api/sales', authMiddleware, (req, res) => {
     try {
         const sales = readSales();
@@ -307,19 +472,63 @@ app.post('/api/sales', authMiddleware, (req, res) => {
     }
 });
 
-// DELETE SALE
+// Delete sale
 app.delete('/api/sales/:id', authMiddleware, (req, res) => {
     try {
         let sales = readSales();
         sales = sales.filter(s => s.id !== req.params.id);
         writeSales(sales);
-        res.json({ message: 'Sale deleted' });
+        res.json({ message: 'Sale deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// GET STATISTICS
+// ==================== TRANSFER ROUTES ====================
+
+// Get all transfers
+app.get('/api/transfers', authMiddleware, (req, res) => {
+    try {
+        const transfers = readTransfers();
+        res.json(transfers);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Create transfer
+app.post('/api/transfers', authMiddleware, (req, res) => {
+    try {
+        const transfers = readTransfers();
+        const newTransfer = {
+            id: 'transfer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            ...req.body,
+            processedBy: req.user.id,
+            createdAt: new Date().toISOString(),
+            status: 'completed'
+        };
+        transfers.push(newTransfer);
+        writeTransfers(transfers);
+        res.status(201).json(newTransfer);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete transfer
+app.delete('/api/transfers/:id', authMiddleware, (req, res) => {
+    try {
+        let transfers = readTransfers();
+        transfers = transfers.filter(t => t.id !== req.params.id);
+        writeTransfers(transfers);
+        res.json({ message: 'Transfer deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== STATISTICS ROUTE ====================
+
 app.get('/api/stats', authMiddleware, (req, res) => {
     try {
         const members = readMembers();
@@ -358,7 +567,6 @@ app.get('/health', (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 
-// Create default admin before starting
 createDefaultAdmin().then(() => {
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Server running on port ${PORT}`);
