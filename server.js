@@ -1,8 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
@@ -11,73 +11,90 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-// Serve static files
 app.use(express.static(__dirname));
 
-// JWT Secret - Use environment variable or fallback
-const JWT_SECRET = process.env.JWT_SECRET || 'gambella-secret-key-2024';
+// JWT Secret
+const JWT_SECRET = 'gambella-secret-key-2024';
 
-// ==================== MONGODB MODELS ====================
+// ==================== FILE STORAGE SETUP ====================
 
-const UserSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    fullName: { type: String, required: true },
-    role: { type: String, default: 'staff' },
-    isActive: { type: Boolean, default: true },
-    createdAt: { type: Date, default: Date.now }
-});
+// Data directory
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR);
+}
 
-UserSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
+// File paths
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const MEMBERS_FILE = path.join(DATA_DIR, 'members.json');
+const SALES_FILE = path.join(DATA_DIR, 'sales.json');
 
-UserSchema.methods.comparePassword = async function(candidate) {
-    return await bcrypt.compare(candidate, this.password);
+// Initialize data files
+if (!fs.existsSync(USERS_FILE)) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify([]));
+}
+if (!fs.existsSync(MEMBERS_FILE)) {
+    fs.writeFileSync(MEMBERS_FILE, JSON.stringify([]));
+}
+if (!fs.existsSync(SALES_FILE)) {
+    fs.writeFileSync(SALES_FILE, JSON.stringify([]));
+}
+
+// Helper functions to read/write data
+function readUsers() {
+    const data = fs.readFileSync(USERS_FILE);
+    return JSON.parse(data);
+}
+
+function writeUsers(users) {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
+function readMembers() {
+    const data = fs.readFileSync(MEMBERS_FILE);
+    return JSON.parse(data);
+}
+
+function writeMembers(members) {
+    fs.writeFileSync(MEMBERS_FILE, JSON.stringify(members, null, 2));
+}
+
+function readSales() {
+    const data = fs.readFileSync(SALES_FILE);
+    return JSON.parse(data);
+}
+
+function writeSales(sales) {
+    fs.writeFileSync(SALES_FILE, JSON.stringify(sales, null, 2));
+}
+
+// ==================== CREATE DEFAULT ADMIN ====================
+
+const createDefaultAdmin = async () => {
+    const users = readUsers();
+    const adminExists = users.find(u => u.username === 'admin');
+    
+    if (!adminExists) {
+        const hashedPassword = await bcrypt.hash('Admin123!', 10);
+        const admin = {
+            id: 'admin_1',
+            username: 'admin',
+            email: 'admin@gambellacoffee.com',
+            password: hashedPassword,
+            fullName: 'System Administrator',
+            role: 'admin',
+            isActive: true,
+            createdAt: new Date().toISOString()
+        };
+        users.push(admin);
+        writeUsers(users);
+        console.log('✅ Default admin created!');
+        console.log('   Username: admin');
+        console.log('   Password: Admin123!');
+    } else {
+        console.log('✅ Admin user already exists');
+    }
 };
-
-const User = mongoose.model('User', UserSchema);
-
-const MemberSchema = new mongoose.Schema({
-    fullName: { type: String, required: true },
-    gender: { type: String, required: true },
-    age: { type: Number, required: true },
-    motherName: { type: String, required: true },
-    nationality: { type: String, default: 'Ethiopian' },
-    education: { type: String },
-    address: { type: String, required: true },
-    phone: { type: String, required: true },
-    taxId: { type: String },
-    role: { type: String, required: true },
-    beneficiaryName: { type: String },
-    beneficiaryAddress: { type: String },
-    legalRepName: { type: String },
-    legalRepAddress: { type: String },
-    legalRepPhone: { type: String },
-    memberPhoto: { type: String },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Member = mongoose.model('Member', MemberSchema);
-
-const SaleSchema = new mongoose.Schema({
-    memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'Member', required: true },
-    date: { type: Date, required: true },
-    productType: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    pricePerKg: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
-    paymentMethod: { type: String, required: true },
-    recordedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Sale = mongoose.model('Sale', SaleSchema);
 
 // ==================== MIDDLEWARE ====================
 
@@ -107,20 +124,22 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ message: 'Username and password required' });
         }
         
-        const user = await User.findOne({ username });
+        const users = readUsers();
+        const user = users.find(u => u.username === username);
+        
         if (!user) {
             console.log('User not found:', username);
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             console.log('Password incorrect for:', username);
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         
         const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
+            { id: user.id, username: user.username, role: user.role },
             JWT_SECRET,
             { expiresIn: '30d' }
         );
@@ -130,7 +149,7 @@ app.post('/api/auth/login', async (req, res) => {
             success: true,
             token,
             user: {
-                id: user._id,
+                id: user.id,
                 username: user.username,
                 email: user.email,
                 fullName: user.fullName,
@@ -144,20 +163,39 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // GET CURRENT USER
-app.get('/api/auth/me', authMiddleware, async (req, res) => {
+app.get('/api/auth/me', authMiddleware, (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
-        res.json(user);
+        const users = readUsers();
+        const user = users.find(u => u.id === req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // GET ALL MEMBERS
-app.get('/api/members', authMiddleware, async (req, res) => {
+app.get('/api/members', authMiddleware, (req, res) => {
     try {
-        const members = await Member.find().sort({ createdAt: -1 });
+        const members = readMembers();
         res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// GET SINGLE MEMBER
+app.get('/api/members/:id', authMiddleware, (req, res) => {
+    try {
+        const members = readMembers();
+        const member = members.find(m => m.id === req.params.id);
+        if (!member) {
+            return res.status(404).json({ message: 'Member not found' });
+        }
+        res.json(member);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -166,18 +204,43 @@ app.get('/api/members', authMiddleware, async (req, res) => {
 // CREATE MEMBER
 app.post('/api/members', authMiddleware, async (req, res) => {
     try {
-        const member = new Member({ ...req.body, createdBy: req.user.id });
-        await member.save();
-        res.status(201).json(member);
+        const members = readMembers();
+        const newMember = {
+            id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            ...req.body,
+            createdBy: req.user.id,
+            createdAt: new Date().toISOString()
+        };
+        members.push(newMember);
+        writeMembers(members);
+        res.status(201).json(newMember);
     } catch (error) {
         res.status(500).json({ message: 'Server error: ' + error.message });
     }
 });
 
-// DELETE MEMBER
-app.delete('/api/members/:id', authMiddleware, async (req, res) => {
+// UPDATE MEMBER
+app.put('/api/members/:id', authMiddleware, (req, res) => {
     try {
-        await Member.findByIdAndDelete(req.params.id);
+        const members = readMembers();
+        const index = members.findIndex(m => m.id === req.params.id);
+        if (index === -1) {
+            return res.status(404).json({ message: 'Member not found' });
+        }
+        members[index] = { ...members[index], ...req.body, updatedAt: new Date().toISOString() };
+        writeMembers(members);
+        res.json(members[index]);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// DELETE MEMBER
+app.delete('/api/members/:id', authMiddleware, (req, res) => {
+    try {
+        let members = readMembers();
+        members = members.filter(m => m.id !== req.params.id);
+        writeMembers(members);
         res.json({ message: 'Member deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -185,101 +248,108 @@ app.delete('/api/members/:id', authMiddleware, async (req, res) => {
 });
 
 // SEARCH MEMBERS
-app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
+app.get('/api/members/search/:query', authMiddleware, (req, res) => {
     try {
-        const members = await Member.find({
-            $or: [
-                { fullName: { $regex: req.params.query, $options: 'i' } },
-                { phone: { $regex: req.params.query, $options: 'i' } }
-            ]
-        });
-        res.json(members);
+        const members = readMembers();
+        const query = req.params.query.toLowerCase();
+        const filtered = members.filter(m => 
+            m.fullName.toLowerCase().includes(query) || 
+            m.phone.includes(query)
+        );
+        res.json(filtered);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // GET ALL SALES
-app.get('/api/sales', authMiddleware, async (req, res) => {
+app.get('/api/sales', authMiddleware, (req, res) => {
     try {
-        const sales = await Sale.find().populate('memberId', 'fullName phone').sort({ date: -1 });
-        res.json(sales);
+        const sales = readSales();
+        const members = readMembers();
+        const salesWithMember = sales.map(sale => ({
+            ...sale,
+            memberId: sale.memberId,
+            member: members.find(m => m.id === sale.memberId)
+        }));
+        res.json(salesWithMember);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// GET SALES BY MEMBER
+app.get('/api/sales/member/:memberId', authMiddleware, (req, res) => {
+    try {
+        const sales = readSales();
+        const memberSales = sales.filter(s => s.memberId === req.params.memberId);
+        res.json(memberSales);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // CREATE SALE
-app.post('/api/sales', authMiddleware, async (req, res) => {
+app.post('/api/sales', authMiddleware, (req, res) => {
     try {
-        const sale = new Sale({ ...req.body, recordedBy: req.user.id });
-        await sale.save();
-        res.status(201).json(sale);
+        const sales = readSales();
+        const newSale = {
+            id: 'sale_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            ...req.body,
+            recordedBy: req.user.id,
+            createdAt: new Date().toISOString()
+        };
+        sales.push(newSale);
+        writeSales(sales);
+        res.status(201).json(newSale);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// ==================== CREATE DEFAULT ADMIN ====================
-
-const createDefaultAdmin = async () => {
+// DELETE SALE
+app.delete('/api/sales/:id', authMiddleware, (req, res) => {
     try {
-        const adminExists = await User.findOne({ username: 'admin' });
-        if (!adminExists) {
-            const admin = new User({
-                username: 'admin',
-                email: 'admin@gambellacoffee.com',
-                password: 'Admin123!',
-                fullName: 'System Administrator',
-                role: 'admin'
-            });
-            await admin.save();
-            console.log('✅ Default admin created!');
-            console.log('   Username: admin');
-            console.log('   Password: Admin123!');
-        } else {
-            console.log('✅ Admin user already exists');
-        }
+        let sales = readSales();
+        sales = sales.filter(s => s.id !== req.params.id);
+        writeSales(sales);
+        res.json({ message: 'Sale deleted' });
     } catch (error) {
-        console.error('Admin creation error:', error.message);
+        res.status(500).json({ message: 'Server error' });
     }
-};
+});
 
-// ==================== DATABASE CONNECTION ====================
-
-// Use Render's MongoDB URI or local
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
-
-console.log('Attempting to connect to MongoDB...');
-
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000,
-    connectTimeoutMS: 30000
-})
-.then(() => {
-    console.log('✅ MongoDB connected successfully');
-    createDefaultAdmin();
-})
-.catch(err => {
-    console.error('❌ MongoDB connection error:', err.message);
-    console.log('⚠️  Please check your MONGODB_URI environment variable');
+// GET STATISTICS
+app.get('/api/stats', authMiddleware, (req, res) => {
+    try {
+        const members = readMembers();
+        const sales = readSales();
+        const totalMembers = members.length;
+        const totalSales = sales.length;
+        const totalRevenue = sales.reduce((sum, sale) => sum + (sale.totalAmount || 0), 0);
+        const totalQuantity = sales.reduce((sum, sale) => sum + (sale.quantity || 0), 0);
+        
+        res.json({
+            totalMembers,
+            totalSales,
+            totalRevenue,
+            totalQuantity
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ==================== SERVE FRONTEND ====================
 
-// Login page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Dashboard page
 app.get('/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -287,8 +357,12 @@ app.get('/health', (req, res) => {
 // ==================== START SERVER ====================
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📱 Login at: https://gambella-coffee-union-1.onrender.com`);
-    console.log(`👤 Default: admin / Admin123!`);
+
+// Create default admin before starting
+createDefaultAdmin().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`📱 Login at: http://localhost:${PORT}`);
+        console.log(`👤 Default: admin / Admin123!`);
+    });
 });
