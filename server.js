@@ -78,7 +78,7 @@ const createDefaultAdmin = async () => {
         const hashedPassword = await bcrypt.hash('Admin123!', 10);
         const admin = {
             id: 'admin_1',
-            username: 'GMFC',
+            username: 'admin',
             email: 'admin@gambellacoffee.com',
             password: hashedPassword,
             fullName: 'System Administrator',
