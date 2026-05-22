@@ -72,10 +72,10 @@ function writeSales(sales) {
 
 const createDefaultAdmin = async () => {
     const users = readUsers();
-    const adminExists = users.find(u => u.username === 'admin');
+    const adminExists = users.find(u => u.username === 'GMFC');
     
     if (!adminExists) {
-        const hashedPassword = await bcrypt.hash('Admin123!', 10);
+        const hashedPassword = await bcrypt.hash('@GMFC120815', 10);
         const admin = {
             id: 'admin_1',
             username: 'admin',
