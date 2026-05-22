@@ -3,116 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Gambella Coffee Union</title>
+    <title>Dashboard - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
+        
+        /* Navbar */
         .navbar{background:#2d6a1a;color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+        .navbar .logo-area{display:flex;align-items:center;gap:15px}
+        .navbar .logo-icon{width:45px;height:45px;background:#f5c542;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:25px}
+        .logout-btn{background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
+        
+        /* Container */
         .container{max-width:1400px;margin:20px auto;padding:0 20px}
+        
+        /* Tabs */
         .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-        .tab-btn{padding:12px 24px;background:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
+        .tab-btn{padding:12px 24px;background:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
         .tab-btn.active{background:#2d6a1a;color:white}
-        .tab-content{display:none;background:white;padding:30px;border-radius:12px}
+        .tab-content{display:none;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
         .tab-content.active{display:block}
-        .form-section{margin-bottom:30px;padding:20px;background:#f9f9f9;border-radius:8px}
-        .form-section h3{margin-bottom:15px;color:#2d6a1a}
+        
+        /* Forms */
+        .form-section{margin-bottom:30px;padding:20px;background:#f9f9f9;border-radius:8px;border:1px solid #e0e0e0}
+        .form-section h3{color:#2d6a1a;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #2d6a1a}
+        .form-section h4{color:#2d6a1a;margin:15px 0 10px 0}
         .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
         .form-group{margin-bottom:15px}
         .form-group label{display:block;margin-bottom:5px;font-weight:bold}
         .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
-        .btn-primary{background:#2d6a1a;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer}
+        .form-group input[type="file"]{padding:10px;border:2px dashed #ddd;background:white;cursor:pointer}
+        .image-preview{margin-top:10px;text-align:center}
+        .image-preview img{max-width:100px;max-height:100px;border-radius:8px;border:2px solid #ddd;cursor:pointer}
+        
+        /* Buttons */
+        .btn-primary{background:#2d6a1a;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
+        .btn-primary:hover{background:#1a4a0e}
         .btn-danger{background:#dc3545;color:white;padding:5px 10px;border:none;border-radius:4px;cursor:pointer}
-        .member-card{border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:8px;background:#fafafa}
-        .member-card strong{color:#2d6a1a}
+        .btn-export{background:#17a2b8;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
+        
+        /* Lists */
+        .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+        .stats{display:flex;gap:10px;align-items:center}
         .search-bar{margin-bottom:20px}
-        .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px}
-        .logout-btn{background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
+        .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
+        
+        .member-card,.sale-card,.transfer-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
+        .member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+        .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px}
+        .member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
+        .member-role{background:#2d6a1a;color:white;padding:5px 10px;border-radius:5px;font-size:0.85em}
+        .member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
+        .detail-item{display:flex;gap:10px}
+        .detail-label{font-weight:bold;color:#555}
+        .member-actions{margin-top:15px;display:flex;gap:10px}
+        
+        /* Sales Stats */
+        .sales-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px}
+        .stat-card{background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white;padding:15px;border-radius:10px;text-align:center}
+        .stat-value{font-size:1.5em;font-weight:bold}
+        
+        .member-search-box{background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px}
+        .no-data{text-align:center;padding:40px;color:#999}
+        
+        /* Lightbox */
+        .lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
+        .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+        .close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
+        
         @media(max-width:768px){.form-row{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div><strong>🌿 Gambella Coffee Union</strong> | Manufacturer and Exporter PLC</div>
+        <div class="logo-area">
+            <div class="logo-icon">🌿☕</div>
+            <div><strong>የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</strong><br><small>Gambella Majang Forest Coffee Producer & Exporter PLC</small></div>
+        </div>
         <div>
             <span id="userName"></span>
-            <button onclick="logout()" class="logout-btn" style="margin-left:15px">🚪 Logout</button>
+            <button onclick="logout()" class="logout-btn" style="margin-left:15px">🚪 ውጣ</button>
         </div>
     </nav>
+    
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('register')">📝 Register Member</button>
-            <button class="tab-btn" onclick="showTab('list')">📋 Members List</button>
-            <button class="tab-btn" onclick="showTab('sales')">💰 Record Sale</button>
-            <button class="tab-btn" onclick="showTab('search')">🔍 Search</button>
+            <button class="tab-btn active" onclick="showTab('register')">📝 አዲስ አባል ይመዝግቡ</button>
+            <button class="tab-btn" onclick="showTab('list')">📋 የአባላት ዝርዝር</button>
+            <button class="tab-btn" onclick="showTab('sales')">💰 ሽያጭ ይመዝግቡ</button>
+            <button class="tab-btn" onclick="showTab('transfer')">🔄 የስም ዝውውር</button>
+            <button class="tab-btn" onclick="showTab('search')">🔍 አባል ይፈልጉ</button>
         </div>
         
+        <!-- ==================== REGISTER MEMBER TAB ==================== -->
         <div id="register" class="tab-content active">
-            <h2>📝 Register New Member</h2>
+            <h2>📝 የአባልነት ምዝገባ ቅፅ</h2>
             <form id="memberForm">
+                <!-- የአባሉ መረጃ -->
                 <div class="form-section">
-                    <h3>Personal Information</h3>
+                    <h3>📌 የአባሉ መረጃ</h3>
                     <div class="form-row">
-                        <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" required></div>
-                        <div class="form-group"><label>Gender *</label><select id="gender"><option>Male</option><option>Female</option></select></div>
+                        <div class="form-group"><label>የአባሉ ሙሉ ስም *</label><input type="text" id="fullName" required></div>
+                        <div class="form-group"><label>ፆታ *</label><select id="gender"><option>ወንድ</option><option>ሴት</option></select></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Age *</label><input type="number" id="age" required></div>
-                        <div class="form-group"><label>Mother's Name *</label><input type="text" id="motherName" required></div>
+                        <div class="form-group"><label>ዕድሜ *</label><input type="number" id="age" required></div>
+                        <div class="form-group"><label>የአባሉ የናት ሙሉ ስም *</label><input type="text" id="motherName" required></div>
                     </div>
-                    <div class="form-group"><label>Address *</label><textarea id="address" rows="2" required></textarea></div>
                     <div class="form-row">
-                        <div class="form-group"><label>Phone *</label><input type="tel" id="phone" required></div>
-                        <div class="form-group"><label>Role/Position *</label><input type="text" id="role" required></div>
+                        <div class="form-group"><label>ዜግነት *</label><input type="text" id="nationality" value="ኢትዮጵያዊ" required></div>
+                        <div class="form-group"><label>የትምህርት ደረጃ</label><select id="education"><option>አንደኛ ደረጃ</option><option>ሁለተኛ ደረጃ</option><option>ዲፕሎማ</option><option>ዲግሪ</option><option>ማስተርስ</option></select></div>
                     </div>
-                    <div class="form-group"><label>📸 Member Photo</label><input type="file" id="memberPhoto" accept="image/*"></div>
+                    <div class="form-group"><label>የአባሉ አድራሻ *</label><textarea id="address" rows="2" required></textarea></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ስልክ ቁጥር *</label><input type="tel" id="phone" required></div>
+                        <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
+                    </div>
+                    <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት/ የስራ ድርሻ *</label><input type="text" id="role" required></div>
+                    <div class="form-group"><label>📸 የአባሉ ፎቶ</label><input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this,'memberPhotoPreview')"><div id="memberPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
                 </div>
-                <button type="submit" class="btn-primary">✅ Register Member</button>
+                
+                <!-- የወራሽ መረጃ -->
+                <div class="form-section">
+                    <h3>👨‍👦 የወራሽ መረጃ</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>የወራሽ ሙሉ ስም</label><input type="text" id="beneficiaryName"></div>
+                        <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group"><label>📸 የወራሽ ፎቶ</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this,'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
+                </div>
+                
+                <!-- የህጋዊ ተወካይ መረጃ -->
+                <div class="form-section">
+                    <h3>⚖️ የአባሉ ህጋዊ ተወካይ መረጃ</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>ስም</label><input type="text" id="legalRepName"></div>
+                        <div class="form-group"><label>አድራሻ</label><textarea id="legalRepAddress" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="legalRepPhone"></div>
+                    <div class="form-group"><label>📸 የተወካይ ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የተወካይ የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
+                </div>
+                
+                <!-- የሃርድ ኮፒ ቅፅ -->
+                <div class="form-section">
+                    <h3>📄 የሀርድ ኮፒ ቅፅ</h3>
+                    <div class="form-group"><label>የእያንዳንዱ አባላት የሀርድ ኮፒ ቅፅ ፎቶ</label><input type="file" id="hardCopyForm" accept="image/*" onchange="previewImage(this,'hardCopyPreview')"><div id="hardCopyPreview" class="image-preview"></div></div>
+                </div>
+                
+                <button type="submit" class="btn-primary">✅ አስመዝግብ</button>
             </form>
         </div>
         
+        <!-- ==================== MEMBERS LIST TAB ==================== -->
         <div id="list" class="tab-content">
-            <h2>📋 Members List</h2>
-            <div class="search-bar"><input type="text" id="searchInput" placeholder="Search by name or phone..." onkeyup="loadMembers()"></div>
-            <div id="membersList"></div>
-        </div>
-        
-        <div id="sales" class="tab-content">
-            <h2>💰 Record Coffee Sale</h2>
-            <div class="form-section">
-                <div class="form-group"><label>Select Member</label><select id="saleMemberId"></select></div>
-                <div class="form-row">
-                    <div class="form-group"><label>Date</label><input type="date" id="saleDate"></div>
-                    <div class="form-group"><label>Product Type</label><select id="productType"><option>Forest Coffee</option><option>Garden Coffee</option></select></div>
+            <div class="list-header">
+                <h2>📋 የአባላት ዝርዝር</h2>
+                <div class="stats">
+                    <span id="memberCount">0 አባላት</span>
+                    <button onclick="exportToCSV()" class="btn-export">📊 ወደ CSV ላክ</button>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Quantity (kg)</label><input type="number" id="quantity" step="0.01"></div>
-                    <div class="form-group"><label>Price per kg (ETB)</label><input type="number" id="pricePerKg" step="0.01"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Total Amount</label><input type="text" id="totalAmount" readonly style="background:#e9ecef"></div>
-                    <div class="form-group"><label>Payment Method</label><select id="paymentMethod"><option>Cash</option><option>Bank Transfer</option></select></div>
-                </div>
-                <button onclick="recordSale()" class="btn-primary">💾 Record Sale</button>
             </div>
-            <div id="salesHistory"></div>
+            <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 ፈልግ... በስም፡ ስልክ ወይም ሚና" onkeyup="loadMembers()"></div>
+            <div id="membersList" class="members-list"></div>
         </div>
         
+        <!-- ==================== SALES TAB ==================== -->
+        <div id="sales" class="tab-content">
+            <h2>💰 የሽያጭ እና የምዝገባ ታሪክ</h2>
+            
+            <div class="member-search-box">
+                <h4>🔍 አባል ይፈልጉ</h4>
+                <div class="form-row">
+                    <input type="text" id="salesMemberSearch" placeholder="በስም ወይም በስልክ ይፈልጉ..." onkeyup="searchMemberForSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
+                    <select id="selectedMemberId" onchange="loadMemberSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
+                        <option value="">አባል ይምረጡ</option>
+                    </select>
+                </div>
+            </div>
+            <div id="selectedMemberInfo" class="selected-member-info"></div>
+            
+            <div class="form-section">
+                <h3>➕ አዲስ ሽያጭ ይመዝግቡ</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>📅 ቀን *</label><input type="date" id="saleDate" required></div>
+                    <div class="form-group"><label>🏷️ የምርት አይነት</label><select id="productType"><option>የጫካ ቡና</option><option>የአትክልት ቡና</option><option>ኦርጋኒክ ቡና</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>⚖️ ብዛት (ኪሎ ግራም) *</label><input type="number" id="quantity" step="0.01" required></div>
+                    <div class="form-group"><label>💰 ዋጋ በአንድ ኪሎ *</label><input type="number" id="pricePerKg" step="0.01" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>💵 ጠቅላላ ዋጋ</label><input type="text" id="totalAmount" readonly style="background:#e9ecef"></div>
+                    <div class="form-group"><label>💳 የክፍያ ዘዴ</label><select id="paymentMethod"><option>ጥሬ ገንዘብ</option><option>ባንክ ዝውውር</option><option>ቼክ</option></select></div>
+                </div>
+                <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="saleNotes" rows="2"></textarea></div>
+                <div class="form-group"><label>🧾 የሽያጭ ደረሰኝ ፎቶ</label><input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this,'receiptPreview')"><div id="receiptPreview" class="image-preview"></div></div>
+                <button onclick="addSale()" class="btn-primary">💾 ሽያጭ ያስመዝግቡ</button>
+            </div>
+            
+            <div class="form-section">
+                <h3>📜 የሽያጭ ታሪክ</h3>
+                <div id="salesStats" class="sales-stats"></div>
+                <div id="salesHistoryList" class="sales-list"></div>
+            </div>
+        </div>
+        
+        <!-- ==================== TRANSFER TAB ==================== -->
+        <div id="transfer" class="tab-content">
+            <h2>🔄 የስም ዝውውር ማስቀመጫ</h2>
+            
+            <div class="form-section">
+                <h3>📝 አዲስ የስም ዝውውር</h3>
+                <div class="form-group"><label>👤 የድሮ አባል *</label><select id="oldMemberId" onchange="loadOldMemberInfo()"><option value="">አባል ይምረጡ</option></select></div>
+                <div id="oldMemberInfo" style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px"></div>
+                <div class="form-group"><label>👤 አዲስ አባል ሙሉ ስም *</label><input type="text" id="newMemberName" placeholder="የአዲሱ አባል ሙሉ ስም"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>🆔 የአዲሱ አባል መታወቂያ ቁጥር</label><input type="text" id="newMemberIdNumber"></div>
+                    <div class="form-group"><label>📞 ስልክ ቁጥር</label><input type="tel" id="newMemberPhone"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>📅 የዝውውር ቀን *</label><input type="date" id="transferDate" required></div>
+                    <div class="form-group"><label>💰 የዝውውር ክፍያ</label><input type="number" id="transferFee" step="0.01"></div>
+                </div>
+                <div class="form-group"><label>📝 የዝውውር ምክንያት</label><textarea id="transferReason" rows="2"></textarea></div>
+                <div class="form-group"><label>📄 የዝውውር ሰነድ</label><input type="file" id="transferDocument" accept="image/*" onchange="previewImage(this,'transferDocPreview')"><div id="transferDocPreview" class="image-preview"></div></div>
+                <button onclick="processNameTransfer()" class="btn-primary">🔄 ዝውውሩን ያስመዝግቡ</button>
+            </div>
+            
+            <div class="form-section">
+                <h3>📜 የስም ዝውውር ታሪክ</h3>
+                <div id="transferHistoryList" class="transfers-list"></div>
+            </div>
+        </div>
+        
+        <!-- ==================== SEARCH TAB ==================== -->
         <div id="search" class="tab-content">
-            <h2>🔍 Search Member</h2>
-            <div class="form-group"><input type="text" id="searchTerm" placeholder="Enter name or phone..." onkeyup="searchMembers()" style="width:100%;padding:12px"></div>
+            <h2>🔍 አባል ይፈልጉ</h2>
+            <div class="form-group"><input type="text" id="searchTerm" placeholder="በሙሉ ስም ወይም በስልክ ቁጥር ይፈልጉ..." onkeyup="searchMembers()" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:6px"></div>
             <div id="searchResults"></div>
         </div>
+    </div>
+    
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="close-lightbox">&times;</span>
+        <img id="lightboxImg" class="lightbox-content">
     </div>
 
     <script>
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/';
         
-        function apiCall(endpoint, options = {}) {
-            return fetch(`/api${endpoint}`, {
+        let members = [];
+        let sales = [];
+        let transfers = [];
+        
+        // API call helper
+        async function apiCall(endpoint, options = {}) {
+            const response = await fetch(`/api${endpoint}`, {
                 ...options,
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
-            }).then(res => res.json());
+            });
+            if (response.status === 401) { localStorage.clear(); window.location.href = '/'; }
+            return response.json();
+        }
+        
+        // Image preview
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
         
         function fileToBase64(file) {
@@ -124,125 +291,391 @@
             });
         }
         
+        function openLightbox(src) {
+            document.getElementById('lightbox').style.display = 'block';
+            document.getElementById('lightboxImg').src = src;
+        }
+        
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+        
+        // Load all members
         async function loadMembers() {
-            let members = await apiCall('/members');
+            members = await apiCall('/members');
             const search = document.getElementById('searchInput')?.value || '';
+            let filtered = members;
             if (search) {
-                members = members.filter(m => m.fullName.toLowerCase().includes(search.toLowerCase()) || m.phone.includes(search));
+                filtered = members.filter(m => m.fullName.toLowerCase().includes(search.toLowerCase()) || m.phone.includes(search));
             }
+            
+            document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+            
             const container = document.getElementById('membersList');
-            if (!members.length) { container.innerHTML = '<p>No members found</p>'; return; }
-            container.innerHTML = members.map(m => `
+            if (!filtered.length) { container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>'; return; }
+            
+            container.innerHTML = filtered.map(m => `
                 <div class="member-card">
-                    <strong>👤 ${m.fullName}</strong><br>
-                    📞 ${m.phone}<br>
-                    👔 ${m.role}<br>
-                    📍 ${m.address}<br>
-                    <button onclick="deleteMember('${m.id}')" class="btn-danger" style="margin-top:10px">🗑️ Delete</button>
+                    <div class="member-header">
+                        <div class="member-name">
+                            ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="openLightbox('${m.memberPhoto}')">` : '👤'}
+                            ${escapeHtml(m.fullName)}
+                        </div>
+                        <div class="member-role">${escapeHtml(m.role)}</div>
+                    </div>
+                    <div class="member-details">
+                        <div class="detail-item"><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
+                        <div class="detail-item"><span class="detail-label">♂/♀ ፆታ:</span> ${escapeHtml(m.gender)}</div>
+                        <div class="detail-item"><span class="detail-label">📅 ዕድሜ:</span> ${escapeHtml(m.age)}</div>
+                        <div class="detail-item"><span class="detail-label">👩 የናት ስም:</span> ${escapeHtml(m.motherName)}</div>
+                        <div class="detail-item"><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
+                        ${m.beneficiaryName ? `<div class="detail-item"><span class="detail-label">👨‍👦 ወራሽ:</span> ${escapeHtml(m.beneficiaryName)}</div>` : ''}
+                        ${m.legalRepName ? `<div class="detail-item"><span class="detail-label">⚖️ ተወካይ:</span> ${escapeHtml(m.legalRepName)}</div>` : ''}
+                    </div>
+                    <div class="member-actions">
+                        <button class="btn-danger" onclick="deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+                    </div>
                 </div>
             `).join('');
             
-            const saleSelect = document.getElementById('saleMemberId');
-            if (saleSelect) {
-                saleSelect.innerHTML = members.map(m => `<option value="${m.id}">${m.fullName} - ${m.phone}</option>`).join('');
-            }
+            // Update dropdowns
+            const saleSelect = document.getElementById('selectedMemberId');
+            const transferSelect = document.getElementById('oldMemberId');
+            if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+            if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
         }
         
+        // Delete member
         async function deleteMember(id) {
-            if (confirm('Delete this member?')) {
+            if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
                 await apiCall(`/members/${id}`, { method: 'DELETE' });
                 loadMembers();
+                alert('አባል ተሰርዟል!');
             }
         }
         
+        // Register member form submit
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const photoFile = document.getElementById('memberPhoto').files[0];
+            
+            const memberPhoto = document.getElementById('memberPhoto').files[0];
+            const memberTaxDoc = document.getElementById('memberTaxDoc').files[0];
+            const beneficiaryPhoto = document.getElementById('beneficiaryPhoto').files[0];
+            const beneficiaryTaxDoc = document.getElementById('beneficiaryTaxDoc').files[0];
+            const repPhoto = document.getElementById('repPhoto').files[0];
+            const repTaxDoc = document.getElementById('repTaxDoc').files[0];
+            const hardCopyForm = document.getElementById('hardCopyForm').files[0];
+            
             const member = {
                 fullName: document.getElementById('fullName').value,
                 gender: document.getElementById('gender').value,
                 age: parseInt(document.getElementById('age').value),
                 motherName: document.getElementById('motherName').value,
+                nationality: document.getElementById('nationality').value,
+                education: document.getElementById('education').value,
                 address: document.getElementById('address').value,
                 phone: document.getElementById('phone').value,
+                taxId: document.getElementById('taxId').value,
                 role: document.getElementById('role').value,
-                nationality: 'Ethiopian',
-                memberPhoto: photoFile ? await fileToBase64(photoFile) : null
+                beneficiaryName: document.getElementById('beneficiaryName').value,
+                beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
+                legalRepName: document.getElementById('legalRepName').value,
+                legalRepAddress: document.getElementById('legalRepAddress').value,
+                legalRepPhone: document.getElementById('legalRepPhone').value,
+                memberPhoto: memberPhoto ? await fileToBase64(memberPhoto) : null,
+                memberTaxDoc: memberTaxDoc ? await fileToBase64(memberTaxDoc) : null,
+                beneficiaryPhoto: beneficiaryPhoto ? await fileToBase64(beneficiaryPhoto) : null,
+                beneficiaryTaxDoc: beneficiaryTaxDoc ? await fileToBase64(beneficiaryTaxDoc) : null,
+                repPhoto: repPhoto ? await fileToBase64(repPhoto) : null,
+                repTaxDoc: repTaxDoc ? await fileToBase64(repTaxDoc) : null,
+                hardCopyForm: hardCopyForm ? await fileToBase64(hardCopyForm) : null
             };
+            
             await apiCall('/members', { method: 'POST', body: JSON.stringify(member) });
-            alert('✅ Member registered!');
+            alert('✅ አባል በሚገባ ተመዝግቧል!');
             e.target.reset();
+            document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             loadMembers();
             showTab('list');
         });
         
-        async function recordSale() {
-            const qty = parseFloat(document.getElementById('quantity').value);
-            const price = parseFloat(document.getElementById('pricePerKg').value);
-            const sale = {
-                memberId: document.getElementById('saleMemberId').value,
-                date: document.getElementById('saleDate').value,
-                productType: document.getElementById('productType').value,
-                quantity: qty,
-                pricePerKg: price,
-                totalAmount: qty * price,
-                paymentMethod: document.getElementById('paymentMethod').value
-            };
-            if (!sale.memberId || !sale.quantity || !sale.pricePerKg) {
-                alert('Please fill all fields');
+        // Sales functions
+        function searchMemberForSales() {
+            const term = document.getElementById('salesMemberSearch').value.toLowerCase();
+            const select = document.getElementById('selectedMemberId');
+            const filtered = members.filter(m => m.fullName.toLowerCase().includes(term) || m.phone.includes(term));
+            select.innerHTML = '<option value="">አባል ይምረጡ</option>' + filtered.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        }
+        
+        async function loadMemberSales() {
+            const memberId = document.getElementById('selectedMemberId').value;
+            if (!memberId) {
+                document.getElementById('selectedMemberInfo').innerHTML = '';
+                document.getElementById('salesHistoryList').innerHTML = '';
+                document.getElementById('salesStats').innerHTML = '';
                 return;
             }
-            await apiCall('/sales', { method: 'POST', body: JSON.stringify(sale) });
-            alert('✅ Sale recorded!');
-            document.getElementById('quantity').value = '';
-            document.getElementById('pricePerKg').value = '';
-            document.getElementById('totalAmount').value = '';
-            loadSalesHistory();
+            
+            const member = members.find(m => m.id === memberId);
+            if (member) {
+                document.getElementById('selectedMemberInfo').innerHTML = `<h4>✅ ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 📍 ${member.role}</p>`;
+            }
+            
+            const memberSales = sales.filter(s => s.memberId === memberId);
+            displaySalesHistory(memberSales);
+            displaySalesStats(memberSales);
         }
         
-        async function loadSalesHistory() {
-            const sales = await apiCall('/sales');
-            if (!sales.length) { document.getElementById('salesHistory').innerHTML = '<p>No sales yet</p>'; return; }
-            document.getElementById('salesHistory').innerHTML = `<h3>Recent Sales</h3>${sales.slice(0, 20).map(s => `
-                <div class="member-card">📅 ${new Date(s.date).toLocaleDateString()} | ${s.quantity} kg | ${s.totalAmount} ETB</div>
-            `).join('')}`;
+        function displaySalesStats(memberSales) {
+            const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
+            const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
+            document.getElementById('salesStats').innerHTML = `
+                <div class="stat-card"><div class="stat-value">${memberSales.length}</div><div>ግብይቶች</div></div>
+                <div class="stat-card"><div class="stat-value">${totalQty.toFixed(2)} kg</div><div>ጠቅላላ ብዛት</div></div>
+                <div class="stat-card"><div class="stat-value">${totalAmt.toFixed(2)} ብር</div><div>ጠቅላላ ገቢ</div></div>
+            `;
         }
         
-        async function searchMembers() {
-            const term = document.getElementById('searchTerm').value;
-            if (!term) { document.getElementById('searchResults').innerHTML = ''; return; }
-            const members = await apiCall(`/members/search/${term}`);
-            document.getElementById('searchResults').innerHTML = members.map(m => `
-                <div class="member-card"><strong>${m.fullName}</strong><br>📞 ${m.phone}<br>📍 ${m.address}</div>
+        function displaySalesHistory(memberSales) {
+            if (!memberSales.length) {
+                document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>';
+                return;
+            }
+            
+            document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `
+                <div class="sale-card">
+                    <div class="member-header">
+                        <span>📅 ${new Date(s.date).toLocaleDateString()}</span>
+                        <span class="member-role">${s.totalAmount.toFixed(2)} ብር</span>
+                    </div>
+                    <div class="member-details">
+                        <div><span class="detail-label">🏷️ ምርት:</span> ${s.productType}</div>
+                        <div><span class="detail-label">⚖️ ብዛት:</span> ${s.quantity} kg</div>
+                        <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
+                        <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
+                    </div>
+                    <button onclick="deleteSale('${s.id}')" class="btn-danger" style="margin-top:10px">🗑️ ሰርዝ</button>
+                </div>
             `).join('');
         }
         
-        function calculateTotal() {
+        function calculateTotalAmount() {
             const qty = parseFloat(document.getElementById('quantity').value) || 0;
             const price = parseFloat(document.getElementById('pricePerKg').value) || 0;
-            document.getElementById('totalAmount').value = (qty * price).toFixed(2) + ' ETB';
+            document.getElementById('totalAmount').value = (qty * price).toFixed(2) + ' ብር';
         }
         
-        function showTab(tab) {
+        async function addSale() {
+            const memberId = document.getElementById('selectedMemberId').value;
+            if (!memberId) { alert('እባክዎ አባል ይምረጡ!'); return; }
+            
+            const date = document.getElementById('saleDate').value;
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value);
+            
+            if (!date || !quantity || !pricePerKg) { alert('እባክዎ ሁሉንም መረጃዎች ይሙሉ!'); return; }
+            
+            let receiptPhoto = null;
+            const file = document.getElementById('receiptPhoto').files[0];
+            if (file) receiptPhoto = await fileToBase64(file);
+            
+            const newSale = {
+                memberId: memberId,
+                date: date,
+                productType: document.getElementById('productType').value,
+                quantity: quantity,
+                pricePerKg: pricePerKg,
+                totalAmount: quantity * pricePerKg,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                notes: document.getElementById('saleNotes').value,
+                receiptPhoto: receiptPhoto
+            };
+            
+            const result = await apiCall('/sales', { method: 'POST', body: JSON.stringify(newSale) });
+            sales.push(result);
+            alert('✅ ሽያጭ ተመዝግቧል!');
+            document.getElementById('quantity').value = '';
+            document.getElementById('pricePerKg').value = '';
+            document.getElementById('saleNotes').value = '';
+            document.getElementById('receiptPhoto').value = '';
+            document.getElementById('receiptPreview').innerHTML = '';
+            loadMemberSales();
+        }
+        
+        async function deleteSale(saleId) {
+            if (confirm('ሽያጭ ይሰረዛል?')) {
+                await apiCall(`/sales/${saleId}`, { method: 'DELETE' });
+                sales = sales.filter(s => s.id !== saleId);
+                loadMemberSales();
+                alert('ሽያጭ ተሰርዟል!');
+            }
+        }
+        
+        // Transfer functions
+        function loadOldMemberInfo() {
+            const memberId = document.getElementById('oldMemberId').value;
+            const member = members.find(m => m.id === memberId);
+            if (member) {
+                document.getElementById('oldMemberInfo').innerHTML = `<h4>📋 ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 📍 ${member.address}<br>👔 ${member.role}</p>`;
+            } else {
+                document.getElementById('oldMemberInfo').innerHTML = '';
+            }
+        }
+        
+        async function processNameTransfer() {
+            const oldMemberId = document.getElementById('oldMemberId').value;
+            const newMemberName = document.getElementById('newMemberName').value;
+            const transferDate = document.getElementById('transferDate').value;
+            
+            if (!oldMemberId || !newMemberName || !transferDate) {
+                alert('እባክዎ ሁሉንም አስፈላጊ መረጃዎች ይሙሉ!');
+                return;
+            }
+            
+            const oldMember = members.find(m => m.id === oldMemberId);
+            let transferDocument = null;
+            const file = document.getElementById('transferDocument').files[0];
+            if (file) transferDocument = await fileToBase64(file);
+            
+            const newTransfer = {
+                oldMemberId: oldMemberId,
+                oldMemberName: oldMember.fullName,
+                newMemberName: newMemberName,
+                newMemberIdNumber: document.getElementById('newMemberIdNumber').value,
+                newMemberPhone: document.getElementById('newMemberPhone').value,
+                transferDate: transferDate,
+                transferFee: parseFloat(document.getElementById('transferFee').value) || 0,
+                transferReason: document.getElementById('transferReason').value,
+                transferDocument: transferDocument
+            };
+            
+            await apiCall('/transfers', { method: 'POST', body: JSON.stringify(newTransfer) });
+            
+            if (confirm('የአባሉን ስም በማህበሩ ዝርዝር ውስጥ ማዘመን ይፈልጋሉ?')) {
+                await apiCall(`/members/${oldMemberId}`, { method: 'PUT', body: JSON.stringify({ ...oldMember, fullName: newMemberName }) });
+                loadMembers();
+            }
+            
+            alert('✅ የስም ዝውውር ተመዝግቧል!');
+            document.getElementById('newMemberName').value = '';
+            document.getElementById('newMemberIdNumber').value = '';
+            document.getElementById('newMemberPhone').value = '';
+            document.getElementById('transferFee').value = '';
+            document.getElementById('transferReason').value = '';
+            document.getElementById('transferDocument').value = '';
+            document.getElementById('transferDocPreview').innerHTML = '';
+            loadTransfers();
+        }
+        
+        async function loadTransfers() {
+            transfers = await apiCall('/transfers');
+            const container = document.getElementById('transferHistoryList');
+            if (!transfers.length) { container.innerHTML = '<div class="no-data">📭 ምንም ዝውውር የለም</div>'; return; }
+            
+            container.innerHTML = transfers.map(t => `
+                <div class="transfer-card">
+                    <div class="member-header">
+                        <span>📅 ${new Date(t.transferDate).toLocaleDateString()}</span>
+                        <span class="member-role">✅ ተጠናቋል</span>
+                    </div>
+                    <div class="member-details">
+                        <div><span class="detail-label">👤 ከ:</span> ${escapeHtml(t.oldMemberName)}</div>
+                        <div><span class="detail-label">👤 ወደ:</span> ${escapeHtml(t.newMemberName)}</div>
+                        <div><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(t.newMemberPhone) || 'N/A'}</div>
+                        <div><span class="detail-label">💰 ክፍያ:</span> ${t.transferFee > 0 ? t.transferFee + ' ብር' : 'አልተከፈለም'}</div>
+                    </div>
+                    <button onclick="deleteTransfer('${t.id}')" class="btn-danger" style="margin-top:10px">🗑️ ሰርዝ</button>
+                </div>
+            `).join('');
+        }
+        
+        async function deleteTransfer(transferId) {
+            if (confirm('ዝውውሩን መሰረዝ ይፈልጋሉ?')) {
+                await apiCall(`/transfers/${transferId}`, { method: 'DELETE' });
+                loadTransfers();
+                alert('ዝውውር ተሰርዟል!');
+            }
+        }
+        
+        // Search function
+        async function searchMembers() {
+            const term = document.getElementById('searchTerm').value;
+            if (!term) { document.getElementById('searchResults').innerHTML = ''; return; }
+            const results = members.filter(m => m.fullName.toLowerCase().includes(term.toLowerCase()) || m.phone.includes(term));
+            document.getElementById('searchResults').innerHTML = results.map(m => `
+                <div class="member-card">
+                    <div class="member-header"><div class="member-name">👤 ${escapeHtml(m.fullName)}</div><div class="member-role">${escapeHtml(m.role)}</div></div>
+                    <div class="member-details">
+                        <div><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
+                        <div><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load all sales
+        async function loadAllSales() {
+            sales = await apiCall('/sales');
+        }
+        
+        // Export to CSV
+        function exportToCSV() {
+            if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
+            const headers = ['ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'ወራሽ', 'ተወካይ'];
+            const rows = members.map(m => [m.fullName, m.gender, m.age, m.motherName, m.address, m.phone, m.role, m.beneficiaryName || '', m.legalRepName || '']);
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `members_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+        
+        // Tab switching
+        function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
-            if (tab === 'list') loadMembers();
-            if (tab === 'sales') loadSalesHistory();
+            if (tabId === 'list') loadMembers();
+            if (tabId === 'sales') { loadAllSales(); loadMemberSales(); }
+            if (tabId === 'transfer') loadTransfers();
         }
         
         function logout() { localStorage.clear(); window.location.href = '/'; }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         
-        document.getElementById('quantity')?.addEventListener('input', calculateTotal);
-        document.getElementById('pricePerKg')?.addEventListener('input', calculateTotal);
+        // Event listeners
+        document.getElementById('quantity')?.addEventListener('input', calculateTotalAmount);
+        document.getElementById('pricePerKg')?.addEventListener('input', calculateTotalAmount);
         document.getElementById('saleDate').valueAsDate = new Date();
+        document.getElementById('transferDate').valueAsDate = new Date();
         
+        // Load user info
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        document.getElementById('userName').innerHTML = `👤 ${user.fullName || 'User'}`;
+        document.getElementById('userName').innerHTML = `👤 ${escapeHtml(user.fullName) || 'User'}`;
         
+        // Initialize
         loadMembers();
-        loadSalesHistory();
+        loadAllSales();
+        loadTransfers();
+        
+        // Make functions global
+        window.showTab = showTab;
+        window.deleteMember = deleteMember;
+        window.exportToCSV = exportToCSV;
+        window.searchMemberForSales = searchMemberForSales;
+        window.loadMemberSales = loadMemberSales;
+        window.addSale = addSale;
+        window.deleteSale = deleteSale;
+        window.loadOldMemberInfo = loadOldMemberInfo;
+        window.processNameTransfer = processNameTransfer;
+        window.deleteTransfer = deleteTransfer;
+        window.searchMembers = searchMembers;
+        window.openLightbox = openLightbox;
+        window.closeLightbox = closeLightbox;
+        window.previewImage = previewImage;
+        window.logout = logout;
     </script>
 </body>
 </html>
