@@ -4,7 +4,6 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 
@@ -13,10 +12,10 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Serve static HTML files from root directory
+// Serve static files
 app.use(express.static(__dirname));
 
-// JWT Secret
+// JWT Secret - Use environment variable or fallback
 const JWT_SECRET = process.env.JWT_SECRET || 'gambella-secret-key-2024';
 
 // ==================== MONGODB MODELS ====================
@@ -248,17 +247,25 @@ const createDefaultAdmin = async () => {
 
 // ==================== DATABASE CONNECTION ====================
 
+// Use Render's MongoDB URI or local
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
 
-mongoose.connect(MONGODB_URI)
-    .then(() => {
-        console.log('✅ MongoDB connected successfully');
-        createDefaultAdmin();
-    })
-    .catch(err => {
-        console.error('❌ MongoDB connection error:', err.message);
-        console.log('⚠️  Make sure MongoDB is running!');
-    });
+console.log('Attempting to connect to MongoDB...');
+
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000,
+    connectTimeoutMS: 30000
+})
+.then(() => {
+    console.log('✅ MongoDB connected successfully');
+    createDefaultAdmin();
+})
+.catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    console.log('⚠️  Please check your MONGODB_URI environment variable');
+});
 
 // ==================== SERVE FRONTEND ====================
 
@@ -272,16 +279,16 @@ app.get('/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
-// Catch-all for any other routes
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // ==================== START SERVER ====================
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📱 Login at: http://localhost:${PORT}`);
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Login at: https://gambella-coffee-union-1.onrender.com`);
     console.log(`👤 Default: admin / Admin123!`);
 });
