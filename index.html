@@ -45,14 +45,13 @@
                 <div id="loading" class="loading">Logging in...</div>
             </form>
             <div class="demo-info">
-                <strong>📝 Default Login Credentials:</strong><br>
+                <strong>📝 Default Login:</strong><br>
                 Username: <strong>admin</strong><br>
                 Password: <strong>Admin123!</strong>
             </div>
         </div>
     </div>
     <script>
-        // Check if already logged in
         const token = localStorage.getItem('token');
         if (token) {
             window.location.href = '/dashboard.html';
@@ -83,9 +82,7 @@
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
                 
@@ -96,17 +93,16 @@
                     localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = '/dashboard.html';
                 } else {
-                    errorDiv.innerHTML = data.message || 'Login failed. Invalid credentials.';
+                    errorDiv.innerHTML = data.message || 'Login failed';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 errorDiv.innerHTML = 'Connection error. Please try again.';
                 errorDiv.style.display = 'block';
             } finally {
                 loadingDiv.style.display = 'none';
                 submitBtn.disabled = false;
-                submitBtn.textContent = '🔐 Login';
+                submitBtn.textContent = '🔐 Login to Dashboard';
             }
         });
     </script>
