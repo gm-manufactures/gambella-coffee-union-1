@@ -72,10 +72,10 @@ function writeSales(sales) {
 
 const createDefaultAdmin = async () => {
     const users = readUsers();
-    const adminExists = users.find(u => u.username === 'GMFC');
+    const adminExists = users.find(u => u.username === 'admin');
     
     if (!adminExists) {
-        const hashedPassword = await bcrypt.hash('@GMFC110815', 10);
+        const hashedPassword = await bcrypt.hash('Admin123!', 10);
         const admin = {
             id: 'admin_1',
             username: 'GMFC',
@@ -86,7 +86,7 @@ const createDefaultAdmin = async () => {
             isActive: true,
             createdAt: new Date().toISOString()
         };
-        users.push(GMFC);
+        users.push(admin);
         writeUsers(users);
         console.log('✅ Default admin created!');
         console.log('   Username: admin');
