@@ -43,7 +43,6 @@
         .btn-primary:hover{background:#1a4a0e}
         .btn-danger{background:#dc3545;color:white;padding:5px 10px;border:none;border-radius:4px;cursor:pointer}
         .btn-export{background:#17a2b8;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
-        .btn-warning{background:#ffc107;color:#333;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
         
         /* Lists */
         .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
@@ -51,7 +50,7 @@
         .search-bar{margin-bottom:20px}
         .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
         
-        .member-card,.sale-card,.transfer-card,.user-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
+        .member-card,.sale-card,.transfer-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
         .member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
         .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
         .member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
@@ -83,9 +82,6 @@
         /* Share badge */
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         
-        /* Admin badge */
-        .admin-badge{background:#17a2b8;color:white;padding:2px 8px;border-radius:12px;font-size:0.7em;margin-left:10px}
-        
         @media(max-width:768px){.form-row{grid-template-columns:1fr}}
     </style>
 </head>
@@ -100,7 +96,6 @@
         </div>
         <div>
             <span id="userName"></span>
-            <span id="userRoleBadge" style="margin-left:10px"></span>
             <button onclick="logout()" class="logout-btn" style="margin-left:15px">🚪 ውጣ</button>
         </div>
     </nav>
@@ -112,7 +107,6 @@
             <button class="tab-btn" onclick="showTab('sales')">💰 ሽያጭ ይመዝግቡ</button>
             <button class="tab-btn" onclick="showTab('transfer')">🔄 የስም ዝውውር</button>
             <button class="tab-btn" onclick="showTab('search')">🔍 አባል ይፈልጉ</button>
-            <button class="tab-btn" onclick="showTab('admin')" id="adminTabBtn" style="display:none">⚙️ አስተዳዳሪ</button>
         </div>
         
         <!-- ==================== REGISTER MEMBER TAB ==================== -->
@@ -147,6 +141,7 @@
                         <div class="form-group"><label>📈 የአክሲዬን ድርሻ በ% (Share Percentage)</label><input type="number" id="sharePercentage" step="0.01" min="0" max="100" value="0"></div>
                     </div>
                     
+                    <!-- NEW: Financial Fields -->
                     <h4>💰 የአክሲዬን ክፍያ መረጃ</h4>
                     <div class="form-row">
                         <div class="form-group"><label>💵 የአንድ አክሲዬን ዋጋ የተከፈለ (ብር)</label><input type="number" id="sharePricePaid" step="0.01" min="0" value="0"></div>
@@ -289,61 +284,6 @@
             <div class="form-group"><input type="text" id="searchTerm" placeholder="በሙሉ ስም ወይም በስልክ ቁጥር ይፈልጉ..." onkeyup="searchMembers()" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:6px"></div>
             <div id="searchResults"></div>
         </div>
-        
-        <!-- ==================== ADMIN SETTINGS TAB ==================== -->
-        <div id="admin" class="tab-content">
-            <h2>⚙️ አስተዳዳሪ ማዋቀሪያ (Admin Settings)</h2>
-            
-            <!-- Update Current User Info -->
-            <div class="form-section">
-                <h3>👤 የአሁኑን ተጠቃሚ መረጃ ያዘምኑ</h3>
-                <div id="updateMessage" style="display:none; padding:10px; margin-bottom:15px; border-radius:5px;"></div>
-                <div class="form-row">
-                    <div class="form-group"><label>አዲስ ሙሉ ስም</label><input type="text" id="newFullName" placeholder="Enter new full name"></div>
-                    <div class="form-group"><label>አዲስ የተጠቃሚ ስም (Username)</label><input type="text" id="newUsername" placeholder="Enter new username"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>አሮጌ የይለፍ ቃል *</label><input type="password" id="oldPassword" placeholder="Current password"></div>
-                    <div class="form-group"><label>አዲስ የይለፍ ቃል</label><input type="password" id="newPassword" placeholder="New password (leave blank to keep same)"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>አዲስ የይለፍ ቃል ድገም</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
-                    <div class="form-group"><label>ኢሜል</label><input type="email" id="newEmail" placeholder="Email address"></div>
-                </div>
-                <button onclick="updateUserProfile()" class="btn-primary">💾 መረጃ ያዘምኑ</button>
-            </div>
-            
-            <!-- Manage Users (Admin only) -->
-            <div class="form-section">
-                <h3>👥 ተጠቃሚዎችን ያስተዳድሩ (Manage Users)</h3>
-                <button onclick="loadAllUsers()" class="btn-primary" style="margin-bottom:15px">📋 ተጠቃሚዎችን ይጫኑ</button>
-                <div id="usersList"></div>
-            </div>
-            
-            <!-- Add New User -->
-            <div class="form-section">
-                <h3>➕ አዲስ ተጠቃሚ ይፍጠሩ</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="newUserFullName" placeholder="Full Name"></div>
-                    <div class="form-group"><label>የተጠቃሚ ስም *</label><input type="text" id="newUserUsername" placeholder="Username"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>ኢሜል *</label><input type="email" id="newUserEmail" placeholder="Email"></div>
-                    <div class="form-group"><label>የይለፍ ቃል *</label><input type="password" id="newUserPassword" placeholder="Password"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>ሚና (Role)</label>
-                        <select id="newUserRole">
-                            <option value="staff">ሠራተኛ (Staff)</option>
-                            <option value="manager">አስተዳዳሪ (Manager)</option>
-                            <option value="admin">አስተዳዳሪ (Admin)</option>
-                        </select>
-                    </div>
-                    <div class="form-group"></div>
-                </div>
-                <button onclick="createNewUser()" class="btn-primary">➕ አዲስ ተጠቃሚ ይፍጠሩ</button>
-            </div>
-        </div>
     </div>
     
     <!-- Lightbox -->
@@ -359,12 +299,6 @@
         let members = [];
         let sales = [];
         let transfers = [];
-        let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        // Show admin tab only for admin users
-        if (currentUser.role === 'admin') {
-            document.getElementById('adminTabBtn').style.display = 'block';
-        }
         
         // API call helper
         async function apiCall(endpoint, options = {}) {
@@ -409,11 +343,13 @@
         function calculateRemainingBalance() {
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+            // Assuming each share costs 1000 ETB (you can change this value)
             const TOTAL_SHARE_VALUE = 1000;
             const totalSharesValue = shareCount * TOTAL_SHARE_VALUE;
             const remaining = totalSharesValue - sharePricePaid;
             document.getElementById('remainingBalance').value = remaining > 0 ? remaining.toFixed(2) : '0.00';
             
+            // Auto-update payment status based on remaining balance
             if (remaining <= 0) {
                 document.getElementById('paymentStatus').value = 'ተከፍሏል';
             } else if (sharePricePaid > 0 && remaining > 0) {
@@ -423,171 +359,11 @@
             }
         }
         
+        // Get payment status badge class
         function getPaymentStatusClass(status) {
             if (status === 'ተከፍሏል') return 'status-paid';
             if (status === 'በከፊል ተከፍሏል') return 'status-partial';
             return 'status-pending';
-        }
-        
-        // ==================== ADMIN FUNCTIONS ====================
-        
-        // Update user profile
-        async function updateUserProfile() {
-            const oldPassword = document.getElementById('oldPassword').value;
-            if (!oldPassword) {
-                showMessage('updateMessage', 'እባክዎ አሮጌ የይለፍ ቃል ያስገቡ! (Please enter current password)', 'error');
-                return;
-            }
-            
-            const newFullName = document.getElementById('newFullName').value;
-            const newUsername = document.getElementById('newUsername').value;
-            const newEmail = document.getElementById('newEmail').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (newPassword && newPassword !== confirmPassword) {
-                showMessage('updateMessage', 'አዲስ የይለፍ ቃል አይዛመድም! (New passwords do not match)', 'error');
-                return;
-            }
-            
-            const updateData = {
-                oldPassword: oldPassword,
-                fullName: newFullName || undefined,
-                username: newUsername || undefined,
-                email: newEmail || undefined,
-                newPassword: newPassword || undefined
-            };
-            
-            try {
-                const result = await apiCall('/auth/update-profile', { method: 'PUT', body: JSON.stringify(updateData) });
-                if (result.success) {
-                    showMessage('updateMessage', '✅ መረጃ በሚገባ ተሻሽሏል! እባክዎ እንደገና ይግቡ (Profile updated. Please login again)', 'success');
-                    setTimeout(() => { logout(); }, 2000);
-                } else {
-                    showMessage('updateMessage', result.message || 'Update failed', 'error');
-                }
-            } catch (error) {
-                showMessage('updateMessage', 'Error updating profile', 'error');
-            }
-        }
-        
-        // Load all users
-        async function loadAllUsers() {
-            try {
-                const users = await apiCall('/auth/users');
-                const container = document.getElementById('usersList');
-                if (!users.length) {
-                    container.innerHTML = '<p>No users found</p>';
-                    return;
-                }
-                
-                container.innerHTML = users.map(u => `
-                    <div class="user-card">
-                        <div class="member-header">
-                            <div class="member-name">
-                                👤 ${escapeHtml(u.fullName)}
-                                ${u.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''}
-                                ${u.id === currentUser.id ? '<span class="share-badge">Current User</span>' : ''}
-                            </div>
-                            <div class="member-role">${escapeHtml(u.role)}</div>
-                        </div>
-                        <div class="member-details">
-                            <div><span class="detail-label">Username:</span> ${escapeHtml(u.username)}</div>
-                            <div><span class="detail-label">Email:</span> ${escapeHtml(u.email)}</div>
-                            <div><span class="detail-label">Status:</span> ${u.isActive ? '✅ Active' : '❌ Inactive'}</div>
-                        </div>
-                        ${u.id !== currentUser.id ? `
-                        <div class="member-actions">
-                            <button onclick="deleteUser('${u.id}')" class="btn-danger">🗑️ Delete</button>
-                            <button onclick="resetUserPassword('${u.id}')" class="btn-warning">🔑 Reset Password</button>
-                        </div>
-                        ` : ''}
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading users:', error);
-            }
-        }
-        
-        // Create new user
-        async function createNewUser() {
-            const fullName = document.getElementById('newUserFullName').value;
-            const username = document.getElementById('newUserUsername').value;
-            const email = document.getElementById('newUserEmail').value;
-            const password = document.getElementById('newUserPassword').value;
-            const role = document.getElementById('newUserRole').value;
-            
-            if (!fullName || !username || !email || !password) {
-                alert('እባክዎ ሁሉንም መረጃዎች ይሙሉ! (Please fill all fields)');
-                return;
-            }
-            
-            try {
-                const result = await apiCall('/auth/register', {
-                    method: 'POST',
-                    body: JSON.stringify({ fullName, username, email, password, role })
-                });
-                if (result.success) {
-                    alert('✅ አዲስ ተጠቃሚ ተፈጥሯል! (New user created)');
-                    document.getElementById('newUserFullName').value = '';
-                    document.getElementById('newUserUsername').value = '';
-                    document.getElementById('newUserEmail').value = '';
-                    document.getElementById('newUserPassword').value = '';
-                    loadAllUsers();
-                } else {
-                    alert(result.message || 'Creation failed');
-                }
-            } catch (error) {
-                alert('Error creating user');
-            }
-        }
-        
-        // Delete user
-        async function deleteUser(userId) {
-            if (confirm('እርግጠኛ ነዎት? ይህ ተጠቃሚ ይሰረዛል! (Delete this user?)')) {
-                try {
-                    const result = await apiCall(`/auth/users/${userId}`, { method: 'DELETE' });
-                    if (result.success) {
-                        alert('✅ ተጠቃሚ ተሰርዟል! (User deleted)');
-                        loadAllUsers();
-                    } else {
-                        alert(result.message);
-                    }
-                } catch (error) {
-                    alert('Error deleting user');
-                }
-            }
-        }
-        
-        // Reset user password
-        async function resetUserPassword(userId) {
-            const newPassword = prompt('Enter new password for this user (በአዲስ የይለፍ ቃል ያስገቡ):');
-            if (newPassword && newPassword.length >= 6) {
-                try {
-                    const result = await apiCall(`/auth/users/${userId}/reset-password`, {
-                        method: 'PUT',
-                        body: JSON.stringify({ newPassword })
-                    });
-                    if (result.success) {
-                        alert('✅ የይለፍ ቃል ተለውጧል! (Password reset successfully)');
-                    } else {
-                        alert(result.message);
-                    }
-                } catch (error) {
-                    alert('Error resetting password');
-                }
-            } else if (newPassword) {
-                alert('Password must be at least 6 characters');
-            }
-        }
-        
-        function showMessage(elementId, message, type) {
-            const el = document.getElementById(elementId);
-            el.textContent = message;
-            el.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
-            el.style.color = type === 'success' ? '#155724' : '#721c24';
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
         
         // Load all members
@@ -636,12 +412,14 @@
                 </div>
             `).join('');
             
+            // Update dropdowns
             const saleSelect = document.getElementById('selectedMemberId');
             const transferSelect = document.getElementById('oldMemberId');
             if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone} ${m.shareCount ? `(${m.shareCount} አክሲዬን)` : ''}</option>`).join('');
             if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
         }
         
+        // Delete member
         async function deleteMember(id) {
             if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
                 await apiCall(`/members/${id}`, { method: 'DELETE' });
@@ -650,6 +428,7 @@
             }
         }
         
+        // Register member form submit
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -709,11 +488,6 @@
             loadMembers();
             showTab('list');
         });
-        // After successful registration, show credentials
-const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
-if (result.credentials) {
-    alert(`✅ አባል በሚገባ ተመዝግቧል!\n\nየአባሉ መግቢያ መረጃ:\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}\n\nእባክዎ ይህን መረጃ ለአባሉ ያሳውቁ።`);
-}
         
         // Sales functions
         function searchMemberForSales() {
@@ -942,6 +716,7 @@ if (result.credentials) {
             `).join('');
         }
         
+        // Load all sales
         async function loadAllSales() {
             sales = await apiCall('/sales');
         }
@@ -984,12 +759,13 @@ if (result.credentials) {
         document.getElementById('saleDate').valueAsDate = new Date();
         document.getElementById('transferDate').valueAsDate = new Date();
         
+        // Share calculation event listeners
         document.getElementById('shareCount')?.addEventListener('input', calculateRemainingBalance);
         document.getElementById('sharePricePaid')?.addEventListener('input', calculateRemainingBalance);
         
         // Load user info
-        document.getElementById('userName').innerHTML = `👤 ${escapeHtml(currentUser.fullName) || 'User'}`;
-        document.getElementById('userRoleBadge').innerHTML = currentUser.role === 'admin' ? '<span class="admin-badge">Admin</span>' : '';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userName').innerHTML = `👤 ${escapeHtml(user.fullName) || 'User'}`;
         
         // Initialize
         loadMembers();
@@ -1013,11 +789,6 @@ if (result.credentials) {
         window.previewImage = previewImage;
         window.logout = logout;
         window.calculateRemainingBalance = calculateRemainingBalance;
-        window.updateUserProfile = updateUserProfile;
-        window.loadAllUsers = loadAllUsers;
-        window.createNewUser = createNewUser;
-        window.deleteUser = deleteUser;
-        window.resetUserPassword = resetUserPassword;
     </script>
 </body>
 </html>
