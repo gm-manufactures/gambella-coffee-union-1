@@ -8,10 +8,12 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
         
-        /* Navbar */
-        .navbar{background:#2d6a1a;color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-        .navbar .logo-area{display:flex;align-items:center;gap:15px}
-        .navbar .logo-icon{width:45px;height:45px;background:#f5c542;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:25px}
+        /* Navbar with Logo */
+        .navbar{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+        .logo-area{display:flex;align-items:center;gap:15px}
+        .union-logo-img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;background:white}
+        .logo-text h3{font-size:1em;color:#ffd700;margin-bottom:3px}
+        .logo-text .manufacturer{font-size:0.7em;opacity:0.9;letter-spacing:0.5px}
         .logout-btn{background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
         
         /* Container */
@@ -71,14 +73,21 @@
         .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
         .close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
         
+        /* Share badge */
+        .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
+        
         @media(max-width:768px){.form-row{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo-area">
-            <div class="logo-icon">🌿☕</div>
-            <div><strong>የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</strong><br><small>Gambella Majang Forest Coffee Producer & Exporter PLC</small></div>
+            <!-- Your Logo Image - Save as "logo.jpg" in the same folder -->
+            <img src="logo.jpg" alt="Union Logo" class="union-logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f5c542%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23333%22%3E🌿%3C/text%3E%3C/svg%3E';">
+            <div class="logo-text">
+                <h3>የጋምቤላ ማጃንግ የጫካ ቡና</h3>
+                <div class="manufacturer">🌿 Manufacturer and Exporter PLC ☕</div>
+            </div>
         </div>
         <div>
             <span id="userName"></span>
@@ -120,6 +129,13 @@
                         <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
                     </div>
                     <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት/ የስራ ድርሻ *</label><input type="text" id="role" required></div>
+                    
+                    <!-- Share Information Fields -->
+                    <div class="form-row">
+                        <div class="form-group"><label>📊 የአክሲዬን ብዛት (Number of Shares)</label><input type="number" id="shareCount" step="1" min="0" value="0"></div>
+                        <div class="form-group"><label>📈 የአክሲዬን ድርሻ በ% (Share Percentage)</label><input type="number" id="sharePercentage" step="0.01" min="0" max="100" value="0"></div>
+                    </div>
+                    
                     <div class="form-group"><label>📸 የአባሉ ፎቶ</label><input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this,'memberPhotoPreview')"><div id="memberPhotoPreview" class="image-preview"></div></div>
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
                 </div>
@@ -320,6 +336,7 @@
                         <div class="member-name">
                             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="openLightbox('${m.memberPhoto}')">` : '👤'}
                             ${escapeHtml(m.fullName)}
+                            ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን | ${m.sharePercentage || 0}%</span>` : ''}
                         </div>
                         <div class="member-role">${escapeHtml(m.role)}</div>
                     </div>
@@ -329,6 +346,8 @@
                         <div class="detail-item"><span class="detail-label">📅 ዕድሜ:</span> ${escapeHtml(m.age)}</div>
                         <div class="detail-item"><span class="detail-label">👩 የናት ስም:</span> ${escapeHtml(m.motherName)}</div>
                         <div class="detail-item"><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
+                        ${m.shareCount ? `<div class="detail-item"><span class="detail-label">📊 አክሲዬን ብዛት:</span> ${m.shareCount}</div>` : ''}
+                        ${m.sharePercentage ? `<div class="detail-item"><span class="detail-label">📈 የአክሲዬን ድርሻ:</span> ${m.sharePercentage}%</div>` : ''}
                         ${m.beneficiaryName ? `<div class="detail-item"><span class="detail-label">👨‍👦 ወራሽ:</span> ${escapeHtml(m.beneficiaryName)}</div>` : ''}
                         ${m.legalRepName ? `<div class="detail-item"><span class="detail-label">⚖️ ተወካይ:</span> ${escapeHtml(m.legalRepName)}</div>` : ''}
                     </div>
@@ -341,7 +360,7 @@
             // Update dropdowns
             const saleSelect = document.getElementById('selectedMemberId');
             const transferSelect = document.getElementById('oldMemberId');
-            if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+            if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone} ${m.shareCount ? `(${m.shareCount} አክሲዬን)` : ''}</option>`).join('');
             if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
         }
         
@@ -377,6 +396,8 @@
                 phone: document.getElementById('phone').value,
                 taxId: document.getElementById('taxId').value,
                 role: document.getElementById('role').value,
+                shareCount: parseInt(document.getElementById('shareCount').value) || 0,
+                sharePercentage: parseFloat(document.getElementById('sharePercentage').value) || 0,
                 beneficiaryName: document.getElementById('beneficiaryName').value,
                 beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
                 legalRepName: document.getElementById('legalRepName').value,
@@ -395,6 +416,8 @@
             alert('✅ አባል በሚገባ ተመዝግቧል!');
             e.target.reset();
             document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
+            document.getElementById('shareCount').value = '0';
+            document.getElementById('sharePercentage').value = '0';
             loadMembers();
             showTab('list');
         });
@@ -404,7 +427,7 @@
             const term = document.getElementById('salesMemberSearch').value.toLowerCase();
             const select = document.getElementById('selectedMemberId');
             const filtered = members.filter(m => m.fullName.toLowerCase().includes(term) || m.phone.includes(term));
-            select.innerHTML = '<option value="">አባል ይምረጡ</option>' + filtered.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+            select.innerHTML = '<option value="">አባል ይምረጡ</option>' + filtered.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone} ${m.shareCount ? `(${m.shareCount} አክሲዬን)` : ''}</option>`).join('');
         }
         
         async function loadMemberSales() {
@@ -418,7 +441,11 @@
             
             const member = members.find(m => m.id === memberId);
             if (member) {
-                document.getElementById('selectedMemberInfo').innerHTML = `<h4>✅ ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 📍 ${member.role}</p>`;
+                document.getElementById('selectedMemberInfo').innerHTML = `
+                    <h4>✅ ${escapeHtml(member.fullName)}</h4>
+                    <p>📞 ${member.phone} | 📍 ${member.role}</p>
+                    ${member.shareCount ? `<p>📊 ${member.shareCount} አክሲዬን (${member.sharePercentage || 0}% ድርሻ)</p>` : ''}
+                `;
             }
             
             const memberSales = sales.filter(s => s.memberId === memberId);
@@ -516,7 +543,11 @@
             const memberId = document.getElementById('oldMemberId').value;
             const member = members.find(m => m.id === memberId);
             if (member) {
-                document.getElementById('oldMemberInfo').innerHTML = `<h4>📋 ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 📍 ${member.address}<br>👔 ${member.role}</p>`;
+                document.getElementById('oldMemberInfo').innerHTML = `
+                    <h4>📋 ${escapeHtml(member.fullName)}</h4>
+                    <p>📞 ${member.phone} | 📍 ${member.address}<br>👔 ${member.role}</p>
+                    ${member.shareCount ? `<p>📊 ${member.shareCount} አክሲዬን (${member.sharePercentage || 0}% ድርሻ)</p>` : ''}
+                `;
             } else {
                 document.getElementById('oldMemberInfo').innerHTML = '';
             }
@@ -551,8 +582,9 @@
             
             await apiCall('/transfers', { method: 'POST', body: JSON.stringify(newTransfer) });
             
-            if (confirm('የአባሉን ስም በማህበሩ ዝርዝር ውስጥ ማዘመን ይፈልጋሉ?')) {
-                await apiCall(`/members/${oldMemberId}`, { method: 'PUT', body: JSON.stringify({ ...oldMember, fullName: newMemberName }) });
+            if (confirm('የአባሉን ስም በማህበሩ ዝርዝር ውስጥ ማዘመን ይፈልጋሉ? (አክሲዬን እና ሌሎች መረጃዎች ይቀራሉ)')) {
+                const updatedMember = { ...oldMember, fullName: newMemberName };
+                await apiCall(`/members/${oldMemberId}`, { method: 'PUT', body: JSON.stringify(updatedMember) });
                 loadMembers();
             }
             
@@ -608,6 +640,7 @@
                     <div class="member-details">
                         <div><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
                         <div><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
+                        ${m.shareCount ? `<div><span class="detail-label">📊 አክሲዬን:</span> ${m.shareCount} (${m.sharePercentage}%)</div>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -621,8 +654,8 @@
         // Export to CSV
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'ወራሽ', 'ተወካይ'];
-            const rows = members.map(m => [m.fullName, m.gender, m.age, m.motherName, m.address, m.phone, m.role, m.beneficiaryName || '', m.legalRepName || '']);
+            const headers = ['ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'ወራሽ', 'ተወካይ'];
+            const rows = members.map(m => [m.fullName, m.gender, m.age, m.motherName, m.address, m.phone, m.role, m.shareCount || 0, m.sharePercentage || 0, m.beneficiaryName || '', m.legalRepName || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement('a');
