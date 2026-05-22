@@ -75,10 +75,10 @@ const createDefaultAdmin = async () => {
     const adminExists = users.find(u => u.username === 'GMFC');
     
     if (!adminExists) {
-        const hashedPassword = await bcrypt.hash('@GMFC120815', 10);
+        const hashedPassword = await bcrypt.hash('@GMFC110815', 10);
         const admin = {
             id: 'admin_1',
-            username: 'admin',
+            username: 'GMFC',
             email: 'admin@gambellacoffee.com',
             password: hashedPassword,
             fullName: 'System Administrator',
@@ -86,7 +86,7 @@ const createDefaultAdmin = async () => {
             isActive: true,
             createdAt: new Date().toISOString()
         };
-        users.push(admin);
+        users.push(GMFC);
         writeUsers(users);
         console.log('✅ Default admin created!');
         console.log('   Username: admin');
