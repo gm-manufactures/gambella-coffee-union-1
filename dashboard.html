@@ -437,96 +437,100 @@
             }
         }
         
-        // Load all members with SHOW MORE/LESS
-        async function loadMembers() {
-            const response = await apiCall('/members');
-            members = response.members || response;
-            const search = document.getElementById('searchInput')?.value || '';
-            let filtered = members;
-            if (search) {
-                filtered = members.filter(m => m.fullName?.toLowerCase().includes(search.toLowerCase()) || m.phone?.includes(search));
-            }
-            
-            document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
-            const container = document.getElementById('membersList');
-            if (!filtered.length) { container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>'; return; }
-            
-            container.innerHTML = filtered.map(m => `
-                <div class="member-card">
-                    <div class="member-header">
-                        <div class="member-name">
-                            ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="openLightbox('${m.memberPhoto}')">` : '👤'}
-                            ${escapeHtml(m.fullName)}
-                            ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን | ${m.sharePercentage || 0}%</span>` : ''}
-                            <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
-                        </div>
-                        <div class="member-role">${escapeHtml(m.role)}</div>
-                    </div>
-                    
-                    <!-- Basic Information (Always Visible) -->
-                    <div class="basic-info">
-                        <div class="basic-item"><span class="basic-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
-                        <div class="basic-item"><span class="basic-label">♂/♀ ፆታ:</span> ${escapeHtml(m.gender)}</div>
-                        <div class="basic-item"><span class="basic-label">📅 ዕድሜ:</span> ${escapeHtml(m.age)}</div>
-                        <div class="basic-item"><span class="basic-label">👩 የናት ስም:</span> ${escapeHtml(m.motherName)}</div>
-                        <div class="basic-item"><span class="basic-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
-                    </div>
-                    
-                    <!-- Show More/Less Button -->
-                    <button class="btn-show-more" id="btn-${m.id}" onclick="toggleDetails('${m.id}')">🔽 ተጨማሪ ያሳይ (Show More)</button>
-                    
-                    <!-- Detailed Information (Hidden by default) -->
-                    <div class="detailed-info" id="details-${m.id}">
-                        <div class="info-grid">
-                            <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value">${m.shareCount || 0}</div></div>
-                            <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value">${m.sharePercentage || 0}%</div></div>
-                            <div class="info-item"><div class="info-label">💵 የተከፈለ (ብር)</div><div class="info-value">${parseFloat(m.sharePricePaid || 0).toFixed(2)} ብር</div></div>
-                            <div class="info-item"><div class="info-label">💰 ቀሪ ገንዘብ</div><div class="info-value">${parseFloat(m.remainingBalance || 0).toFixed(2)} ብር</div></div>
-                            <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value">${escapeHtml(m.bankAccountNumber) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">🆔 የታክስ ቁጥር</div><div class="info-value">${escapeHtml(m.taxId) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(m.financialNotes) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><div class="info-value">${escapeHtml(m.beneficiaryName) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">📍 የወራሽ አድራሻ</div><div class="info-value">${escapeHtml(m.beneficiaryAddress) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><div class="info-value">${escapeHtml(m.legalRepName) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">📍 የተወካይ አድራሻ</div><div class="info-value">${escapeHtml(m.legalRepAddress) || 'N/A'}</div></div>
-                            <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><div class="info-value">${escapeHtml(m.legalRepPhone) || 'N/A'}</div></div>
-                        </div>
-                        
-                        <!-- Document Photos Section -->
-                        <div style="margin-top:15px; padding-top:10px; border-top:1px solid #ddd">
-                            <div class="info-label" style="margin-bottom:10px">📸 ሰነዶች (Documents):</div>
-                            <div style="display:flex; flex-wrap:wrap; gap:10px">
-                                ${m.memberTaxDoc ? `<img src="${m.memberTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.memberTaxDoc}')" title="የአባሉ የፋይዳ መታወቂያ">` : ''}
-                                ${m.beneficiaryPhoto ? `<img src="${m.beneficiaryPhoto}" class="photo-thumbnail" onclick="openLightbox('${m.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : ''}
-                                ${m.beneficiaryTaxDoc ? `<img src="${m.beneficiaryTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.beneficiaryTaxDoc}')" title="የወራሽ የፋይዳ መታወቂያ">` : ''}
-                                ${m.repPhoto ? `<img src="${m.repPhoto}" class="photo-thumbnail" onclick="openLightbox('${m.repPhoto}')" title="የተወካይ ፎቶ">` : ''}
-                                ${m.repTaxDoc ? `<img src="${m.repTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.repTaxDoc}')" title="የተወካይ የፋይዳ መታወቂያ">` : ''}
-                                ${m.hardCopyForm ? `<img src="${m.hardCopyForm}" class="photo-thumbnail" onclick="openLightbox('${m.hardCopyForm}')" title="የሃርድ ኮፒ ቅፅ">` : ''}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="member-actions">
-                        <button class="btn-danger" onclick="deleteMember('${m.id}')">🗑️ ሰርዝ</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Update dropdowns
-            const saleSelect = document.getElementById('selectedMemberId');
-            const transferSelect = document.getElementById('oldMemberId');
-            if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-            if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+ // ==================== LOAD MEMBERS FUNCTION - REPLACE THIS ENTIRE FUNCTION ====================
+async function loadMembers() {
+    console.log("Loading members...");
+    try {
+        const response = await fetch('/api/members', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        console.log("Members data:", data);
+        
+        // Handle both response formats
+        let members = data;
+        if (data.members) members = data.members;
+        if (!Array.isArray(members)) members = [];
+        
+        const search = document.getElementById('searchInput')?.value || '';
+        let filtered = members;
+        if (search) {
+            filtered = members.filter(m => 
+                (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
+                (m.phone && m.phone.includes(search))
+            );
         }
         
-        // Delete member
-        async function deleteMember(id) {
-            if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
-                await apiCall(`/members/${id}`, { method: 'DELETE' });
-                loadMembers();
-                alert('አባል ተሰርዟል!');
-            }
+        document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+        const container = document.getElementById('membersList');
+        
+        if (!filtered.length) {
+            container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
+            return;
         }
+        
+        container.innerHTML = filtered.map(m => `
+            <div class="member-card">
+                <div class="member-header">
+                    <div class="member-name">
+                        ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" style="width:40px;height:40px;border-radius:50%;cursor:pointer" onclick="openLightbox('${m.memberPhoto}')">` : '👤'}
+                        <strong>${escapeHtml(m.fullName || 'No Name')}</strong>
+                        ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
+                    </div>
+                    <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
+                </div>
+                <div class="member-details">
+                    <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
+                    <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
+                    <div>📅 ${m.age || 'N/A'}</div>
+                    <div>👩 ${escapeHtml(m.motherName || 'N/A')}</div>
+                    <div>🏠 ${escapeHtml(m.address || 'N/A')}</div>
+                </div>
+                <div class="member-actions">
+                    <button class="btn-danger" onclick="deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Update dropdowns
+        const saleSelect = document.getElementById('selectedMemberId');
+        const transferSelect = document.getElementById('oldMemberId');
+        if (saleSelect) {
+            saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + 
+                members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        }
+        if (transferSelect) {
+            transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + 
+                members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        }
+    } catch (error) {
+        console.error('Error loading members:', error);
+        document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
+    }
+}
+// ==================== END OF LOAD MEMBERS FUNCTION ====================
+        
+        // ==================== DELETE MEMBER FUNCTION - REPLACE THIS ====================
+async function deleteMember(id) {
+    if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
+        try {
+            const response = await fetch(`/api/members/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('አባል ተሰርዟል!');
+                loadMembers();
+            } else {
+                alert(result.message || 'Delete failed');
+            }
+        } catch (error) {
+            alert('Error deleting member: ' + error.message);
+        }
+    }
+}
+// ==================== END OF DELETE MEMBER FUNCTION ====================
         
         // Register member
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
