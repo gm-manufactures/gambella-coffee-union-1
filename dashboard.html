@@ -42,6 +42,7 @@
         .btn-danger{background:#dc3545;color:white;padding:5px 15px;border:none;border-radius:4px;cursor:pointer}
         .btn-export{background:#17a2b8;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
         .btn-warning{background:#ffc107;color:#333;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
+        .btn-show-more{background:#6c757d;color:white;padding:5px 12px;border:none;border-radius:20px;cursor:pointer;font-size:0.8em;margin-top:10px}
         
         /* Lists */
         .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
@@ -49,15 +50,25 @@
         .search-bar{margin-bottom:20px}
         .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
         
-        .member-card,.sale-card,.transfer-card,.user-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
+        .member-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a}
         .member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
         .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
         .member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
         .member-role{background:#2d6a1a;color:white;padding:5px 10px;border-radius:5px;font-size:0.85em}
-        .member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
-        .detail-item{display:flex;gap:10px;flex-wrap:wrap}
-        .detail-label{font-weight:bold;color:#555;min-width:180px}
-        .member-actions{margin-top:15px;display:flex;gap:10px}
+        
+        .basic-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+        .basic-item{display:flex;gap:8px;align-items:center}
+        .basic-label{font-weight:bold;color:#555;min-width:80px}
+        
+        .detailed-info{display:none;margin-top:15px;padding-top:15px;border-top:2px dashed #ddd}
+        .detailed-info.show{display:block}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+        .info-item{background:#f0f0f0;padding:10px;border-radius:6px}
+        .info-label{font-weight:bold;color:#2d6a1a;margin-bottom:5px}
+        .info-value{color:#333}
+        
+        .member-actions{margin-top:15px;display:flex;gap:10px;flex-wrap:wrap}
+        .photo-thumbnail{width:50px;height:50px;border-radius:8px;object-fit:cover;cursor:pointer;margin-right:5px}
         
         /* Status Badges */
         .payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
@@ -65,7 +76,6 @@
         .status-partial{background:#fff3cd;color:#856404}
         .status-pending{background:#f8d7da;color:#721c24}
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
-        .admin-badge{background:#17a2b8;color:white;padding:2px 8px;border-radius:12px;font-size:0.7em;margin-left:10px}
         
         /* Stats Grid */
         .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
@@ -187,7 +197,7 @@
             </form>
         </div>
         
-        <!-- ==================== MEMBERS LIST TAB ==================== -->
+        <!-- ==================== MEMBERS LIST TAB with SHOW MORE/LESS ==================== -->
         <div id="list" class="tab-content">
             <div class="list-header">
                 <h2>📋 የአባላት ዝርዝር</h2>
@@ -196,7 +206,7 @@
                     <button onclick="exportToCSV()" class="btn-export">📊 ወደ CSV ላክ</button>
                 </div>
             </div>
-            <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 ፈልግ..." onkeyup="loadMembers()"></div>
+            <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 ፈልግ... በስም፡ ስልክ ወይም ሚና" onkeyup="loadMembers()"></div>
             <div id="membersList" class="members-list"></div>
         </div>
         
@@ -288,18 +298,16 @@
         <!-- ==================== ADMIN SETTINGS TAB ==================== -->
         <div id="admin" class="tab-content">
             <h2>⚙️ አስተዳዳሪ ማዋቀሪያ (Admin Settings)</h2>
-            
-            <!-- Update Current Admin Profile -->
             <div class="form-section">
                 <h3>👤 የአሁኑን ተጠቃሚ መረጃ ያዘምኑ</h3>
                 <div id="updateMessage" style="display:none; padding:10px; margin-bottom:15px; border-radius:5px;"></div>
                 <div class="form-row">
                     <div class="form-group"><label>አዲስ ሙሉ ስም</label><input type="text" id="newFullName" placeholder="Enter new full name"></div>
-                    <div class="form-group"><label>አዲስ የተጠቃሚ ስም (Username)</label><input type="text" id="newUsername" placeholder="Enter new username"></div>
+                    <div class="form-group"><label>አዲስ የተጠቃሚ ስም</label><input type="text" id="newUsername" placeholder="Enter new username"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>አሮጌ የይለፍ ቃል *</label><input type="password" id="oldPassword" placeholder="Current password"></div>
-                    <div class="form-group"><label>አዲስ የይለፍ ቃል</label><input type="password" id="newPassword" placeholder="New password (leave blank to keep same)"></div>
+                    <div class="form-group"><label>አዲስ የይለፍ ቃል</label><input type="password" id="newPassword" placeholder="New password"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>አዲስ የይለፍ ቃል ድገም</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
@@ -307,31 +315,27 @@
                 </div>
                 <button onclick="updateUserProfile()" class="btn-primary">💾 መረጃ ያዘምኑ</button>
             </div>
-            
-            <!-- Manage Users -->
             <div class="form-section">
-                <h3>👥 ተጠቃሚዎችን ያስተዳድሩ (Manage Users)</h3>
+                <h3>👥 ተጠቃሚዎችን ያስተዳድሩ</h3>
                 <button onclick="loadAllUsers()" class="btn-primary" style="margin-bottom:15px">📋 ተጠቃሚዎችን ይጫኑ</button>
                 <div id="usersList"></div>
             </div>
-            
-            <!-- Add New User -->
             <div class="form-section">
                 <h3>➕ አዲስ ተጠቃሚ ይፍጠሩ</h3>
                 <div class="form-row">
-                    <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="newUserFullName" placeholder="Full Name"></div>
-                    <div class="form-group"><label>የተጠቃሚ ስም *</label><input type="text" id="newUserUsername" placeholder="Username"></div>
+                    <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="newUserFullName"></div>
+                    <div class="form-group"><label>የተጠቃሚ ስም *</label><input type="text" id="newUserUsername"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>ኢሜል *</label><input type="email" id="newUserEmail" placeholder="Email"></div>
-                    <div class="form-group"><label>የይለፍ ቃል *</label><input type="password" id="newUserPassword" placeholder="Password"></div>
+                    <div class="form-group"><label>ኢሜል *</label><input type="email" id="newUserEmail"></div>
+                    <div class="form-group"><label>የይለፍ ቃል *</label><input type="password" id="newUserPassword"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>ሚና (Role)</label>
+                    <div class="form-group"><label>ሚና</label>
                         <select id="newUserRole">
-                            <option value="staff">ሠራተኛ (Staff)</option>
-                            <option value="manager">አስተዳዳሪ (Manager)</option>
-                            <option value="admin">አስተዳዳሪ (Admin)</option>
+                            <option value="staff">ሠራተኛ</option>
+                            <option value="manager">አስተዳዳሪ</option>
+                            <option value="admin">አስተዳዳሪ</option>
                         </select>
                     </div>
                     <div class="form-group"></div>
@@ -418,7 +422,22 @@
             return 'status-pending';
         }
         
-        // Load all members (WITH DELETE BUTTON)
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+        
+        // Toggle show more/less
+        function toggleDetails(memberId) {
+            const detailsDiv = document.getElementById(`details-${memberId}`);
+            const btn = document.getElementById(`btn-${memberId}`);
+            if (detailsDiv.classList.contains('show')) {
+                detailsDiv.classList.remove('show');
+                btn.innerHTML = '🔽 ተጨማሪ ያሳይ (Show More)';
+            } else {
+                detailsDiv.classList.add('show');
+                btn.innerHTML = '🔼 አጭር ያድርግ (Show Less)';
+            }
+        }
+        
+        // Load all members with SHOW MORE/LESS
         async function loadMembers() {
             const response = await apiCall('/members');
             members = response.members || response;
@@ -443,20 +462,50 @@
                         </div>
                         <div class="member-role">${escapeHtml(m.role)}</div>
                     </div>
-                    <div class="member-details">
-                        <div class="detail-item"><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
-                        <div class="detail-item"><span class="detail-label">♂/♀ ፆታ:</span> ${escapeHtml(m.gender)}</div>
-                        <div class="detail-item"><span class="detail-label">📅 ዕድሜ:</span> ${escapeHtml(m.age)}</div>
-                        <div class="detail-item"><span class="detail-label">👩 የናት ስም:</span> ${escapeHtml(m.motherName)}</div>
-                        <div class="detail-item"><span class="detail-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
-                        ${m.shareCount ? `<div class="detail-item"><span class="detail-label">📊 አክሲዬን ብዛት:</span> ${m.shareCount}</div>` : ''}
-                        ${m.sharePercentage ? `<div class="detail-item"><span class="detail-label">📈 የአክሲዬን ድርሻ:</span> ${m.sharePercentage}%</div>` : ''}
-                        ${m.sharePricePaid ? `<div class="detail-item"><span class="detail-label">💵 የተከፈለ:</span> ${parseFloat(m.sharePricePaid).toFixed(2)} ብር</div>` : ''}
-                        ${m.remainingBalance ? `<div class="detail-item"><span class="detail-label">💰 ቀሪ ገንዘብ:</span> ${parseFloat(m.remainingBalance).toFixed(2)} ብር</div>` : ''}
-                        ${m.bankAccountNumber ? `<div class="detail-item"><span class="detail-label">🏦 ባንክ ሂሳብ:</span> ${escapeHtml(m.bankAccountNumber)}</div>` : ''}
-                        ${m.beneficiaryName ? `<div class="detail-item"><span class="detail-label">👨‍👦 ወራሽ:</span> ${escapeHtml(m.beneficiaryName)}</div>` : ''}
-                        ${m.legalRepName ? `<div class="detail-item"><span class="detail-label">⚖️ ተወካይ:</span> ${escapeHtml(m.legalRepName)}</div>` : ''}
+                    
+                    <!-- Basic Information (Always Visible) -->
+                    <div class="basic-info">
+                        <div class="basic-item"><span class="basic-label">📞 ስልክ:</span> ${escapeHtml(m.phone)}</div>
+                        <div class="basic-item"><span class="basic-label">♂/♀ ፆታ:</span> ${escapeHtml(m.gender)}</div>
+                        <div class="basic-item"><span class="basic-label">📅 ዕድሜ:</span> ${escapeHtml(m.age)}</div>
+                        <div class="basic-item"><span class="basic-label">👩 የናት ስም:</span> ${escapeHtml(m.motherName)}</div>
+                        <div class="basic-item"><span class="basic-label">🏠 አድራሻ:</span> ${escapeHtml(m.address)}</div>
                     </div>
+                    
+                    <!-- Show More/Less Button -->
+                    <button class="btn-show-more" id="btn-${m.id}" onclick="toggleDetails('${m.id}')">🔽 ተጨማሪ ያሳይ (Show More)</button>
+                    
+                    <!-- Detailed Information (Hidden by default) -->
+                    <div class="detailed-info" id="details-${m.id}">
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value">${m.shareCount || 0}</div></div>
+                            <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value">${m.sharePercentage || 0}%</div></div>
+                            <div class="info-item"><div class="info-label">💵 የተከፈለ (ብር)</div><div class="info-value">${parseFloat(m.sharePricePaid || 0).toFixed(2)} ብር</div></div>
+                            <div class="info-item"><div class="info-label">💰 ቀሪ ገንዘብ</div><div class="info-value">${parseFloat(m.remainingBalance || 0).toFixed(2)} ብር</div></div>
+                            <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value">${escapeHtml(m.bankAccountNumber) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">🆔 የታክስ ቁጥር</div><div class="info-value">${escapeHtml(m.taxId) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(m.financialNotes) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><div class="info-value">${escapeHtml(m.beneficiaryName) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">📍 የወራሽ አድራሻ</div><div class="info-value">${escapeHtml(m.beneficiaryAddress) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><div class="info-value">${escapeHtml(m.legalRepName) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">📍 የተወካይ አድራሻ</div><div class="info-value">${escapeHtml(m.legalRepAddress) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><div class="info-value">${escapeHtml(m.legalRepPhone) || 'N/A'}</div></div>
+                        </div>
+                        
+                        <!-- Document Photos Section -->
+                        <div style="margin-top:15px; padding-top:10px; border-top:1px solid #ddd">
+                            <div class="info-label" style="margin-bottom:10px">📸 ሰነዶች (Documents):</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:10px">
+                                ${m.memberTaxDoc ? `<img src="${m.memberTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.memberTaxDoc}')" title="የአባሉ የፋይዳ መታወቂያ">` : ''}
+                                ${m.beneficiaryPhoto ? `<img src="${m.beneficiaryPhoto}" class="photo-thumbnail" onclick="openLightbox('${m.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : ''}
+                                ${m.beneficiaryTaxDoc ? `<img src="${m.beneficiaryTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.beneficiaryTaxDoc}')" title="የወራሽ የፋይዳ መታወቂያ">` : ''}
+                                ${m.repPhoto ? `<img src="${m.repPhoto}" class="photo-thumbnail" onclick="openLightbox('${m.repPhoto}')" title="የተወካይ ፎቶ">` : ''}
+                                ${m.repTaxDoc ? `<img src="${m.repTaxDoc}" class="photo-thumbnail" onclick="openLightbox('${m.repTaxDoc}')" title="የተወካይ የፋይዳ መታወቂያ">` : ''}
+                                ${m.hardCopyForm ? `<img src="${m.hardCopyForm}" class="photo-thumbnail" onclick="openLightbox('${m.hardCopyForm}')" title="የሃርድ ኮፒ ቅፅ">` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="member-actions">
                         <button class="btn-danger" onclick="deleteMember('${m.id}')">🗑️ ሰርዝ</button>
                     </div>
@@ -544,7 +593,7 @@
             showTab('list');
         });
         
-        // Sales functions
+        // Sales functions (simplified - same as before)
         function searchMemberForSales() {
             const term = document.getElementById('salesMemberSearch').value.toLowerCase();
             const select = document.getElementById('selectedMemberId');
@@ -736,10 +785,8 @@
                     <div class="stat-card"><div class="stat-value">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div>
                     <div class="stat-card"><div class="stat-value">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div>
                     <div class="stat-card"><div class="stat-value">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>
-                    <div class="stat-card"><div class="stat-value">${stats.totalBuyShares || 0}</div><div>ለግዢ የቀረበ</div></div>
-                    <div class="stat-card"><div class="stat-value">${stats.totalSellShares || 0}</div><div>ለሽያጭ የቀረበ</div></div>
                 `;
-            } catch(e) { console.error('Stats error:', e); }
+            } catch(e) { console.error(e); }
         }
         
         async function loadPendingRequests() {
@@ -751,11 +798,8 @@
                     <div class="member-card">
                         <div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div>
                         <div class="member-details">
-                            <div><span class="detail-label">📞 ስልክ:</span> ${escapeHtml(r.memberPhone)}</div>
                             <div><span class="detail-label">📊 አክሲዬን:</span> ${r.shareAmount}</div>
-                            <div><span class="detail-label">💰 ዋጋ:</span> ${r.pricePerShare} ብር/አክሲዬን</div>
-                            <div><span class="detail-label">💵 ጠቅላላ:</span> ${r.totalValue.toFixed(2)} ብር</div>
-                            ${r.notes ? `<div><span class="detail-label">📝 ማስታወሻ:</span> ${escapeHtml(r.notes)}</div>` : ''}
+                            <div><span class="detail-label">💰 ጠቅላላ:</span> ${r.totalValue.toFixed(2)} ብር</div>
                         </div>
                         <div class="member-actions">
                             <button class="btn-primary" onclick="approveTradingRequest('${r.id}')">✅ ጸድቋል</button>
@@ -763,7 +807,7 @@
                         </div>
                     </div>
                 `).join('');
-            } catch(e) { console.error('Pending error:', e); }
+            } catch(e) { console.error(e); }
         }
         
         async function approveTradingRequest(requestId) {
@@ -797,25 +841,82 @@
                 const requests = await apiCall('/share-trading/requests');
                 const container = document.getElementById('allRequestsList');
                 if (!requests.length) { container.innerHTML = '<div class="no-data">📭 ምንም ጥያቄዎች የሉም</div>'; return; }
-                container.innerHTML = requests.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(r => `
+                container.innerHTML = requests.slice(0, 20).map(r => `
                     <div class="member-card">
-                        <div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'} | ${getRequestStatus(r.status)}</div></div>
+                        <div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div>
                         <div class="member-details">
                             <div><span class="detail-label">📅 ቀን:</span> ${new Date(r.createdAt).toLocaleDateString()}</div>
                             <div><span class="detail-label">📊 አክሲዬን:</span> ${r.shareAmount}</div>
-                            <div><span class="detail-label">💰 ዋጋ:</span> ${r.pricePerShare} ብር/አክሲዬን</div>
-                            <div><span class="detail-label">💵 ጠቅላላ:</span> ${r.totalValue.toFixed(2)} ብር</div>
-                            ${r.notes ? `<div><span class="detail-label">📝 ማስታወሻ:</span> ${escapeHtml(r.notes)}</div>` : ''}
+                            <div><span class="detail-label">💰 ጠቅላላ:</span> ${r.totalValue.toFixed(2)} ብር</div>
                         </div>
                     </div>
                 `).join('');
-            } catch(e) { console.error('All requests error:', e); }
+            } catch(e) { console.error(e); }
         }
         
-        function getRequestStatus(status) {
-            if (status === 'pending') return '⏳ በመጠባበቅ ላይ';
-            if (status === 'approved') return '✅ ጸድቋል';
-            return '❌ ውድቅ ተደርጓል';
+        // Admin functions
+        async function updateUserProfile() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            if (!oldPassword) { alert('እባክዎ አሮጌ የይለፍ ቃል ያስገቡ!'); return; }
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (newPassword && newPassword !== confirmPassword) { alert('አዲስ የይለፍ ቃል አይዛመድም!'); return; }
+            
+            const result = await apiCall('/auth/update-profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    oldPassword, fullName: document.getElementById('newFullName').value,
+                    username: document.getElementById('newUsername').value, email: document.getElementById('newEmail').value,
+                    newPassword: newPassword || undefined
+                })
+            });
+            if (result.success) { alert('✅ መረጃ ተሻሽሏል! እንደገና ይግቡ'); setTimeout(() => logout(), 2000); }
+            else alert(result.message);
+        }
+        
+        async function loadAllUsers() {
+            const users = await apiCall('/auth/users');
+            const container = document.getElementById('usersList');
+            if (!users.length) { container.innerHTML = '<p>No users found</p>'; return; }
+            container.innerHTML = users.map(u => `
+                <div class="user-card">
+                    <div class="member-header"><div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div>
+                    <div class="member-details"><div><span class="detail-label">Username:</span> ${escapeHtml(u.username)}</div><div><span class="detail-label">Email:</span> ${escapeHtml(u.email)}</div></div>
+                    ${u.id !== currentUser.id ? `<div class="member-actions"><button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button><button class="btn-warning" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button></div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        async function createNewUser() {
+            const result = await apiCall('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    fullName: document.getElementById('newUserFullName').value,
+                    username: document.getElementById('newUserUsername').value,
+                    email: document.getElementById('newUserEmail').value,
+                    password: document.getElementById('newUserPassword').value,
+                    role: document.getElementById('newUserRole').value
+                })
+            });
+            if (result.success) { alert('✅ አዲስ ተጠቃሚ ተፈጥሯል!'); loadAllUsers(); }
+            else alert(result.message);
+        }
+        
+        async function deleteUser(userId) {
+            if (confirm('እርግጠኛ ነዎት?')) {
+                const result = await apiCall(`/auth/users/${userId}`, { method: 'DELETE' });
+                if (result.success) { alert('✅ ተጠቃሚ ተሰርዟል!'); loadAllUsers(); }
+                else alert(result.message);
+            }
+        }
+        
+        async function resetUserPassword(userId) {
+            const newPassword = prompt('Enter new password:');
+            if (newPassword && newPassword.length >= 6) {
+                const result = await apiCall(`/auth/users/${userId}/reset-password`, { method: 'PUT', body: JSON.stringify({ newPassword }) });
+                if (result.success) alert('✅ የይለፍ ቃል ተለውጧል!');
+                else alert(result.message);
+            }
         }
         
         // Load all sales
@@ -837,132 +938,6 @@
             link.click();
         }
         
-        // ==================== ADMIN FUNCTIONS ====================
-        
-        async function updateUserProfile() {
-            const oldPassword = document.getElementById('oldPassword').value;
-            if (!oldPassword) {
-                showMessage('updateMessage', 'እባክዎ አሮጌ የይለፍ ቃል ያስገቡ!', 'error');
-                return;
-            }
-            
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (newPassword && newPassword !== confirmPassword) {
-                showMessage('updateMessage', 'አዲስ የይለፍ ቃል አይዛመድም!', 'error');
-                return;
-            }
-            
-            const updateData = {
-                oldPassword: oldPassword,
-                fullName: document.getElementById('newFullName').value || undefined,
-                username: document.getElementById('newUsername').value || undefined,
-                email: document.getElementById('newEmail').value || undefined,
-                newPassword: newPassword || undefined
-            };
-            
-            const result = await apiCall('/auth/update-profile', { method: 'PUT', body: JSON.stringify(updateData) });
-            if (result.success) {
-                showMessage('updateMessage', '✅ መረጃ ተሻሽሏል! እንደገና ይግቡ', 'success');
-                setTimeout(() => logout(), 2000);
-            } else {
-                showMessage('updateMessage', result.message || 'Update failed', 'error');
-            }
-        }
-        
-        async function loadAllUsers() {
-            const users = await apiCall('/auth/users');
-            const container = document.getElementById('usersList');
-            if (!users.length) { container.innerHTML = '<p>No users found</p>'; return; }
-            
-            container.innerHTML = users.map(u => `
-                <div class="user-card">
-                    <div class="member-header">
-                        <div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''} ${u.id === currentUser.id ? '<span class="share-badge">Current User</span>' : ''}</div>
-                        <div class="member-role">${escapeHtml(u.role)}</div>
-                    </div>
-                    <div class="member-details">
-                        <div><span class="detail-label">Username:</span> ${escapeHtml(u.username)}</div>
-                        <div><span class="detail-label">Email:</span> ${escapeHtml(u.email)}</div>
-                        <div><span class="detail-label">Status:</span> ${u.isActive ? '✅ Active' : '❌ Inactive'}</div>
-                    </div>
-                    ${u.id !== currentUser.id ? `
-                    <div class="member-actions">
-                        <button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button>
-                        <button class="btn-warning" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button>
-                    </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-        
-        async function createNewUser() {
-            const fullName = document.getElementById('newUserFullName').value;
-            const username = document.getElementById('newUserUsername').value;
-            const email = document.getElementById('newUserEmail').value;
-            const password = document.getElementById('newUserPassword').value;
-            const role = document.getElementById('newUserRole').value;
-            
-            if (!fullName || !username || !email || !password) {
-                alert('እባክዎ ሁሉንም መረጃዎች ይሙሉ!');
-                return;
-            }
-            
-            const result = await apiCall('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify({ fullName, username, email, password, role })
-            });
-            if (result.success) {
-                alert('✅ አዲስ ተጠቃሚ ተፈጥሯል!');
-                document.getElementById('newUserFullName').value = '';
-                document.getElementById('newUserUsername').value = '';
-                document.getElementById('newUserEmail').value = '';
-                document.getElementById('newUserPassword').value = '';
-                loadAllUsers();
-            } else {
-                alert(result.message || 'Creation failed');
-            }
-        }
-        
-        async function deleteUser(userId) {
-            if (confirm('እርግጠኛ ነዎት? ይህ ተጠቃሚ ይሰረዛል!')) {
-                const result = await apiCall(`/auth/users/${userId}`, { method: 'DELETE' });
-                if (result.success) {
-                    alert('✅ ተጠቃሚ ተሰርዟል!');
-                    loadAllUsers();
-                } else {
-                    alert(result.message);
-                }
-            }
-        }
-        
-        async function resetUserPassword(userId) {
-            const newPassword = prompt('Enter new password for this user (አዲስ የይለፍ ቃል ያስገቡ):');
-            if (newPassword && newPassword.length >= 6) {
-                const result = await apiCall(`/auth/users/${userId}/reset-password`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ newPassword })
-                });
-                if (result.success) {
-                    alert('✅ የይለፍ ቃል ተለውጧል!');
-                } else {
-                    alert(result.message);
-                }
-            } else if (newPassword) {
-                alert('Password must be at least 6 characters');
-            }
-        }
-        
-        function showMessage(elementId, message, type) {
-            const el = document.getElementById(elementId);
-            el.textContent = message;
-            el.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
-            el.style.color = type === 'success' ? '#155724' : '#721c24';
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
-        }
-        
         // Tab switching
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -976,7 +951,6 @@
         }
         
         function logout() { localStorage.clear(); window.location.href = '/'; }
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         
         // Event listeners
         document.getElementById('quantity')?.addEventListener('input', calculateTotalAmount);
@@ -1018,6 +992,7 @@
         window.createNewUser = createNewUser;
         window.deleteUser = deleteUser;
         window.resetUserPassword = resetUserPassword;
+        window.toggleDetails = toggleDetails;
     </script>
 </body>
 </html>
