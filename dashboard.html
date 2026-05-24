@@ -173,7 +173,7 @@
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
                 </div>
                 
-                <!-- ==================== UPDATED BENEFICIARY SECTION ==================== -->
+                <!-- Beneficiary Section -->
                 <div class="form-section">
                     <h3>👨‍👦 የወራሽ መረጃ</h3>
                     <div class="form-row">
@@ -253,7 +253,7 @@
                 <span class="close-modal" onclick="closeMemberModal()">&times;</span>
             </div>
             <div id="modalBody" class="modal-body">
-                <!-- Content loaded dynamically -->
+                <div style="text-align:center; padding:20px">Loading...</div>
             </div>
             <div class="modal-footer">
                 <button id="editModeBtn" class="btn-edit" onclick="enableEditMode()">✏️ አርትዕ</button>
@@ -477,7 +477,7 @@
             }
         }
         
-        // ==================== LOAD MEMBERS WITH AMHARIC SORT ====================
+        // ==================== LOAD MEMBERS ====================
         async function loadMembers() {
             console.log("Loading members...");
             try {
@@ -544,8 +544,12 @@
         
         // ==================== SHOW FULL MEMBER DETAILS ====================
         function showMemberDetails(memberId) {
+            console.log("Showing details for member:", memberId);
             const member = members.find(m => m.id === memberId);
-            if (!member) return;
+            if (!member) {
+                console.log("Member not found!");
+                return;
+            }
             
             currentEditingMemberId = memberId;
             isEditMode = false;
@@ -847,7 +851,6 @@
             const TOTAL_SHARE_VALUE = 1000;
             const remainingBalance = (shareCount * TOTAL_SHARE_VALUE) - sharePricePaid;
             
-            // Get beneficiary relationship value
             let beneficiaryRelationship = document.getElementById('beneficiaryRelationship').value;
             if (beneficiaryRelationship === 'ሌላ') {
                 beneficiaryRelationship = document.getElementById('beneficiaryOtherRelationship').value;
@@ -914,7 +917,12 @@
         
         async function loadMemberSales() {
             const memberId = document.getElementById('selectedMemberId').value;
-            if (!memberId) { document.getElementById('selectedMemberInfo').innerHTML = ''; document.getElementById('salesHistoryList').innerHTML = ''; document.getElementById('salesStats').innerHTML = ''; return; }
+            if (!memberId) { 
+                document.getElementById('selectedMemberInfo').innerHTML = ''; 
+                document.getElementById('salesHistoryList').innerHTML = ''; 
+                document.getElementById('salesStats').innerHTML = ''; 
+                return; 
+            }
             const member = members.find(m => m.id === memberId);
             if (member) document.getElementById('selectedMemberInfo').innerHTML = `<h4>✅ ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 👔 ${member.role}</p>`;
             const memberSales = sales.filter(s => s.memberId === memberId);
@@ -929,7 +937,10 @@
         }
         
         function displaySalesHistory(memberSales) {
-            if (!memberSales.length) { document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>'; return; }
+            if (!memberSales.length) { 
+                document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>'; 
+                return; 
+            }
             document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `<div class="member-card"><div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div><div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg | 💳 ${s.paymentMethod}</div><button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');
         }
         
