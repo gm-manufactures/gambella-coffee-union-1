@@ -63,7 +63,7 @@
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         
         /* Bottom-Right Modal */
-        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:500px;max-width:90%;max-height:80vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:550px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
         @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
         .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
         .modal-header h3{margin:0}
@@ -78,18 +78,19 @@
         .profile-name{font-size:1.4em;font-weight:bold;color:#2d6a1a}
         
         .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}
-        .info-item{background:#f9f9f9;padding:10px;border-radius:8px;border-left:3px solid #2d6a1a}
+        .info-item{background:#f9f9f9;padding:12px;border-radius:8px;border-left:3px solid #2d6a1a}
         .info-label{font-weight:bold;color:#2d6a1a;margin-bottom:5px;font-size:0.85em}
         .info-value{color:#333;word-break:break-word}
         .full-width{grid-column:span 2}
         
-        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
-        .doc-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
-        .doc-thumb:hover{transform:scale(1.05);border-color:#2d6a1a}
+        .section-card{background:#fff8e1;padding:15px;border-radius:8px;margin-top:15px;border:1px solid #ffecb3}
+        .section-title{font-weight:bold;color:#2d6a1a;margin-bottom:10px;font-size:1em;border-bottom:1px solid #ddd;padding-bottom:5px}
+        .photo-with-info{display:flex;gap:15px;align-items:flex-start;flex-wrap:wrap}
+        .photo-with-info img{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid #ddd;cursor:pointer}
+        .info-flex{flex:1}
         
-        /* Edit Mode Styles */
-        .edit-mode .info-item{background:#fff8e1}
-        .edit-mode input,.edit-mode select,.edit-mode textarea{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;margin-top:5px}
+        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+        .doc-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
         
         .lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
         .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
@@ -133,7 +134,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label>ዕድሜ</label><input type="number" id="age"></div>
-                        <div class="form-group"><label>የናት ስም</label><input type="text" id="motherName"></div>
+                        <div class="form-group"><label>የእናት ሙሉ ስም</label><input type="text" id="motherName"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label>ዜግነት</label><input type="text" id="nationality" value="ኢትዮጵያዊ"></div>
@@ -178,8 +179,8 @@
                         <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName"></div>
                         <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress" rows="2"></textarea></div>
                     </div>
-                    <div class="form-group"><label>📸 ፎቶ</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this,'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
-                    <div class="form-group"><label>🆔 የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>📸 የወራሽ ፎቶ</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this,'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
                 </div>
                 
                 <div class="form-section">
@@ -189,8 +190,8 @@
                         <div class="form-group"><label>አድራሻ</label><textarea id="legalRepAddress" rows="2"></textarea></div>
                     </div>
                     <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="legalRepPhone"></div>
-                    <div class="form-group"><label>📸 ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
-                    <div class="form-group"><label>🆔 የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>📸 የተወካይ ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የተወካይ የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
                 </div>
                 
                 <div class="form-section">
@@ -502,15 +503,18 @@
             
             modalBody.innerHTML = `
                 <div id="viewMode">
+                    <!-- Member Profile Header with Photo -->
                     <div class="profile-header">
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
                         <div class="profile-name">${escapeHtml(member.fullName)}</div>
                     </div>
+                    
+                    <!-- Member Main Information -->
                     <div class="info-grid">
                         <div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${serialNumber}</div></div>
                         <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(member.gender)}</div></div>
                         <div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value">${member.age || 'N/A'}</div></div>
-                        <div class="info-item"><div class="info-label">👩 የናት ስም</div><div class="info-value">${escapeHtml(member.motherName)}</div></div>
+                        <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><div class="info-value">${escapeHtml(member.motherName)}</div></div>
                         <div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(member.nationality)}</div></div>
                         <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><div class="info-value">${escapeHtml(member.education)}</div></div>
                         <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(member.address)}</div></div>
@@ -523,25 +527,50 @@
                         <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><div class="info-value">${(member.remainingBalance || 0).toFixed(2)} ብር</div></div>
                         <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(member.paymentStatus)}</div></div>
                         <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value">${escapeHtml(member.bankAccountNumber)}</div></div>
-                        <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><div class="info-value">${escapeHtml(member.beneficiaryName)}</div></div>
-                        <div class="info-item full-width"><div class="info-label">📍 የወራሽ አድራሻ</div><div class="info-value">${escapeHtml(member.beneficiaryAddress)}</div></div>
-                        <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><div class="info-value">${escapeHtml(member.legalRepName)}</div></div>
-                        <div class="info-item full-width"><div class="info-label">📍 የተወካይ አድራሻ</div><div class="info-value">${escapeHtml(member.legalRepAddress)}</div></div>
-                        <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><div class="info-value">${escapeHtml(member.legalRepPhone)}</div></div>
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
                     </div>
-                    <div class="photo-grid">
-                        <div class="info-label" style="margin-bottom:5px">📸 ሰነዶች (Documents):</div>
-                        ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="doc-thumb" onclick="openLightbox('${member.memberPhoto}')" title="የአባሉ ፎቶ">` : ''}
-                        ${member.memberTaxDoc ? `<img src="${member.memberTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.memberTaxDoc}')" title="የአባሉ የፋይዳ መታወቂያ">` : ''}
-                        ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : ''}
-                        ${member.beneficiaryTaxDoc ? `<img src="${member.beneficiaryTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryTaxDoc}')" title="የወራሽ የፋይዳ መታወቂያ">` : ''}
-                        ${member.repPhoto ? `<img src="${member.repPhoto}" class="doc-thumb" onclick="openLightbox('${member.repPhoto}')" title="የተወካይ ፎቶ">` : ''}
-                        ${member.repTaxDoc ? `<img src="${member.repTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.repTaxDoc}')" title="የተወካይ የፋይዳ መታወቂያ">` : ''}
-                        ${member.hardCopyForm ? `<img src="${member.hardCopyForm}" class="doc-thumb" onclick="openLightbox('${member.hardCopyForm}')" title="የሃርድ ኮፒ ቅፅ">` : ''}
+                    
+                    <!-- Beneficiary Section with Photo -->
+                    <div class="section-card">
+                        <div class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary Information)</div>
+                        <div class="photo-with-info">
+                            ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" onclick="openLightbox('${member.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <div><strong>ሙሉ ስም:</strong> ${escapeHtml(member.beneficiaryName) || 'N/A'}</div>
+                                <div><strong>አድራሻ:</strong> ${escapeHtml(member.beneficiaryAddress) || 'N/A'}</div>
+                                ${member.beneficiaryTaxDoc ? `<div><strong>🆔 የፋይዳ መታወቂያ:</strong> <a href="#" onclick="openLightbox('${member.beneficiaryTaxDoc}');return false">ተመልከት</a></div>` : ''}
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Legal Representative Section with Photo -->
+                    <div class="section-card">
+                        <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ (Legal Representative)</div>
+                        <div class="photo-with-info">
+                            ${member.repPhoto ? `<img src="${member.repPhoto}" onclick="openLightbox('${member.repPhoto}')" title="የተወካይ ፎቶ">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <div><strong>ስም:</strong> ${escapeHtml(member.legalRepName) || 'N/A'}</div>
+                                <div><strong>አድራሻ:</strong> ${escapeHtml(member.legalRepAddress) || 'N/A'}</div>
+                                <div><strong>ስልክ:</strong> ${escapeHtml(member.legalRepPhone) || 'N/A'}</div>
+                                ${member.repTaxDoc ? `<div><strong>🆔 የፋይዳ መታወቂያ:</strong> <a href="#" onclick="openLightbox('${member.repTaxDoc}');return false">ተመልከት</a></div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Member Documents -->
+                    ${(member.memberTaxDoc || member.hardCopyForm) ? `
+                    <div class="section-card">
+                        <div class="section-title">📄 የአባሉ ሰነዶች (Member Documents)</div>
+                        <div class="photo-grid">
+                            ${member.memberTaxDoc ? `<img src="${member.memberTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.memberTaxDoc}')" title="የፋይዳ መታወቂያ">` : ''}
+                            ${member.hardCopyForm ? `<img src="${member.hardCopyForm}" class="doc-thumb" onclick="openLightbox('${member.hardCopyForm}')" title="የሃርድ ኮፒ ቅፅ">` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
+                
                 <div id="editMode" style="display:none">
+                    <!-- Edit Mode Content - similar to before but organized with photos with their respective sections -->
                     <div class="profile-header">
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
                         <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; font-weight:bold; padding:8px; border:1px solid #ddd; border-radius:6px; width:100%">
@@ -549,7 +578,7 @@
                     <div class="info-grid">
                         <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><select id="editGender" style="width:100%; padding:8px"><option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option><option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option></select></div>
                         <div class="info-item"><div class="info-label">📅 ዕድሜ</div><input type="number" id="editAge" value="${member.age || ''}" style="width:100%; padding:8px"></div>
-                        <div class="info-item"><div class="info-label">👩 የናት ስም</div><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" style="width:100%; padding:8px"></div>
                         <div class="info-item"><div class="info-label">🌍 ዜግነት</div><input type="text" id="editNationality" value="${escapeHtml(member.nationality)}" style="width:100%; padding:8px"></div>
                         <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><input type="text" id="editEducation" value="${escapeHtml(member.education)}" style="width:100%; padding:8px"></div>
                         <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><textarea id="editAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.address)}</textarea></div>
@@ -563,19 +592,36 @@
                         <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><select id="editPaymentStatus" style="width:100%; padding:8px"><option ${member.paymentStatus === 'ተከፍሏል' ? 'selected' : ''}>ተከፍሏል</option><option ${member.paymentStatus === 'በከፊል ተከፍሏል' ? 'selected' : ''}>በከፊል ተከፍሏል</option><option ${member.paymentStatus === 'አልተከፈለም' ? 'selected' : ''}>አልተከፈለም</option></select></div>
                         <div class="info-item"><div class="info-label">🏦 ባንክ ሂሳብ</div><input type="text" id="editBankAccountNumber" value="${escapeHtml(member.bankAccountNumber)}" style="width:100%; padding:8px"></div>
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" style="width:100%; padding:8px">${escapeHtml(member.financialNotes)}</textarea></div>
-                        <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}" style="width:100%; padding:8px"></div>
-                        <div class="info-item full-width"><div class="info-label">📍 የወራሽ አድራሻ</div><textarea id="editBeneficiaryAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.beneficiaryAddress)}</textarea></div>
-                        <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}" style="width:100%; padding:8px"></div>
-                        <div class="info-item full-width"><div class="info-label">📍 የተወካይ አድራሻ</div><textarea id="editLegalRepAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.legalRepAddress)}</textarea></div>
-                        <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}" style="width:100%; padding:8px"></div>
+                    </div>
+                    
+                    <!-- Beneficiary Edit Section -->
+                    <div class="section-card">
+                        <div class="section-title">👨‍👦 የወራሽ መረጃ</div>
+                        <div class="photo-with-info">
+                            ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryPhoto}')">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}" placeholder="ሙሉ ስም" style="width:100%; margin-bottom:5px; padding:6px">
+                                <textarea id="editBeneficiaryAddress" rows="2" placeholder="አድራሻ" style="width:100%; margin-bottom:5px; padding:6px">${escapeHtml(member.beneficiaryAddress)}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editBeneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'editBeneficiaryTaxPreview')"><div id="editBeneficiaryTaxPreview" class="image-preview"></div></div>
+                    </div>
+                    
+                    <!-- Legal Representative Edit Section -->
+                    <div class="section-card">
+                        <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ</div>
+                        <div class="photo-with-info">
+                            ${member.repPhoto ? `<img src="${member.repPhoto}" class="doc-thumb" onclick="openLightbox('${member.repPhoto}')">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}" placeholder="ሙሉ ስም" style="width:100%; margin-bottom:5px; padding:6px">
+                                <textarea id="editLegalRepAddress" rows="2" placeholder="አድራሻ" style="width:100%; margin-bottom:5px; padding:6px">${escapeHtml(member.legalRepAddress)}</textarea>
+                                <input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}" placeholder="ስልክ ቁጥር" style="width:100%; margin-top:5px; padding:6px">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editRepTaxDoc" accept="image/*" onchange="previewImage(this,'editRepTaxPreview')"><div id="editRepTaxPreview" class="image-preview"></div></div>
                     </div>
                 </div>
             `;
-            
-            // Calculate remaining balance for edit mode
-            if (document.getElementById('editShareCount')) {
-                calculateEditRemainingBalance();
-            }
             
             document.getElementById('memberModal').style.display = 'block';
             document.getElementById('editModeBtn').style.display = 'inline-block';
@@ -615,6 +661,16 @@
         }
         
         async function saveMemberEdit() {
+            // Get all edit values including new photo files
+            let beneficiaryTaxDocBase64 = null;
+            let repTaxDocBase64 = null;
+            
+            const beneficiaryTaxFile = document.getElementById('editBeneficiaryTaxDoc')?.files[0];
+            if (beneficiaryTaxFile) beneficiaryTaxDocBase64 = await fileToBase64(beneficiaryTaxFile);
+            
+            const repTaxFile = document.getElementById('editRepTaxDoc')?.files[0];
+            if (repTaxFile) repTaxDocBase64 = await fileToBase64(repTaxFile);
+            
             const updatedMember = {
                 fullName: document.getElementById('editFullName').value,
                 gender: document.getElementById('editGender').value,
@@ -639,6 +695,9 @@
                 legalRepPhone: document.getElementById('editLegalRepPhone').value,
                 updatedAt: new Date().toISOString()
             };
+            
+            if (beneficiaryTaxDocBase64) updatedMember.beneficiaryTaxDoc = beneficiaryTaxDocBase64;
+            if (repTaxDocBase64) updatedMember.repTaxDoc = repTaxDocBase64;
             
             const TOTAL_SHARE_VALUE = 1000;
             const totalSharesValue = updatedMember.shareCount * TOTAL_SHARE_VALUE;
@@ -968,7 +1027,7 @@
         // ==================== EXPORT TO CSV ====================
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የናት ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'ማስታወሻ'];
+            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'ማስታወሻ'];
             const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.beneficiaryAddress || '', m.legalRepName || '', m.legalRepAddress || '', m.legalRepPhone || '', m.financialNotes || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
