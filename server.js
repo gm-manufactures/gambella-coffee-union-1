@@ -211,17 +211,63 @@ app.post('/api/members/register', async (req, res) => {
             return res.status(400).json({ message: 'Phone number already registered' });
         }
         
-        // Create new member
+        // Create new member with all fields
         const newMember = {
             id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-            ...req.body,
+            // Basic Information
+            fullName: req.body.fullName,
+            gender: req.body.gender,
+            age: req.body.age,
+            motherName: req.body.motherName,
+            nationality: req.body.nationality,
+            education: req.body.education,
+            address: req.body.address,
+            phone: req.body.phone,
+            taxId: req.body.taxId,
+            role: req.body.role,
+            // Share Information
+            shareCount: req.body.shareCount,
+            sharePercentage: req.body.sharePercentage,
+            sharePricePaid: req.body.sharePricePaid,
+            remainingBalance: req.body.remainingBalance,
+            paymentStatus: req.body.paymentStatus,
+            bankAccountNumber: req.body.bankAccountNumber,
+            financialNotes: req.body.financialNotes,
+            // Beneficiary Information
+            beneficiaryName: req.body.beneficiaryName,
+            beneficiaryGender: req.body.beneficiaryGender,
+            beneficiaryRelationship: req.body.beneficiaryRelationship,
+            beneficiaryAddress: req.body.beneficiaryAddress,
+            // Legal Representative
+            legalRepName: req.body.legalRepName,
+            legalRepAddress: req.body.legalRepAddress,
+            legalRepPhone: req.body.legalRepPhone,
+            // Power of Attorney (ውክልና)
+            powerOfAttorneyType: req.body.powerOfAttorneyType,
+            powerOfAttorneyNumber: req.body.powerOfAttorneyNumber,
+            powerOfAttorneyDate: req.body.powerOfAttorneyDate,
+            powerOfAttorneyIssuer: req.body.powerOfAttorneyIssuer,
+            powerOfAttorneyExpiry: req.body.powerOfAttorneyExpiry,
+            powerOfAttorneyNotes: req.body.powerOfAttorneyNotes,
+            // Photos and Documents
+            memberPhoto: req.body.memberPhoto,
+            memberTaxDoc: req.body.memberTaxDoc,
+            beneficiaryPhoto: req.body.beneficiaryPhoto,
+            beneficiaryTaxDoc: req.body.beneficiaryTaxDoc,
+            repPhoto: req.body.repPhoto,
+            repTaxDoc: req.body.repTaxDoc,
+            hardCopyForm: req.body.hardCopyForm,
+            powerOfAttorneyPhoto: req.body.powerOfAttorneyPhoto,
+            hardCopyDocumentPhoto: req.body.hardCopyDocumentPhoto,
+            // Metadata
+            createdBy: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
         members.push(newMember);
         writeMembers(members);
         
-        // Generate credentials
+        // Generate credentials for member login
         const username = generateUsername(newMember.fullName, newMember.phone);
         const plainPassword = generateRandomPassword();
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
