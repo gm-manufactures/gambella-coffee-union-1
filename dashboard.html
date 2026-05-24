@@ -375,6 +375,53 @@
     </div>
 
     <script>
+        // ==================== SESSION TIMEOUT (1 MINUTE INACTIVITY) ====================
+let inactivityTimer;
+const INACTIVITY_TIMEOUT = 120000; // 1 minute in milliseconds
+
+// Function to reset the inactivity timer
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
+}
+
+// Function to handle logout due to inactivity
+function logoutDueToInactivity() {
+    if (confirm('እንቅስቃሴ ባለመኖሩ ምክንያት ክፍለ ጊዜዎ ተቋርጧል። እንደገና ይግቡ።\n\nYour session has expired due to inactivity. Please login again.')) {
+        logout();
+    } else {
+        logout();
+    }
+}
+
+// Function to start tracking user activity
+function startInactivityTracking() {
+    // Reset timer on user activity events
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+    events.forEach(event => {
+        document.addEventListener(event, resetInactivityTimer);
+    });
+    resetInactivityTimer();
+}
+
+// Function to stop tracking (call when logging out)
+function stopInactivityTracking() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+    events.forEach(event => {
+        document.removeEventListener(event, resetInactivityTimer);
+    });
+    clearTimeout(inactivityTimer);
+}
+
+// Modify the existing logout function to stop tracking
+const originalLogout = logout;
+logout = function() {
+    stopInactivityTracking();
+    originalLogout();
+};
+
+// Start tracking when page loads
+startInactivityTracking();
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/';
         
