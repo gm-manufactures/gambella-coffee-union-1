@@ -39,13 +39,14 @@
         .btn-edit{background:#ffc107;color:#333;padding:5px 15px;border:none;border-radius:4px;cursor:pointer;font-weight:bold}
         .btn-edit:hover{background:#e0a800}
         .btn-save{background:#28a745;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
+        .btn-cancel{background:#6c757d;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
         
         .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
         .stats{display:flex;gap:10px;align-items:center}
         .search-bar{margin-bottom:20px}
         .search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
         
-        .member-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a;cursor:pointer;transition:all 0.3s}
+        .member-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a;transition:all 0.3s}
         .member-card:hover{transform:translateX(5px);box-shadow:0 5px 15px rgba(0,0,0,0.1)}
         .member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
         .member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -53,6 +54,7 @@
         .member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
         .member-role{background:#2d6a1a;color:white;padding:5px 10px;border-radius:5px;font-size:0.85em}
         .member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
+        .member-actions{margin-top:15px;display:flex;gap:10px;border-top:1px solid #eee;padding-top:15px}
         
         .payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         .status-paid{background:#d4edda;color:#155724}
@@ -60,22 +62,40 @@
         .status-pending{background:#f8d7da;color:#721c24}
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         
-        /* Modal Styles */
-        .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);overflow:auto}
-        .modal-content{background:white;margin:3% auto;padding:25px;width:95%;max-width:900px;border-radius:12px;max-height:85%;overflow-y:auto}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #2d6a1a}
-        .modal-header h2{color:#2d6a1a}
-        .close-modal{font-size:28px;font-weight:bold;cursor:pointer;color:#999}
-        .close-modal:hover{color:#333}
+        /* Bottom-Right Modal */
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:500px;max-width:90%;max-height:80vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
+        .modal-header h3{margin:0}
+        .close-modal{font-size:28px;font-weight:bold;cursor:pointer;color:white}
+        .close-modal:hover{color:#ffc107}
+        .modal-body{padding:20px;max-height:60vh;overflow-y:auto}
+        .modal-footer{padding:15px 20px;border-top:1px solid #ddd;display:flex;justify-content:flex-end;gap:10px;background:#f9f9f9}
         
-        .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:15px}
-        .info-item{background:#f9f9f9;padding:12px;border-radius:8px;border-left:3px solid #2d6a1a}
-        .info-label{font-weight:bold;color:#2d6a1a;margin-bottom:5px}
-        .info-value{color:#333}
-        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-        .doc-thumb{width:80px;height:80px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
+        /* Profile Header in Modal */
+        .profile-header{display:flex;align-items:center;gap:20px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #2d6a1a}
+        .profile-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #2d6a1a;cursor:pointer}
+        .profile-name{font-size:1.4em;font-weight:bold;color:#2d6a1a}
         
-        @media(max-width:768px){.form-row{grid-template-columns:1fr}}
+        .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}
+        .info-item{background:#f9f9f9;padding:10px;border-radius:8px;border-left:3px solid #2d6a1a}
+        .info-label{font-weight:bold;color:#2d6a1a;margin-bottom:5px;font-size:0.85em}
+        .info-value{color:#333;word-break:break-word}
+        .full-width{grid-column:span 2}
+        
+        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+        .doc-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
+        .doc-thumb:hover{transform:scale(1.05);border-color:#2d6a1a}
+        
+        /* Edit Mode Styles */
+        .edit-mode .info-item{background:#fff8e1}
+        .edit-mode input,.edit-mode select,.edit-mode textarea{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;margin-top:5px}
+        
+        .lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
+        .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+        .close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
+        
+        @media(max-width:768px){.form-row{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}.full-width{grid-column:span 1}}
     </style>
 </head>
 <body>
@@ -182,7 +202,7 @@
             </form>
         </div>
         
-        <!-- ==================== MEMBERS LIST TAB with Serial Numbers ==================== -->
+        <!-- ==================== MEMBERS LIST TAB ==================== -->
         <div id="list" class="tab-content">
             <div class="list-header">
                 <h2>📋 የአባላት ዝርዝር</h2>
@@ -195,28 +215,26 @@
             <div id="membersList" class="members-list"></div>
         </div>
         
-        <!-- ==================== MEMBER DETAILS MODAL ==================== -->
-        <div id="memberModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle">👤 የአባል መረጃ</h2>
-                    <span class="close-modal" onclick="closeMemberModal()">&times;</span>
-                </div>
-                <div id="modalBody">
-                    <!-- Member details will be loaded here -->
-                </div>
-                <div style="display:flex; gap:10px; margin-top:20px; justify-content:flex-end">
-                    <button id="editModeBtn" class="btn-edit" onclick="enableEditMode()">✏️ አርትዕ</button>
-                    <button id="saveEditBtn" class="btn-save" style="display:none" onclick="saveMemberEdit()">💾 አስቀምጥ</button>
-                    <button onclick="closeMemberModal()" class="btn-danger">❌ ዝጋ</button>
-                </div>
+        <!-- ==================== BOTTOM-RIGHT MEMBER DETAILS MODAL ==================== -->
+        <div id="memberModal" class="modal-bottom">
+            <div class="modal-header">
+                <h3>👤 የአባል መረጃ</h3>
+                <span class="close-modal" onclick="closeMemberModal()">&times;</span>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button id="editModeBtn" class="btn-edit" onclick="enableEditMode()">✏️ አርትዕ</button>
+                <button id="saveEditBtn" class="btn-save" style="display:none" onclick="saveMemberEdit()">💾 አስቀምጥ</button>
+                <button id="cancelEditBtn" class="btn-cancel" style="display:none" onclick="cancelEditMode()">❌ ሰርዝ</button>
             </div>
         </div>
         
         <!-- ==================== SALES TAB ==================== -->
         <div id="sales" class="tab-content">
             <h2>💰 የሽያጭ እና የምዝገባ ታሪክ</h2>
-            <div class="member-search-box" style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
+            <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
                 <h4>🔍 አባል ይፈልጉ</h4>
                 <div class="form-row">
                     <input type="text" id="salesMemberSearch" placeholder="በስም ወይም በስልክ ይፈልጉ..." onkeyup="searchMemberForSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
@@ -246,7 +264,7 @@
             </div>
             <div class="form-section">
                 <h3>📜 የሽያጭ ታሪክ</h3>
-                <div id="salesStats" class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px"></div>
+                <div id="salesStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px"></div>
                 <div id="salesHistoryList"></div>
             </div>
         </div>
@@ -280,7 +298,7 @@
         <!-- ==================== TRADING TAB ==================== -->
         <div id="trading" class="tab-content">
             <h2>📊 የአክሲዬን ግብይት ጥያቄዎች</h2>
-            <div id="tradingStats" class="stats-grid"></div>
+            <div id="tradingStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px"></div>
             <div class="form-section"><h3>⏳ በመጠባበቅ ላይ ያሉ ጥያቄዎች</h3><div id="pendingRequestsList"></div></div>
             <div class="form-section"><h3>📜 ሁሉም ጥያቄዎች ታሪክ</h3><div id="allRequestsList"></div></div>
         </div>
@@ -312,9 +330,9 @@
         </div>
     </div>
     
-    <div id="lightbox" class="lightbox" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer" onclick="closeLightbox()">
-        <span class="close-lightbox" style="position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer">&times;</span>
-        <img id="lightboxImg" class="lightbox-content" style="display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="close-lightbox">&times;</span>
+        <img id="lightboxImg" class="lightbox-content">
     </div>
 
     <script>
@@ -326,6 +344,23 @@
         let transfers = [];
         let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         let currentEditingMemberId = null;
+        let isEditMode = false;
+        
+        // Amharic sorting function
+        const amharicOrder = ['አ', 'ኡ', 'ኢ', 'ኤ', 'እ', 'ኦ', 'ኧ', 'በ', 'ቡ', 'ቢ', 'ቤ', 'ብ', 'ቦ', 'ቧ', 'ገ', 'ጉ', 'ጊ', 'ጌ', 'ግ', 'ጎ', 'ጓ', 'ደ', 'ዱ', 'ዲ', 'ዴ', 'ድ', 'ዶ', 'ዷ', 'ሀ', 'ሁ', 'ሂ', 'ሄ', 'ህ', 'ሆ', 'ሃ', 'ወ', 'ዉ', 'ዊ', 'ዌ', 'ው', 'ዎ', 'ዋ', 'ዘ', 'ዙ', 'ዚ', 'ዜ', 'ዝ', 'ዞ', 'ዛ', 'ሠ', 'ሡ', 'ሢ', 'ሤ', 'ሥ', 'ሦ', 'ሣ', 'የ', 'ዩ', 'ዪ', 'ዬ', 'ይ', 'ዮ', 'ያ', 'ለ', 'ሉ', 'ሊ', 'ሌ', 'ል', 'ሎ', 'ላ', 'መ', 'ሙ', 'ሚ', 'ሜ', 'ም', 'ሞ', 'ማ', 'ነ', 'ኑ', 'ኒ', 'ኔ', 'ን', 'ኖ', 'ና', 'ሰ', 'ሱ', 'ሲ', 'ሴ', 'ስ', 'ሶ', 'ሳ', 'ዐ', 'ዑ', 'ዒ', 'ዔ', 'ዕ', 'ዖ', 'ዓ', 'ፈ', 'ፉ', 'ፊ', 'ፌ', 'ፍ', 'ፎ', 'ፋ', 'ጸ', 'ጹ', 'ጺ', 'ጼ', 'ጽ', 'ጾ', 'ጻ', 'ቀ', 'ቁ', 'ቂ', 'ቄ', 'ቅ', 'ቆ', 'ቃ', 'ረ', 'ሩ', 'ሪ', 'ሬ', 'ር', 'ሮ', 'ራ', 'ሸ', 'ሹ', 'ሺ', 'ሼ', 'ሽ', 'ሾ', 'ሻ', 'ቸ', 'ቹ', 'ቺ', 'ቼ', 'ች', 'ቾ', 'ቻ', 'ከ', 'ኩ', 'ኪ', 'ኬ', 'ክ', 'ኮ', 'ካ', 'ጨ', 'ጩ', 'ጪ', 'ጬ', 'ጭ', 'ጮ', 'ጫ', 'ፐ', 'ፑ', 'ፒ', 'ፔ', 'ፕ', 'ፖ', 'ፓ'];
+        
+        function sortAmharic(a, b) {
+            const nameA = a.fullName || '';
+            const nameB = b.fullName || '';
+            const firstCharA = nameA.charAt(0);
+            const firstCharB = nameB.charAt(0);
+            const indexA = amharicOrder.indexOf(firstCharA);
+            const indexB = amharicOrder.indexOf(firstCharB);
+            if (indexA === -1 && indexB === -1) return nameA.localeCompare(nameB);
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        }
         
         // API call helper
         async function apiCall(endpoint, options = {}) {
@@ -387,109 +422,116 @@
         
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         
-       // ==================== LOAD MEMBERS WITH SERIAL NUMBERS AND DELETE BUTTON ====================
-async function loadMembers() {
-    console.log("Loading members...");
-    try {
-        const response = await fetch('/api/members', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        members = data.members || data;
-        if (!Array.isArray(members)) members = [];
-        
-        // Sort by registration date (oldest first)
-        members.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-        
-        const search = document.getElementById('searchInput')?.value || '';
-        let filtered = members;
-        if (search) {
-            filtered = members.filter(m => 
-                (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
-                (m.phone && m.phone.includes(search))
-            );
-        }
-        
-        document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
-        const container = document.getElementById('membersList');
-        
-        if (!filtered.length) {
-            container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
-            return;
-        }
-        
-        container.innerHTML = filtered.map((m, index) => `
-            <div class="member-card">
-                <div class="member-header">
-                    <div class="member-name">
-                        <span class="serial-number">#${index + 1}</span>
-                        ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-                        <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
-                        ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
-                        <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
+        // ==================== LOAD MEMBERS WITH AMHARIC SORT ====================
+        async function loadMembers() {
+            console.log("Loading members...");
+            try {
+                const response = await fetch('/api/members', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                members = data.members || data;
+                if (!Array.isArray(members)) members = [];
+                
+                // Sort by Amharic alphabetical order
+                members.sort(sortAmharic);
+                
+                const search = document.getElementById('searchInput')?.value || '';
+                let filtered = members;
+                if (search) {
+                    filtered = members.filter(m => 
+                        (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
+                        (m.phone && m.phone.includes(search))
+                    );
+                }
+                
+                document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+                const container = document.getElementById('membersList');
+                
+                if (!filtered.length) {
+                    container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
+                    return;
+                }
+                
+                container.innerHTML = filtered.map((m, index) => `
+                    <div class="member-card">
+                        <div class="member-header">
+                            <div class="member-name">
+                                <span class="serial-number">#${index + 1}</span>
+                                ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
+                                <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
+                                ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
+                                <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
+                            </div>
+                            <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
+                        </div>
+                        <div class="member-details">
+                            <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
+                            <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
+                            <div>📅 ${m.age || 'N/A'}</div>
+                            <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
+                        </div>
+                        <div class="member-actions">
+                            <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
+                            <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+                        </div>
                     </div>
-                    <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
-                </div>
-                <div class="member-details">
-                    <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
-                    <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
-                    <div>📅 ${m.age || 'N/A'}</div>
-                    <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
-                </div>
-                <div class="member-actions" style="margin-top:15px; display:flex; gap:10px;">
-                    <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
-                    <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
-                </div>
-            </div>
-        `).join('');
+                `).join('');
+                
+                // Update dropdowns
+                const saleSelect = document.getElementById('selectedMemberId');
+                const transferSelect = document.getElementById('oldMemberId');
+                if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+                if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading members:', error);
+                document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
+            }
+        }
         
-        // Update dropdowns
-        const saleSelect = document.getElementById('selectedMemberId');
-        const transferSelect = document.getElementById('oldMemberId');
-        if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-        if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-    } catch (error) {
-        console.error('Error loading members:', error);
-        document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
-    }
-}
-        
-        // ==================== SHOW FULL MEMBER DETAILS ====================
-        async function showMemberDetails(memberId) {
+        // ==================== SHOW FULL MEMBER DETAILS IN BOTTOM-RIGHT MODAL ====================
+        function showMemberDetails(memberId) {
             const member = members.find(m => m.id === memberId);
             if (!member) return;
             
             currentEditingMemberId = memberId;
+            isEditMode = false;
             
             const modalBody = document.getElementById('modalBody');
+            const serialNumber = members.findIndex(m => m.id === memberId) + 1;
+            
             modalBody.innerHTML = `
                 <div id="viewMode">
+                    <div class="profile-header">
+                        ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
+                        <div class="profile-name">${escapeHtml(member.fullName)}</div>
+                    </div>
                     <div class="info-grid">
-                        <div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value" id="viewSerial">${members.findIndex(m => m.id === memberId) + 1}</div></div>
-                        <div class="info-item"><div class="info-label">👤 ሙሉ ስም</div><div class="info-value" id="viewFullName">${escapeHtml(member.fullName)}</div></div>
-                        <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value" id="viewGender">${escapeHtml(member.gender)}</div></div>
-                        <div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value" id="viewAge">${member.age}</div></div>
-                        <div class="info-item"><div class="info-label">👩 የናት ስም</div><div class="info-value" id="viewMotherName">${escapeHtml(member.motherName)}</div></div>
-                        <div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value" id="viewNationality">${escapeHtml(member.nationality)}</div></div>
-                        <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><div class="info-value" id="viewEducation">${escapeHtml(member.education)}</div></div>
-                        <div class="info-item"><div class="info-label">🏠 አድራሻ</div><div class="info-value" id="viewAddress">${escapeHtml(member.address)}</div></div>
-                        <div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value" id="viewPhone">${escapeHtml(member.phone)}</div></div>
-                        <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value" id="viewTaxId">${escapeHtml(member.taxId)}</div></div>
-                        <div class="info-item"><div class="info-label">👔 ሚና/ኃላፊነት</div><div class="info-value" id="viewRole">${escapeHtml(member.role)}</div></div>
-                        <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value" id="viewShareCount">${member.shareCount || 0}</div></div>
-                        <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value" id="viewSharePercentage">${member.sharePercentage || 0}%</div></div>
-                        <div class="info-item"><div class="info-label">💰 የተከፈለ</div><div class="info-value" id="viewSharePricePaid">${(member.sharePricePaid || 0).toFixed(2)} ብር</div></div>
-                        <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><div class="info-value" id="viewRemainingBalance">${(member.remainingBalance || 0).toFixed(2)} ብር</div></div>
-                        <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><div class="info-value" id="viewPaymentStatus">${escapeHtml(member.paymentStatus)}</div></div>
-                        <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value" id="viewBankAccount">${escapeHtml(member.bankAccountNumber)}</div></div>
-                        <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><div class="info-value" id="viewBeneficiaryName">${escapeHtml(member.beneficiaryName)}</div></div>
-                        <div class="info-item"><div class="info-label">📍 የወራሽ አድራሻ</div><div class="info-value" id="viewBeneficiaryAddress">${escapeHtml(member.beneficiaryAddress)}</div></div>
-                        <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><div class="info-value" id="viewLegalRepName">${escapeHtml(member.legalRepName)}</div></div>
-                        <div class="info-item"><div class="info-label">📍 የተወካይ አድራሻ</div><div class="info-value" id="viewLegalRepAddress">${escapeHtml(member.legalRepAddress)}</div></div>
-                        <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><div class="info-value" id="viewLegalRepPhone">${escapeHtml(member.legalRepPhone)}</div></div>
-                        <div class="info-item"><div class="info-label">📝 ማስታወሻ</div><div class="info-value" id="viewFinancialNotes">${escapeHtml(member.financialNotes)}</div></div>
+                        <div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${serialNumber}</div></div>
+                        <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(member.gender)}</div></div>
+                        <div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value">${member.age || 'N/A'}</div></div>
+                        <div class="info-item"><div class="info-label">👩 የናት ስም</div><div class="info-value">${escapeHtml(member.motherName)}</div></div>
+                        <div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(member.nationality)}</div></div>
+                        <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><div class="info-value">${escapeHtml(member.education)}</div></div>
+                        <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(member.address)}</div></div>
+                        <div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value">${escapeHtml(member.phone)}</div></div>
+                        <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(member.taxId)}</div></div>
+                        <div class="info-item"><div class="info-label">👔 ሚና/ኃላፊነት</div><div class="info-value">${escapeHtml(member.role)}</div></div>
+                        <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value">${member.shareCount || 0}</div></div>
+                        <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value">${member.sharePercentage || 0}%</div></div>
+                        <div class="info-item"><div class="info-label">💰 የተከፈለ</div><div class="info-value">${(member.sharePricePaid || 0).toFixed(2)} ብር</div></div>
+                        <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><div class="info-value">${(member.remainingBalance || 0).toFixed(2)} ብር</div></div>
+                        <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(member.paymentStatus)}</div></div>
+                        <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value">${escapeHtml(member.bankAccountNumber)}</div></div>
+                        <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><div class="info-value">${escapeHtml(member.beneficiaryName)}</div></div>
+                        <div class="info-item full-width"><div class="info-label">📍 የወራሽ አድራሻ</div><div class="info-value">${escapeHtml(member.beneficiaryAddress)}</div></div>
+                        <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><div class="info-value">${escapeHtml(member.legalRepName)}</div></div>
+                        <div class="info-item full-width"><div class="info-label">📍 የተወካይ አድራሻ</div><div class="info-value">${escapeHtml(member.legalRepAddress)}</div></div>
+                        <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><div class="info-value">${escapeHtml(member.legalRepPhone)}</div></div>
+                        <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
                     </div>
                     <div class="photo-grid">
+                        <div class="info-label" style="margin-bottom:5px">📸 ሰነዶች (Documents):</div>
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="doc-thumb" onclick="openLightbox('${member.memberPhoto}')" title="የአባሉ ፎቶ">` : ''}
                         ${member.memberTaxDoc ? `<img src="${member.memberTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.memberTaxDoc}')" title="የአባሉ የፋይዳ መታወቂያ">` : ''}
                         ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : ''}
@@ -500,33 +542,62 @@ async function loadMembers() {
                     </div>
                 </div>
                 <div id="editMode" style="display:none">
-                    <div class="form-row"><div class="form-group"><label>ሙሉ ስም</label><input type="text" id="editFullName" value="${escapeHtml(member.fullName)}"></div>
-                    <div class="form-group"><label>ፆታ</label><select id="editGender"><option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option><option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option></select></div></div>
-                    <div class="form-row"><div class="form-group"><label>ዕድሜ</label><input type="number" id="editAge" value="${member.age || ''}"></div>
-                    <div class="form-group"><label>የናት ስም</label><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}"></div></div>
-                    <div class="form-row"><div class="form-group"><label>ዜግነት</label><input type="text" id="editNationality" value="${escapeHtml(member.nationality)}"></div>
-                    <div class="form-group"><label>የትምህርት ደረጃ</label><input type="text" id="editEducation" value="${escapeHtml(member.education)}"></div></div>
-                    <div class="form-group"><label>አድራሻ</label><textarea id="editAddress" rows="2">${escapeHtml(member.address)}</textarea></div>
-                    <div class="form-row"><div class="form-group"><label>ስልክ</label><input type="tel" id="editPhone" value="${escapeHtml(member.phone)}"></div>
-                    <div class="form-group"><label>የፋይዳ መለያ</label><input type="text" id="editTaxId" value="${escapeHtml(member.taxId)}"></div></div>
-                    <div class="form-group"><label>ሚና</label><input type="text" id="editRole" value="${escapeHtml(member.role)}"></div>
-                    <div class="form-row"><div class="form-group"><label>የአክሲዬን ብዛት</label><input type="number" id="editShareCount" value="${member.shareCount || 0}"></div>
-                    <div class="form-group"><label>የአክሲዬን ድርሻ %</label><input type="number" id="editSharePercentage" value="${member.sharePercentage || 0}"></div></div>
-                    <div class="form-row"><div class="form-group"><label>የተከፈለ (ብር)</label><input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}"></div>
-                    <div class="form-group"><label>የክፍያ ሁኔታ</label><select id="editPaymentStatus"><option ${member.paymentStatus === 'ተከፍሏል' ? 'selected' : ''}>ተከፍሏል</option><option ${member.paymentStatus === 'በከፊል ተከፍሏል' ? 'selected' : ''}>በከፊል ተከፍሏል</option><option ${member.paymentStatus === 'አልተከፈለም' ? 'selected' : ''}>አልተከፈለም</option></select></div></div>
-                    <div class="form-row"><div class="form-group"><label>የባንክ ሂሳብ</label><input type="text" id="editBankAccountNumber" value="${escapeHtml(member.bankAccountNumber)}"></div>
-                    <div class="form-group"><label>ማስታወሻ</label><textarea id="editFinancialNotes" rows="2">${escapeHtml(member.financialNotes)}</textarea></div></div>
-                    <div class="form-row"><div class="form-group"><label>የወራሽ ስም</label><input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}"></div>
-                    <div class="form-group"><label>የወራሽ አድራሻ</label><textarea id="editBeneficiaryAddress" rows="2">${escapeHtml(member.beneficiaryAddress)}</textarea></div></div>
-                    <div class="form-row"><div class="form-group"><label>ህጋዊ ተወካይ</label><input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}"></div>
-                    <div class="form-group"><label>የተወካይ አድራሻ</label><textarea id="editLegalRepAddress" rows="2">${escapeHtml(member.legalRepAddress)}</textarea></div></div>
-                    <div class="form-group"><label>የተወካይ ስልክ</label><input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}"></div>
+                    <div class="profile-header">
+                        ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
+                        <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; font-weight:bold; padding:8px; border:1px solid #ddd; border-radius:6px; width:100%">
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><select id="editGender" style="width:100%; padding:8px"><option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option><option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option></select></div>
+                        <div class="info-item"><div class="info-label">📅 ዕድሜ</div><input type="number" id="editAge" value="${member.age || ''}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">👩 የናት ስም</div><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">🌍 ዜግነት</div><input type="text" id="editNationality" value="${escapeHtml(member.nationality)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><input type="text" id="editEducation" value="${escapeHtml(member.education)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><textarea id="editAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.address)}</textarea></div>
+                        <div class="info-item"><div class="info-label">📞 ስልክ</div><input type="tel" id="editPhone" value="${escapeHtml(member.phone)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><input type="text" id="editTaxId" value="${escapeHtml(member.taxId)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">👔 ሚና</div><input type="text" id="editRole" value="${escapeHtml(member.role)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">📊 አክሲዬን ብዛት</div><input type="number" id="editShareCount" value="${member.shareCount || 0}" style="width:100%; padding:8px" oninput="calculateEditRemainingBalance()"></div>
+                        <div class="info-item"><div class="info-label">📈 አክሲዬን ድርሻ %</div><input type="number" id="editSharePercentage" value="${member.sharePercentage || 0}" step="0.01" style="width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">💰 የተከፈለ (ብር)</div><input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}" step="0.01" style="width:100%; padding:8px" oninput="calculateEditRemainingBalance()"></div>
+                        <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><input type="text" id="editRemainingBalance" readonly style="background:#e9ecef; width:100%; padding:8px"></div>
+                        <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><select id="editPaymentStatus" style="width:100%; padding:8px"><option ${member.paymentStatus === 'ተከፍሏል' ? 'selected' : ''}>ተከፍሏል</option><option ${member.paymentStatus === 'በከፊል ተከፍሏል' ? 'selected' : ''}>በከፊል ተከፍሏል</option><option ${member.paymentStatus === 'አልተከፈለም' ? 'selected' : ''}>አልተከፈለም</option></select></div>
+                        <div class="info-item"><div class="info-label">🏦 ባንክ ሂሳብ</div><input type="text" id="editBankAccountNumber" value="${escapeHtml(member.bankAccountNumber)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" style="width:100%; padding:8px">${escapeHtml(member.financialNotes)}</textarea></div>
+                        <div class="info-item"><div class="info-label">👨‍👦 የወራሽ ስም</div><input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item full-width"><div class="info-label">📍 የወራሽ አድራሻ</div><textarea id="editBeneficiaryAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.beneficiaryAddress)}</textarea></div>
+                        <div class="info-item"><div class="info-label">⚖️ ህጋዊ ተወካይ</div><input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}" style="width:100%; padding:8px"></div>
+                        <div class="info-item full-width"><div class="info-label">📍 የተወካይ አድራሻ</div><textarea id="editLegalRepAddress" rows="2" style="width:100%; padding:8px">${escapeHtml(member.legalRepAddress)}</textarea></div>
+                        <div class="info-item"><div class="info-label">📞 የተወካይ ስልክ</div><input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}" style="width:100%; padding:8px"></div>
+                    </div>
                 </div>
             `;
+            
+            // Calculate remaining balance for edit mode
+            if (document.getElementById('editShareCount')) {
+                calculateEditRemainingBalance();
+            }
             
             document.getElementById('memberModal').style.display = 'block';
             document.getElementById('editModeBtn').style.display = 'inline-block';
             document.getElementById('saveEditBtn').style.display = 'none';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+        
+        function calculateEditRemainingBalance() {
+            const shareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
+            const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid')?.value) || 0;
+            const TOTAL_SHARE_VALUE = 1000;
+            const totalSharesValue = shareCount * TOTAL_SHARE_VALUE;
+            const remaining = totalSharesValue - sharePricePaid;
+            const remainingField = document.getElementById('editRemainingBalance');
+            if (remainingField) remainingField.value = remaining > 0 ? remaining.toFixed(2) : '0.00';
+            
+            const paymentStatus = document.getElementById('editPaymentStatus');
+            if (paymentStatus) {
+                if (remaining <= 0) paymentStatus.value = 'ተከፍሏል';
+                else if (sharePricePaid > 0 && remaining > 0) paymentStatus.value = 'በከፊል ተከፍሏል';
+                else paymentStatus.value = 'አልተከፈለም';
+            }
         }
         
         function enableEditMode() {
@@ -534,6 +605,13 @@ async function loadMembers() {
             document.getElementById('editMode').style.display = 'block';
             document.getElementById('editModeBtn').style.display = 'none';
             document.getElementById('saveEditBtn').style.display = 'inline-block';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            isEditMode = true;
+            calculateEditRemainingBalance();
+        }
+        
+        function cancelEditMode() {
+            showMemberDetails(currentEditingMemberId);
         }
         
         async function saveMemberEdit() {
@@ -562,7 +640,6 @@ async function loadMembers() {
                 updatedAt: new Date().toISOString()
             };
             
-            // Calculate remaining balance
             const TOTAL_SHARE_VALUE = 1000;
             const totalSharesValue = updatedMember.shareCount * TOTAL_SHARE_VALUE;
             updatedMember.remainingBalance = totalSharesValue - updatedMember.sharePricePaid;
@@ -588,6 +665,7 @@ async function loadMembers() {
         
         function closeMemberModal() {
             document.getElementById('memberModal').style.display = 'none';
+            isEditMode = false;
         }
         
         // ==================== DELETE MEMBER ====================
@@ -661,7 +739,7 @@ async function loadMembers() {
             
             const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
             if (result.credentials) {
-                alert(`✅ አባል ተመዝግቧል!\n\nተራ ቁጥር: ${members.length + 1}\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
+                alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
             } else {
                 alert('✅ አባል ተመዝግቧል!');
             }
@@ -696,7 +774,7 @@ async function loadMembers() {
         function displaySalesStats(memberSales) {
             const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
             const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
-            document.getElementById('salesStats').innerHTML = `<div class="stat-card"><div class="stat-value">${memberSales.length}</div><div>ግብይቶች</div></div><div class="stat-card"><div class="stat-value">${totalQty.toFixed(2)} kg</div><div>ጠቅላላ ብዛት</div></div><div class="stat-card"><div class="stat-value">${totalAmt.toFixed(2)} ብር</div><div>ጠቅላላ ገቢ</div></div>`;
+            document.getElementById('salesStats').innerHTML = `<div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales.length}</div><div>ግብይቶች</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div><div>ጠቅላላ ብዛት</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div><div>ጠቅላላ ገቢ</div></div>`;
         }
         
         function displaySalesHistory(memberSales) {
@@ -800,7 +878,7 @@ async function loadMembers() {
         async function loadTradingStats() {
             try {
                 const stats = await apiCall('/share-trading/stats');
-                document.getElementById('tradingStats').innerHTML = `<div class="stat-card"><div class="stat-value">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div><div class="stat-card"><div class="stat-value">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div><div class="stat-card"><div class="stat-value">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>`;
+                document.getElementById('tradingStats').innerHTML = `<div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>`;
             } catch(e) { console.error(e); }
         }
         
@@ -958,6 +1036,8 @@ async function loadMembers() {
         window.closeMemberModal = closeMemberModal;
         window.enableEditMode = enableEditMode;
         window.saveMemberEdit = saveMemberEdit;
+        window.cancelEditMode = cancelEditMode;
+        window.calculateEditRemainingBalance = calculateEditRemainingBalance;
     </script>
 </body>
 </html>
