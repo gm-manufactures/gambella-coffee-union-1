@@ -63,7 +63,7 @@
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         
         /* Bottom-Right Modal */
-        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:550px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:600px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
         @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
         .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
         .modal-header h3{margin:0}
@@ -213,6 +213,7 @@
                     <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
                 </div>
                 
+                <!-- Legal Representative Section -->
                 <div class="form-section">
                     <h3>⚖️ ህጋዊ ተወካይ መረጃ</h3>
                     <div class="form-row">
@@ -222,6 +223,32 @@
                     <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="legalRepPhone"></div>
                     <div class="form-group"><label>📸 የተወካይ ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
                     <div class="form-group"><label>🆔 የተወካይ የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
+                </div>
+                
+                <!-- Power of Attorney Section (ውክልና) -->
+                <div class="form-section">
+                    <h3>📜 ውክልና (Power of Attorney)</h3>
+                    <div class="form-group">
+                        <label>የውክልና አይነት (Type of Power of Attorney)</label>
+                        <select id="powerOfAttorneyType" onchange="togglePowerOfAttorneyOptions()">
+                            <option value="">ምረጥ / Select</option>
+                            <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ">ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ (Federal Documents Registration Agency)</option>
+                            <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት">በፍትህ የተረጋገጠ የምስክር ወረቀት (Justice Certified Witness Certificate)</option>
+                        </select>
+                    </div>
+                    <div id="powerOfAttorneyDetails" style="display:none;">
+                        <div class="form-row">
+                            <div class="form-group"><label>የውክልና ቁጥር (Power of Attorney Number)</label><input type="text" id="powerOfAttorneyNumber" placeholder="ለምሳሌ: ቁጥር 001/2016"></div>
+                            <div class="form-group"><label>ቀን (Date)</label><input type="date" id="powerOfAttorneyDate"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>የሰጠው ተቋም (Issuing Authority)</label><input type="text" id="powerOfAttorneyIssuer" placeholder="የሰጠው ተቋም ስም"></div>
+                            <div class="form-group"><label>የሚቀጥልበት ቀን (Expiry Date)</label><input type="date" id="powerOfAttorneyExpiry"></div>
+                        </div>
+                        <div class="form-group"><label>ማስታወሻ (Notes)</label><textarea id="powerOfAttorneyNotes" rows="2" placeholder="ተጨማሪ መረጃ..."></textarea></div>
+                        <div class="form-group"><label>📸 የውክልና ሰነድ ፎቶ (Power of Attorney Document Photo)</label><input type="file" id="powerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'powerOfAttorneyPreview')"><div id="powerOfAttorneyPreview" class="image-preview"></div></div>
+                        <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ ፎቶ (Hard Copy Document Photo)</label><input type="file" id="hardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'hardCopyDocumentPreview')"><div id="hardCopyDocumentPreview" class="image-preview"></div></div>
+                    </div>
                 </div>
                 
                 <div class="form-section">
@@ -453,7 +480,7 @@
         
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         
-        // Toggle for "ሌላ" relationship in registration form
+        // Toggle functions
         function toggleOtherRelationship() {
             const relationship = document.getElementById('beneficiaryRelationship').value;
             const otherDiv = document.getElementById('otherRelationshipDiv');
@@ -465,7 +492,6 @@
             }
         }
         
-        // Toggle for "ሌላ" relationship in edit mode
         function toggleEditOtherRelationship() {
             const relationship = document.getElementById('editBeneficiaryRelationship').value;
             const otherDiv = document.getElementById('editOtherRelationshipDiv');
@@ -474,6 +500,26 @@
             } else {
                 otherDiv.style.display = 'none';
                 document.getElementById('editBeneficiaryOtherRelationship').value = '';
+            }
+        }
+        
+        function togglePowerOfAttorneyOptions() {
+            const type = document.getElementById('powerOfAttorneyType').value;
+            const detailsDiv = document.getElementById('powerOfAttorneyDetails');
+            if (type !== '') {
+                detailsDiv.style.display = 'block';
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+        
+        function toggleEditPowerOfAttorneyOptions() {
+            const type = document.getElementById('editPowerOfAttorneyType').value;
+            const detailsDiv = document.getElementById('editPowerOfAttorneyDetails');
+            if (type !== '') {
+                detailsDiv.style.display = 'block';
+            } else {
+                detailsDiv.style.display = 'none';
             }
         }
         
@@ -559,13 +605,11 @@
             
             modalBody.innerHTML = `
                 <div id="viewMode">
-                    <!-- Member Profile Header with Photo -->
                     <div class="profile-header">
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
                         <div class="profile-name">${escapeHtml(member.fullName)}</div>
                     </div>
                     
-                    <!-- Member Main Information -->
                     <div class="info-grid">
                         <div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${serialNumber}</div></div>
                         <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(member.gender)}</div></div>
@@ -586,7 +630,6 @@
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
                     </div>
                     
-                    <!-- Beneficiary Section with Photo -->
                     <div class="section-card">
                         <div class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary Information)</div>
                         <div class="photo-with-info">
@@ -601,7 +644,6 @@
                         </div>
                     </div>
                     
-                    <!-- Legal Representative Section with Photo -->
                     <div class="section-card">
                         <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ (Legal Representative)</div>
                         <div class="photo-with-info">
@@ -615,7 +657,24 @@
                         </div>
                     </div>
                     
-                    <!-- Member Documents -->
+                    ${(member.powerOfAttorneyType) ? `
+                    <div class="section-card">
+                        <div class="section-title">📜 ውክልና (Power of Attorney)</div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">የውክልና አይነት:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyType)}</div></div>
+                            <div class="info-item"><div class="info-label">ቁጥር:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyNumber) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">ቀን:</div><div class="info-value">${member.powerOfAttorneyDate ? new Date(member.powerOfAttorneyDate).toLocaleDateString() : 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">የሰጠው ተቋም:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyIssuer) || 'N/A'}</div></div>
+                            <div class="info-item"><div class="info-label">የሚቀጥልበት ቀን:</div><div class="info-value">${member.powerOfAttorneyExpiry ? new Date(member.powerOfAttorneyExpiry).toLocaleDateString() : 'N/A'}</div></div>
+                            <div class="info-item full-width"><div class="info-label">ማስታወሻ:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyNotes) || 'N/A'}</div></div>
+                        </div>
+                        <div class="photo-grid">
+                            ${member.powerOfAttorneyPhoto ? `<img src="${member.powerOfAttorneyPhoto}" class="doc-thumb" onclick="openLightbox('${member.powerOfAttorneyPhoto}')" title="የውክልና ሰነድ">` : ''}
+                            ${member.hardCopyDocumentPhoto ? `<img src="${member.hardCopyDocumentPhoto}" class="doc-thumb" onclick="openLightbox('${member.hardCopyDocumentPhoto}')" title="የሀርድ ኮፒ ቅጂ">` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
                     ${(member.memberTaxDoc || member.hardCopyForm) ? `
                     <div class="section-card">
                         <div class="section-title">📄 የአባሉ ሰነዶች (Member Documents)</div>
@@ -628,6 +687,7 @@
                 </div>
                 
                 <div id="editMode" style="display:none">
+                    <!-- Edit Mode Content - Simplified for brevity, includes all fields -->
                     <div class="profile-header">
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
                         <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; font-weight:bold; padding:8px; border:1px solid #ddd; border-radius:6px; width:100%">
@@ -651,7 +711,6 @@
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" style="width:100%; padding:8px">${escapeHtml(member.financialNotes)}</textarea></div>
                     </div>
                     
-                    <!-- Beneficiary Edit Section -->
                     <div class="section-card">
                         <div class="section-title">👨‍👦 የወራሽ መረጃ</div>
                         <div class="photo-with-info">
@@ -687,7 +746,6 @@
                         <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editBeneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'editBeneficiaryTaxPreview')"><div id="editBeneficiaryTaxPreview" class="image-preview"></div></div>
                     </div>
                     
-                    <!-- Legal Representative Edit Section -->
                     <div class="section-card">
                         <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ</div>
                         <div class="photo-with-info">
@@ -699,6 +757,30 @@
                             </div>
                         </div>
                         <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editRepTaxDoc" accept="image/*" onchange="previewImage(this,'editRepTaxPreview')"><div id="editRepTaxPreview" class="image-preview"></div></div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <div class="section-title">📜 ውክልና (Power of Attorney)</div>
+                        <div class="form-group"><label>የውክልና አይነት</label>
+                            <select id="editPowerOfAttorneyType" style="width:100%; padding:8px" onchange="toggleEditPowerOfAttorneyOptions()">
+                                <option value="">ምረጥ</option>
+                                <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ" ${member.powerOfAttorneyType === 'ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ' ? 'selected' : ''}>ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ</option>
+                                <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት" ${member.powerOfAttorneyType === 'በፍትህ የተረጋገጠ የምስክር ወረቀት' ? 'selected' : ''}>በፍትህ የተረጋገጠ የምስክር ወረቀት</option>
+                            </select>
+                        </div>
+                        <div id="editPowerOfAttorneyDetails" style="${member.powerOfAttorneyType ? 'display:block' : 'display:none'}">
+                            <div class="form-row">
+                                <div class="form-group"><label>የውክልና ቁጥር</label><input type="text" id="editPowerOfAttorneyNumber" value="${escapeHtml(member.powerOfAttorneyNumber)}" style="width:100%; padding:8px"></div>
+                                <div class="form-group"><label>ቀን</label><input type="date" id="editPowerOfAttorneyDate" value="${member.powerOfAttorneyDate || ''}" style="width:100%; padding:8px"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>የሰጠው ተቋም</label><input type="text" id="editPowerOfAttorneyIssuer" value="${escapeHtml(member.powerOfAttorneyIssuer)}" style="width:100%; padding:8px"></div>
+                                <div class="form-group"><label>የሚቀጥልበት ቀን</label><input type="date" id="editPowerOfAttorneyExpiry" value="${member.powerOfAttorneyExpiry || ''}" style="width:100%; padding:8px"></div>
+                            </div>
+                            <div class="form-group"><label>ማስታወሻ</label><textarea id="editPowerOfAttorneyNotes" rows="2" style="width:100%; padding:8px">${escapeHtml(member.powerOfAttorneyNotes)}</textarea></div>
+                            <div class="form-group"><label>📸 የውክልና ሰነድ ፎቶ (አዲስ ለመጫን)</label><input type="file" id="editPowerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'editPowerOfAttorneyPreview')"><div id="editPowerOfAttorneyPreview" class="image-preview"></div></div>
+                            <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ ፎቶ (አዲስ ለመጫን)</label><input type="file" id="editHardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'editHardCopyDocumentPreview')"><div id="editHardCopyDocumentPreview" class="image-preview"></div></div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -741,20 +823,34 @@
         }
         
         async function saveMemberEdit() {
-            // Get beneficiary relationship value for edit
             let editBeneficiaryRelationship = document.getElementById('editBeneficiaryRelationship').value;
             if (editBeneficiaryRelationship === 'ሌላ') {
                 editBeneficiaryRelationship = document.getElementById('editBeneficiaryOtherRelationship').value;
             }
             
+            let editPowerOfAttorneyType = document.getElementById('editPowerOfAttorneyType').value;
+            let editPowerOfAttorneyNumber = document.getElementById('editPowerOfAttorneyNumber').value;
+            let editPowerOfAttorneyDate = document.getElementById('editPowerOfAttorneyDate').value;
+            let editPowerOfAttorneyIssuer = document.getElementById('editPowerOfAttorneyIssuer').value;
+            let editPowerOfAttorneyExpiry = document.getElementById('editPowerOfAttorneyExpiry').value;
+            let editPowerOfAttorneyNotes = document.getElementById('editPowerOfAttorneyNotes').value;
+            
             let beneficiaryTaxDocBase64 = null;
             let repTaxDocBase64 = null;
+            let powerOfAttorneyPhotoBase64 = null;
+            let hardCopyDocumentPhotoBase64 = null;
             
             const beneficiaryTaxFile = document.getElementById('editBeneficiaryTaxDoc')?.files[0];
             if (beneficiaryTaxFile) beneficiaryTaxDocBase64 = await fileToBase64(beneficiaryTaxFile);
             
             const repTaxFile = document.getElementById('editRepTaxDoc')?.files[0];
             if (repTaxFile) repTaxDocBase64 = await fileToBase64(repTaxFile);
+            
+            const poaPhotoFile = document.getElementById('editPowerOfAttorneyPhoto')?.files[0];
+            if (poaPhotoFile) powerOfAttorneyPhotoBase64 = await fileToBase64(poaPhotoFile);
+            
+            const hardCopyDocFile = document.getElementById('editHardCopyDocumentPhoto')?.files[0];
+            if (hardCopyDocFile) hardCopyDocumentPhotoBase64 = await fileToBase64(hardCopyDocFile);
             
             const updatedMember = {
                 fullName: document.getElementById('editFullName').value,
@@ -780,11 +876,19 @@
                 legalRepName: document.getElementById('editLegalRepName').value,
                 legalRepAddress: document.getElementById('editLegalRepAddress').value,
                 legalRepPhone: document.getElementById('editLegalRepPhone').value,
+                powerOfAttorneyType: editPowerOfAttorneyType,
+                powerOfAttorneyNumber: editPowerOfAttorneyNumber,
+                powerOfAttorneyDate: editPowerOfAttorneyDate,
+                powerOfAttorneyIssuer: editPowerOfAttorneyIssuer,
+                powerOfAttorneyExpiry: editPowerOfAttorneyExpiry,
+                powerOfAttorneyNotes: editPowerOfAttorneyNotes,
                 updatedAt: new Date().toISOString()
             };
             
             if (beneficiaryTaxDocBase64) updatedMember.beneficiaryTaxDoc = beneficiaryTaxDocBase64;
             if (repTaxDocBase64) updatedMember.repTaxDoc = repTaxDocBase64;
+            if (powerOfAttorneyPhotoBase64) updatedMember.powerOfAttorneyPhoto = powerOfAttorneyPhotoBase64;
+            if (hardCopyDocumentPhotoBase64) updatedMember.hardCopyDocumentPhoto = hardCopyDocumentPhotoBase64;
             
             const TOTAL_SHARE_VALUE = 1000;
             const totalSharesValue = updatedMember.shareCount * TOTAL_SHARE_VALUE;
@@ -846,6 +950,10 @@
             const repTaxDoc = document.getElementById('repTaxDoc').files[0];
             const hardCopyForm = document.getElementById('hardCopyForm').files[0];
             
+            // Power of Attorney files
+            const powerOfAttorneyPhoto = document.getElementById('powerOfAttorneyPhoto').files[0];
+            const hardCopyDocumentPhoto = document.getElementById('hardCopyDocumentPhoto').files[0];
+            
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
             const TOTAL_SHARE_VALUE = 1000;
@@ -881,13 +989,21 @@
                 legalRepName: document.getElementById('legalRepName').value,
                 legalRepAddress: document.getElementById('legalRepAddress').value,
                 legalRepPhone: document.getElementById('legalRepPhone').value,
+                powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
+                powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
+                powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
+                powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
+                powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
+                powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
                 memberPhoto: memberPhoto ? await fileToBase64(memberPhoto) : null,
                 memberTaxDoc: memberTaxDoc ? await fileToBase64(memberTaxDoc) : null,
                 beneficiaryPhoto: beneficiaryPhoto ? await fileToBase64(beneficiaryPhoto) : null,
                 beneficiaryTaxDoc: beneficiaryTaxDoc ? await fileToBase64(beneficiaryTaxDoc) : null,
                 repPhoto: repPhoto ? await fileToBase64(repPhoto) : null,
                 repTaxDoc: repTaxDoc ? await fileToBase64(repTaxDoc) : null,
-                hardCopyForm: hardCopyForm ? await fileToBase64(hardCopyForm) : null
+                hardCopyForm: hardCopyForm ? await fileToBase64(hardCopyForm) : null,
+                powerOfAttorneyPhoto: powerOfAttorneyPhoto ? await fileToBase64(powerOfAttorneyPhoto) : null,
+                hardCopyDocumentPhoto: hardCopyDocumentPhoto ? await fileToBase64(hardCopyDocumentPhoto) : null
             };
             
             const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
@@ -903,6 +1019,7 @@
             document.getElementById('sharePricePaid').value = '0';
             document.getElementById('remainingBalance').value = '0';
             document.getElementById('otherRelationshipDiv').style.display = 'none';
+            document.getElementById('powerOfAttorneyDetails').style.display = 'none';
             loadMembers();
             showTab('list');
         });
@@ -1130,8 +1247,8 @@
         // ==================== EXPORT TO CSV ====================
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ ፆታ', 'የወራሽ ዝምድና', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'ማስታወሻ'];
-            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.beneficiaryGender || '', m.beneficiaryRelationship || '', m.beneficiaryAddress || '', m.legalRepName || '', m.legalRepAddress || '', m.legalRepPhone || '', m.financialNotes || '']);
+            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ ፆታ', 'የወራሽ ዝምድና', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'የውክልና አይነት', 'የውክልና ቁጥር', 'የውክልና ቀን', 'የሰጠው ተቋም', 'የውክልና የሚቀጥልበት ቀን', 'የውክልና ማስታወሻ', 'ማስታወሻ'];
+            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.beneficiaryGender || '', m.beneficiaryRelationship || '', m.beneficiaryAddress || '', m.legalRepName || '', m.legalRepAddress || '', m.legalRepPhone || '', m.powerOfAttorneyType || '', m.powerOfAttorneyNumber || '', m.powerOfAttorneyDate || '', m.powerOfAttorneyIssuer || '', m.powerOfAttorneyExpiry || '', m.powerOfAttorneyNotes || '', m.financialNotes || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -1202,6 +1319,8 @@
         window.calculateEditRemainingBalance = calculateEditRemainingBalance;
         window.toggleOtherRelationship = toggleOtherRelationship;
         window.toggleEditOtherRelationship = toggleEditOtherRelationship;
+        window.togglePowerOfAttorneyOptions = togglePowerOfAttorneyOptions;
+        window.toggleEditPowerOfAttorneyOptions = toggleEditPowerOfAttorneyOptions;
     </script>
 </body>
 </html>
