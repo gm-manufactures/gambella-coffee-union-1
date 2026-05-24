@@ -387,68 +387,72 @@
         
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         
-        // ==================== LOAD MEMBERS WITH SERIAL NUMBERS ====================
-        async function loadMembers() {
-            console.log("Loading members...");
-            try {
-                const response = await fetch('/api/members', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-                members = data.members || data;
-                if (!Array.isArray(members)) members = [];
-                
-                // Sort by registration date (oldest first) or by name
-                members.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-                
-                const search = document.getElementById('searchInput')?.value || '';
-                let filtered = members;
-                if (search) {
-                    filtered = members.filter(m => 
-                        (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
-                        (m.phone && m.phone.includes(search))
-                    );
-                }
-                
-                document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
-                const container = document.getElementById('membersList');
-                
-                if (!filtered.length) {
-                    container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
-                    return;
-                }
-                
-                container.innerHTML = filtered.map((m, index) => `
-                    <div class="member-card" onclick="showMemberDetails('${m.id}')">
-                        <div class="member-header">
-                            <div class="member-name">
-                                <span class="serial-number">#${index + 1}</span>
-                                ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-                                <strong>${escapeHtml(m.fullName || 'No Name')}</strong>
-                                ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
-                                <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
-                            </div>
-                            <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
-                        </div>
-                        <div class="member-details">
-                            <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
-                            <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
-                            <div>📅 ${m.age || 'N/A'}</div>
-                            <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                // Update dropdowns
-                const saleSelect = document.getElementById('selectedMemberId');
-                const transferSelect = document.getElementById('oldMemberId');
-                if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-                if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-            } catch (error) {
-                console.error('Error loading members:', error);
-                document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
-            }
+       // ==================== LOAD MEMBERS WITH SERIAL NUMBERS AND DELETE BUTTON ====================
+async function loadMembers() {
+    console.log("Loading members...");
+    try {
+        const response = await fetch('/api/members', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        members = data.members || data;
+        if (!Array.isArray(members)) members = [];
+        
+        // Sort by registration date (oldest first)
+        members.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+        
+        const search = document.getElementById('searchInput')?.value || '';
+        let filtered = members;
+        if (search) {
+            filtered = members.filter(m => 
+                (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
+                (m.phone && m.phone.includes(search))
+            );
         }
+        
+        document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+        const container = document.getElementById('membersList');
+        
+        if (!filtered.length) {
+            container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map((m, index) => `
+            <div class="member-card">
+                <div class="member-header">
+                    <div class="member-name">
+                        <span class="serial-number">#${index + 1}</span>
+                        ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
+                        <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
+                        ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
+                        <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
+                    </div>
+                    <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
+                </div>
+                <div class="member-details">
+                    <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
+                    <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
+                    <div>📅 ${m.age || 'N/A'}</div>
+                    <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
+                </div>
+                <div class="member-actions" style="margin-top:15px; display:flex; gap:10px;">
+                    <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
+                    <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Update dropdowns
+        const saleSelect = document.getElementById('selectedMemberId');
+        const transferSelect = document.getElementById('oldMemberId');
+        if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+    } catch (error) {
+        console.error('Error loading members:', error);
+        document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
+    }
+}
         
         // ==================== SHOW FULL MEMBER DETAILS ====================
         async function showMemberDetails(memberId) {
