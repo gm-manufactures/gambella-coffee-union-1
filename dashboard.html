@@ -173,44 +173,65 @@
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
                 </div>
                 
-               <div class="form-section">
-    <h3>👨‍👦 የወራሽ መረጃ</h3>
-    <div class="form-row">
-        <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName"></div>
-        <div class="form-group"><label>ፆታ</label>
-            <select id="beneficiaryGender">
-                <option value="">ምረጥ</option>
-                <option value="ወንድ">ወንድ</option>
-                <option value="ሴት">ሴት</option>
-            </select>
+                <!-- ==================== UPDATED BENEFICIARY SECTION ==================== -->
+                <div class="form-section">
+                    <h3>👨‍👦 የወራሽ መረጃ</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName"></div>
+                        <div class="form-group"><label>ፆታ</label>
+                            <select id="beneficiaryGender">
+                                <option value="">ምረጥ</option>
+                                <option value="ወንድ">ወንድ</option>
+                                <option value="ሴት">ሴት</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>ዝምድና</label>
+                            <select id="beneficiaryRelationship" onchange="toggleOtherRelationship()">
+                                <option value="">ምረጥ</option>
+                                <option value="አባት">አባት</option>
+                                <option value="እናት">እናት</option>
+                                <option value="ወንድም">ወንድም</option>
+                                <option value="እህት">እህት</option>
+                                <option value="ልጅ">ልጅ</option>
+                                <option value="ሚስት">ሚስት</option>
+                                <option value="አክስት">አክስት</option>
+                                <option value="አጎት">አጎት</option>
+                                <option value="የአጎት ልጅ">የአጎት ልጅ</option>
+                                <option value="የአክስት ልጅ">የአክስት ልጅ</option>
+                                <option value="ሌላ">ሌላ</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="otherRelationshipDiv" style="display:none">
+                            <label>ሌላ (ዝምድናውን ይግለጹ)</label>
+                            <input type="text" id="beneficiaryOtherRelationship" placeholder="ለምሳሌ: አያት, የአጎት ልጅ, ወዘተ">
+                        </div>
+                    </div>
+                    <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress" rows="2"></textarea></div>
+                    <div class="form-group"><label>📸 የወራሽ ፎቶ</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this,'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>⚖️ ህጋዊ ተወካይ መረጃ</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>ስም</label><input type="text" id="legalRepName"></div>
+                        <div class="form-group"><label>አድራሻ</label><textarea id="legalRepAddress" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="legalRepPhone"></div>
+                    <div class="form-group"><label>📸 የተወካይ ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
+                    <div class="form-group"><label>🆔 የተወካይ የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>📄 የሃርድ ኮፒ ቅፅ</h3>
+                    <div class="form-group"><label>የሀርድ ኮፒ ቅፅ ፎቶ</label><input type="file" id="hardCopyForm" accept="image/*" onchange="previewImage(this,'hardCopyPreview')"><div id="hardCopyPreview" class="image-preview"></div></div>
+                </div>
+                
+                <button type="submit" class="btn-primary">✅ አስመዝግብ</button>
+            </form>
         </div>
-    </div>
-    <div class="form-row">
-        <div class="form-group"><label>ዝምድና</label>
-            <select id="beneficiaryRelationship" onchange="toggleOtherRelationship()">
-                <option value="">ምረጥ</option>
-                <option value="አባት">አባት</option>
-                <option value="እናት">እናት</option>
-                <option value="ወንድም">ወንድም</option>
-                <option value="እህት">እህት</option>
-                <option value="ልጅ">ልጅ</option>
-                <option value="ሚስት">ሚስት</option>
-                <option value="አክስት">አክስት</option>
-                <option value="አጎት">አጎት</option>
-                <option value="የአጎት ልጅ">የአጎት ልጅ</option>
-                <option value="የአክስት ልጅ">የአክስት ልጅ</option>
-                <option value="ሌላ">ሌላ</option>
-            </select>
-        </div>
-        <div class="form-group" id="otherRelationshipDiv" style="display:none">
-            <label>ሌላ (ዝምድናውን ይግለጹ)</label>
-            <input type="text" id="beneficiaryOtherRelationship" placeholder="ለምሳሌ: አያት, የአጎት ልጅ, ወዘተ">
-        </div>
-    </div>
-    <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress" rows="2"></textarea></div>
-    <div class="form-group"><label>📸 የወራሽ ፎቶ</label><input type="file" id="beneficiaryPhoto" accept="image/*" onchange="previewImage(this,'beneficiaryPhotoPreview')"><div id="beneficiaryPhotoPreview" class="image-preview"></div></div>
-    <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'beneficiaryTaxPreview')"><div id="beneficiaryTaxPreview" class="image-preview"></div></div>
-</div>
         
         <!-- ==================== MEMBERS LIST TAB ==================== -->
         <div id="list" class="tab-content">
@@ -423,26 +444,6 @@
             else if (sharePricePaid > 0 && remaining > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
             else document.getElementById('paymentStatus').value = 'አልተከፈለም';
         }
-        function toggleOtherRelationship() {
-    const relationship = document.getElementById('beneficiaryRelationship').value;
-    const otherDiv = document.getElementById('otherRelationshipDiv');
-    if (relationship === 'ሌላ') {
-        otherDiv.style.display = 'block';
-    } else {
-        otherDiv.style.display = 'none';
-        document.getElementById('beneficiaryOtherRelationship').value = '';
-    }
-}
-        function toggleEditOtherRelationship() {
-    const relationship = document.getElementById('editBeneficiaryRelationship').value;
-    const otherDiv = document.getElementById('editOtherRelationshipDiv');
-    if (relationship === 'ሌላ') {
-        otherDiv.style.display = 'block';
-    } else {
-        otherDiv.style.display = 'none';
-        document.getElementById('editBeneficiaryOtherRelationship').value = '';
-    }
-}
         
         function getPaymentStatusClass(status) {
             if (status === 'ተከፍሏል') return 'status-paid';
@@ -451,6 +452,30 @@
         }
         
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+        
+        // Toggle for "ሌላ" relationship in registration form
+        function toggleOtherRelationship() {
+            const relationship = document.getElementById('beneficiaryRelationship').value;
+            const otherDiv = document.getElementById('otherRelationshipDiv');
+            if (relationship === 'ሌላ') {
+                otherDiv.style.display = 'block';
+            } else {
+                otherDiv.style.display = 'none';
+                document.getElementById('beneficiaryOtherRelationship').value = '';
+            }
+        }
+        
+        // Toggle for "ሌላ" relationship in edit mode
+        function toggleEditOtherRelationship() {
+            const relationship = document.getElementById('editBeneficiaryRelationship').value;
+            const otherDiv = document.getElementById('editOtherRelationshipDiv');
+            if (relationship === 'ሌላ') {
+                otherDiv.style.display = 'block';
+            } else {
+                otherDiv.style.display = 'none';
+                document.getElementById('editBeneficiaryOtherRelationship').value = '';
+            }
+        }
         
         // ==================== LOAD MEMBERS WITH AMHARIC SORT ====================
         async function loadMembers() {
@@ -463,7 +488,6 @@
                 members = data.members || data;
                 if (!Array.isArray(members)) members = [];
                 
-                // Sort by Amharic alphabetical order
                 members.sort(sortAmharic);
                 
                 const search = document.getElementById('searchInput')?.value || '';
@@ -508,7 +532,6 @@
                     </div>
                 `).join('');
                 
-                // Update dropdowns
                 const saleSelect = document.getElementById('selectedMemberId');
                 const transferSelect = document.getElementById('oldMemberId');
                 if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
@@ -519,7 +542,7 @@
             }
         }
         
-        // ==================== SHOW FULL MEMBER DETAILS IN BOTTOM-RIGHT MODAL ====================
+        // ==================== SHOW FULL MEMBER DETAILS ====================
         function showMemberDetails(memberId) {
             const member = members.find(m => m.id === memberId);
             if (!member) return;
@@ -559,20 +582,20 @@
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
                     </div>
                     
-                   <!-- Beneficiary Section with Photo -->
-<div class="section-card">
-    <div class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary Information)</div>
-    <div class="photo-with-info">
-        ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" onclick="openLightbox('${member.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
-        <div class="info-flex">
-            <div><strong>ሙሉ ስም:</strong> ${escapeHtml(member.beneficiaryName) || 'N/A'}</div>
-            <div><strong>ፆታ:</strong> ${escapeHtml(member.beneficiaryGender) || 'N/A'}</div>
-            <div><strong>ዝምድና:</strong> ${escapeHtml(member.beneficiaryRelationship) || 'N/A'}</div>
-            <div><strong>አድራሻ:</strong> ${escapeHtml(member.beneficiaryAddress) || 'N/A'}</div>
-            ${member.beneficiaryTaxDoc ? `<div><strong>🆔 የፋይዳ መታወቂያ:</strong> <a href="#" onclick="openLightbox('${member.beneficiaryTaxDoc}');return false">ተመልከት</a></div>` : ''}
-        </div>
-    </div>
-</div>
+                    <!-- Beneficiary Section with Photo -->
+                    <div class="section-card">
+                        <div class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary Information)</div>
+                        <div class="photo-with-info">
+                            ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" onclick="openLightbox('${member.beneficiaryPhoto}')" title="የወራሽ ፎቶ">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <div><strong>ሙሉ ስም:</strong> ${escapeHtml(member.beneficiaryName) || 'N/A'}</div>
+                                <div><strong>ፆታ:</strong> ${escapeHtml(member.beneficiaryGender) || 'N/A'}</div>
+                                <div><strong>ዝምድና:</strong> ${escapeHtml(member.beneficiaryRelationship) || 'N/A'}</div>
+                                <div><strong>አድራሻ:</strong> ${escapeHtml(member.beneficiaryAddress) || 'N/A'}</div>
+                                ${member.beneficiaryTaxDoc ? `<div><strong>🆔 የፋይዳ መታወቂያ:</strong> <a href="#" onclick="openLightbox('${member.beneficiaryTaxDoc}');return false">ተመልከት</a></div>` : ''}
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Legal Representative Section with Photo -->
                     <div class="section-card">
@@ -601,7 +624,6 @@
                 </div>
                 
                 <div id="editMode" style="display:none">
-                    <!-- Edit Mode Content - similar to before but organized with photos with their respective sections -->
                     <div class="profile-header">
                         ${member.memberPhoto ? `<img src="${member.memberPhoto}" class="profile-photo" onclick="openLightbox('${member.memberPhoto}')">` : '<div class="profile-photo" style="background:#ddd; display:flex;align-items:center;justify-content:center;font-size:40px">👤</div>'}
                         <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; font-weight:bold; padding:8px; border:1px solid #ddd; border-radius:6px; width:100%">
@@ -625,41 +647,41 @@
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" style="width:100%; padding:8px">${escapeHtml(member.financialNotes)}</textarea></div>
                     </div>
                     
-                   <!-- Beneficiary Edit Section -->
-<div class="section-card">
-    <div class="section-title">👨‍👦 የወራሽ መረጃ</div>
-    <div class="photo-with-info">
-        ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryPhoto}')">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
-        <div class="info-flex">
-            <input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}" placeholder="ሙሉ ስም" style="width:100%; margin-bottom:5px; padding:6px">
-            <select id="editBeneficiaryGender" style="width:100%; margin-bottom:5px; padding:6px">
-                <option value="">ምረጥ</option>
-                <option value="ወንድ" ${member.beneficiaryGender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
-                <option value="ሴት" ${member.beneficiaryGender === 'ሴት' ? 'selected' : ''}>ሴት</option>
-            </select>
-            <select id="editBeneficiaryRelationship" style="width:100%; margin-bottom:5px; padding:6px" onchange="toggleEditOtherRelationship()">
-                <option value="">ምረጥ</option>
-                <option value="አባት" ${member.beneficiaryRelationship === 'አባት' ? 'selected' : ''}>አባት</option>
-                <option value="እናት" ${member.beneficiaryRelationship === 'እናት' ? 'selected' : ''}>እናት</option>
-                <option value="ወንድም" ${member.beneficiaryRelationship === 'ወንድም' ? 'selected' : ''}>ወንድም</option>
-                <option value="እህት" ${member.beneficiaryRelationship === 'እህት' ? 'selected' : ''}>እህት</option>
-                <option value="ልጅ" ${member.beneficiaryRelationship === 'ልጅ' ? 'selected' : ''}>ልጅ</option>
-                <option value="ሚስት" ${member.beneficiaryRelationship === 'ሚስት' ? 'selected' : ''}>ሚስት</option>
-                <option value="አክስት" ${member.beneficiaryRelationship === 'አክስት' ? 'selected' : ''}>አክስት</option>
-                <option value="አጎት" ${member.beneficiaryRelationship === 'አጎት' ? 'selected' : ''}>አጎት</option>
-                <option value="የአጎት ልጅ" ${member.beneficiaryRelationship === 'የአጎት ልጅ' ? 'selected' : ''}>የአጎት ልጅ</option>
-                <option value="የአክስት ልጅ" ${member.beneficiaryRelationship === 'የአክስት ልጅ' ? 'selected' : ''}>የአክስት ልጅ</option>
-                <option value="ሌላ" ${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) && member.beneficiaryRelationship ? 'selected' : ''}>ሌላ</option>
-            </select>
-            <div id="editOtherRelationshipDiv" style="display:${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) && member.beneficiaryRelationship ? 'block' : 'none'}; margin-bottom:5px">
-                <label>ሌላ (ዝምድናውን ይግለጹ)</label>
-                <input type="text" id="editBeneficiaryOtherRelationship" value="${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) ? escapeHtml(member.beneficiaryRelationship) : ''}" placeholder="ለምሳሌ: አያት, የአጎት ልጅ, ወዘተ" style="width:100%; padding:6px">
-            </div>
-            <textarea id="editBeneficiaryAddress" rows="2" placeholder="አድራሻ" style="width:100%; margin-bottom:5px; padding:6px">${escapeHtml(member.beneficiaryAddress)}</textarea>
-        </div>
-    </div>
-    <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editBeneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'editBeneficiaryTaxPreview')"><div id="editBeneficiaryTaxPreview" class="image-preview"></div></div>
-</div>
+                    <!-- Beneficiary Edit Section -->
+                    <div class="section-card">
+                        <div class="section-title">👨‍👦 የወራሽ መረጃ</div>
+                        <div class="photo-with-info">
+                            ${member.beneficiaryPhoto ? `<img src="${member.beneficiaryPhoto}" class="doc-thumb" onclick="openLightbox('${member.beneficiaryPhoto}')">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            <div class="info-flex">
+                                <input type="text" id="editBeneficiaryName" value="${escapeHtml(member.beneficiaryName)}" placeholder="ሙሉ ስም" style="width:100%; margin-bottom:5px; padding:6px">
+                                <select id="editBeneficiaryGender" style="width:100%; margin-bottom:5px; padding:6px">
+                                    <option value="">ምረጥ</option>
+                                    <option value="ወንድ" ${member.beneficiaryGender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
+                                    <option value="ሴት" ${member.beneficiaryGender === 'ሴት' ? 'selected' : ''}>ሴት</option>
+                                </select>
+                                <select id="editBeneficiaryRelationship" style="width:100%; margin-bottom:5px; padding:6px" onchange="toggleEditOtherRelationship()">
+                                    <option value="">ምረጥ</option>
+                                    <option value="አባት" ${member.beneficiaryRelationship === 'አባት' ? 'selected' : ''}>አባት</option>
+                                    <option value="እናት" ${member.beneficiaryRelationship === 'እናት' ? 'selected' : ''}>እናት</option>
+                                    <option value="ወንድም" ${member.beneficiaryRelationship === 'ወንድም' ? 'selected' : ''}>ወንድም</option>
+                                    <option value="እህት" ${member.beneficiaryRelationship === 'እህት' ? 'selected' : ''}>እህት</option>
+                                    <option value="ልጅ" ${member.beneficiaryRelationship === 'ልጅ' ? 'selected' : ''}>ልጅ</option>
+                                    <option value="ሚስት" ${member.beneficiaryRelationship === 'ሚስት' ? 'selected' : ''}>ሚስት</option>
+                                    <option value="አክስት" ${member.beneficiaryRelationship === 'አክስት' ? 'selected' : ''}>አክስት</option>
+                                    <option value="አጎት" ${member.beneficiaryRelationship === 'አጎት' ? 'selected' : ''}>አጎት</option>
+                                    <option value="የአጎት ልጅ" ${member.beneficiaryRelationship === 'የአጎት ልጅ' ? 'selected' : ''}>የአጎት ልጅ</option>
+                                    <option value="የአክስት ልጅ" ${member.beneficiaryRelationship === 'የአክስት ልጅ' ? 'selected' : ''}>የአክስት ልጅ</option>
+                                    <option value="ሌላ" ${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) && member.beneficiaryRelationship ? 'selected' : ''}>ሌላ</option>
+                                </select>
+                                <div id="editOtherRelationshipDiv" style="display:${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) && member.beneficiaryRelationship ? 'block' : 'none'}; margin-bottom:5px">
+                                    <label>ሌላ (ዝምድናውን ይግለጹ)</label>
+                                    <input type="text" id="editBeneficiaryOtherRelationship" value="${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(member.beneficiaryRelationship) ? escapeHtml(member.beneficiaryRelationship) : ''}" placeholder="ለምሳሌ: አያት, የአጎት ልጅ, ወዘተ" style="width:100%; padding:6px">
+                                </div>
+                                <textarea id="editBeneficiaryAddress" rows="2" placeholder="አድራሻ" style="width:100%; margin-bottom:5px; padding:6px">${escapeHtml(member.beneficiaryAddress)}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:10px"><label>🆔 የፋይዳ መታወቂያ (አዲስ ለመጫን)</label><input type="file" id="editBeneficiaryTaxDoc" accept="image/*" onchange="previewImage(this,'editBeneficiaryTaxPreview')"><div id="editBeneficiaryTaxPreview" class="image-preview"></div></div>
+                    </div>
                     
                     <!-- Legal Representative Edit Section -->
                     <div class="section-card">
@@ -715,7 +737,12 @@
         }
         
         async function saveMemberEdit() {
-            // Get all edit values including new photo files
+            // Get beneficiary relationship value for edit
+            let editBeneficiaryRelationship = document.getElementById('editBeneficiaryRelationship').value;
+            if (editBeneficiaryRelationship === 'ሌላ') {
+                editBeneficiaryRelationship = document.getElementById('editBeneficiaryOtherRelationship').value;
+            }
+            
             let beneficiaryTaxDocBase64 = null;
             let repTaxDocBase64 = null;
             
@@ -743,15 +770,9 @@
                 bankAccountNumber: document.getElementById('editBankAccountNumber').value,
                 financialNotes: document.getElementById('editFinancialNotes').value,
                 beneficiaryName: document.getElementById('editBeneficiaryName').value,
+                beneficiaryGender: document.getElementById('editBeneficiaryGender').value,
+                beneficiaryRelationship: editBeneficiaryRelationship,
                 beneficiaryAddress: document.getElementById('editBeneficiaryAddress').value,
-                const updatedMember = {
-    // ... existing fields
-    beneficiaryName: document.getElementById('editBeneficiaryName').value,
-    beneficiaryGender: document.getElementById('editBeneficiaryGender').value,
-    beneficiaryRelationship: editBeneficiaryRelationship,
-    beneficiaryAddress: document.getElementById('editBeneficiaryAddress').value,
-    // ... rest of fields
-};
                 legalRepName: document.getElementById('editLegalRepName').value,
                 legalRepAddress: document.getElementById('editLegalRepAddress').value,
                 legalRepPhone: document.getElementById('editLegalRepPhone').value,
@@ -825,11 +846,12 @@
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
             const TOTAL_SHARE_VALUE = 1000;
             const remainingBalance = (shareCount * TOTAL_SHARE_VALUE) - sharePricePaid;
+            
             // Get beneficiary relationship value
-               let beneficiaryRelationship = document.getElementById('beneficiaryRelationship').value;
-                        if (beneficiaryRelationship === 'ሌላ') {
+            let beneficiaryRelationship = document.getElementById('beneficiaryRelationship').value;
+            if (beneficiaryRelationship === 'ሌላ') {
                 beneficiaryRelationship = document.getElementById('beneficiaryOtherRelationship').value;
-                                 }
+            }
             
             const member = {
                 fullName: document.getElementById('fullName').value,
@@ -849,15 +871,9 @@
                 paymentStatus: document.getElementById('paymentStatus').value,
                 bankAccountNumber: document.getElementById('bankAccountNumber').value,
                 financialNotes: document.getElementById('financialNotes').value,
-                const member = {
-    // ... existing fields (fullName, gender, age, etc.)
-    beneficiaryName: document.getElementById('beneficiaryName').value,
-    beneficiaryGender: document.getElementById('beneficiaryGender').value,
-    beneficiaryRelationship: beneficiaryRelationship,
-    beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
-    // ... rest of fields
-};
                 beneficiaryName: document.getElementById('beneficiaryName').value,
+                beneficiaryGender: document.getElementById('beneficiaryGender').value,
+                beneficiaryRelationship: beneficiaryRelationship,
                 beneficiaryAddress: document.getElementById('beneficiaryAddress').value,
                 legalRepName: document.getElementById('legalRepName').value,
                 legalRepAddress: document.getElementById('legalRepAddress').value,
@@ -883,6 +899,7 @@
             document.getElementById('sharePercentage').value = '0';
             document.getElementById('sharePricePaid').value = '0';
             document.getElementById('remainingBalance').value = '0';
+            document.getElementById('otherRelationshipDiv').style.display = 'none';
             loadMembers();
             showTab('list');
         });
@@ -1102,8 +1119,8 @@
         // ==================== EXPORT TO CSV ====================
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'ማስታወሻ'];
-            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.beneficiaryAddress || '', m.legalRepName || '', m.legalRepAddress || '', m.legalRepPhone || '', m.financialNotes || '']);
+            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ስም', 'የወራሽ ፆታ', 'የወራሽ ዝምድና', 'የወራሽ አድራሻ', 'ህጋዊ ተወካይ', 'የተወካይ አድራሻ', 'የተወካይ ስልክ', 'ማስታወሻ'];
+            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaryName || '', m.beneficiaryGender || '', m.beneficiaryRelationship || '', m.beneficiaryAddress || '', m.legalRepName || '', m.legalRepAddress || '', m.legalRepPhone || '', m.financialNotes || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -1172,6 +1189,8 @@
         window.saveMemberEdit = saveMemberEdit;
         window.cancelEditMode = cancelEditMode;
         window.calculateEditRemainingBalance = calculateEditRemainingBalance;
+        window.toggleOtherRelationship = toggleOtherRelationship;
+        window.toggleEditOtherRelationship = toggleEditOtherRelationship;
     </script>
 </body>
 </html>
