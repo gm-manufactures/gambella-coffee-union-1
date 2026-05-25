@@ -102,6 +102,8 @@
         .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
         .close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
         
+        .share-info-box{background:#e8f5e9;padding:10px;border-radius:6px;margin-top:5px;font-size:0.85em;color:#2d6a1a}
+        
         @media(max-width:768px){.form-row{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}.full-width{grid-column:span 1}}
     </style>
 </head>
@@ -153,25 +155,54 @@
                     </div>
                     <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት</label><input type="text" id="role"></div>
                     
-                    <div class="form-row">
-                        <div class="form-group"><label>📊 የአክሲዬን ብዛት</label><input type="number" id="shareCount" step="1" min="0" value="0"></div>
-                        <div class="form-group"><label>📈 የአክሲዬን ድርሻ በ%</label><input type="number" id="sharePercentage" step="0.01" min="0" max="100" value="0"></div>
-                    </div>
-                    
-                    <h4>💰 የአክሲዬን ክፍያ መረጃ</h4>
-                    <div class="form-row">
-                        <div class="form-group"><label>💵 የተከፈለ (ብር)</label><input type="number" id="sharePricePaid" step="0.01" min="0" value="0"></div>
-                        <div class="form-group"><label>💰 ቀሪ ገንዘብ</label><input type="text" id="remainingBalance" readonly style="background:#e9ecef"></div>
+                    <!-- Share Information Section with Calculations -->
+                    <h4>💰 የአክሲዬን መረጃ (Share Information)</h4>
+                    <div class="share-info-box">
+                        <strong>📊 አጠቃላይ መረጃ:</strong> አጠቃላይ የአክሲዬን ብዛት = 25,000 | የአንድ አክሲዬን ዋጋ = 10,000 ብር
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>📋 የክፍያ ሁኔታ</label>
+                        <div class="form-group">
+                            <label>📊 የአክሲዬን ብዛት (Number of Shares)</label>
+                            <input type="number" id="shareCount" step="1" min="0" value="0" oninput="calculateSharePayment()">
+                        </div>
+                        <div class="form-group">
+                            <label>💰 የአንድ አክሲዬን ዋጋ (Price per Share)</label>
+                            <input type="text" id="sharePrice" value="10,000 ብር" readonly style="background:#e9ecef; font-weight:bold">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>💵 አጠቃላይ የሚከፈል (Total Amount to Pay)</label>
+                            <input type="text" id="totalPayable" readonly style="background:#e9ecef; font-weight:bold">
+                        </div>
+                        <div class="form-group">
+                            <label>💵 የተከፈለ (Amount Paid)</label>
+                            <input type="number" id="sharePricePaid" step="0.01" min="0" value="0" oninput="calculateSharePayment()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>💰 ቀሪ ገንዘብ (Remaining Balance)</label>
+                            <input type="text" id="remainingBalance" readonly style="background:#e9ecef; font-weight:bold">
+                        </div>
+                        <div class="form-group">
+                            <label>📋 የክፍያ ሁኔታ (Payment Status)</label>
                             <select id="paymentStatus">
-                                <option value="ተከፍሏል">✅ ተከፍሏል</option>
-                                <option value="በከፊል ተከፍሏል">⚠️ በከፊል ተከፍሏል</option>
-                                <option value="አልተከፈለም">❌ አልተከፈለም</option>
+                                <option value="አልተከፈለም">❌ አልተከፈለም (Pending)</option>
+                                <option value="በከፊል ተከፍሏል">⚠️ በከፊል ተከፍሏል (Partial)</option>
+                                <option value="ተከፍሏል">✅ ተከፍሏል (Paid)</option>
                             </select>
                         </div>
-                        <div class="form-group"><label>🏦 የባንክ ሂሳብ ቁጥር</label><input type="text" id="bankAccountNumber"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📈 የአክሲዬን ድርሻ በ% (Share Percentage)</label>
+                            <input type="text" id="sharePercentage" readonly style="background:#e9ecef">
+                        </div>
+                        <div class="form-group">
+                            <label>🏦 የባንክ ሂሳብ ቁጥር (ለትርፍ ክፍፍል)</label>
+                            <input type="text" id="bankAccountNumber">
+                        </div>
                     </div>
                     <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="financialNotes" rows="2"></textarea></div>
                     
@@ -375,53 +406,6 @@
     </div>
 
     <script>
-        // ==================== SESSION TIMEOUT (1 MINUTE INACTIVITY) ====================
-let inactivityTimer;
-const INACTIVITY_TIMEOUT = 120000; // 1 minute in milliseconds
-
-// Function to reset the inactivity timer
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
-}
-
-// Function to handle logout due to inactivity
-function logoutDueToInactivity() {
-    if (confirm('እንቅስቃሴ ባለመኖሩ ምክንያት ክፍለ ጊዜዎ ተቋርጧል። እንደገና ይግቡ።\n\nYour session has expired due to inactivity. Please login again.')) {
-        logout();
-    } else {
-        logout();
-    }
-}
-
-// Function to start tracking user activity
-function startInactivityTracking() {
-    // Reset timer on user activity events
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
-    events.forEach(event => {
-        document.addEventListener(event, resetInactivityTimer);
-    });
-    resetInactivityTimer();
-}
-
-// Function to stop tracking (call when logging out)
-function stopInactivityTracking() {
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
-    events.forEach(event => {
-        document.removeEventListener(event, resetInactivityTimer);
-    });
-    clearTimeout(inactivityTimer);
-}
-
-// Modify the existing logout function to stop tracking
-const originalLogout = logout;
-logout = function() {
-    stopInactivityTracking();
-    originalLogout();
-};
-
-// Start tracking when page loads
-startInactivityTracking();
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/';
         
@@ -431,6 +415,10 @@ startInactivityTracking();
         let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         let currentEditingMemberId = null;
         let isEditMode = false;
+        
+        // Share calculation constants
+        const TOTAL_SHARES = 25000;
+        const PRICE_PER_SHARE = 10000;
         
         // Amharic sorting function
         const amharicOrder = ['አ', 'ኡ', 'ኢ', 'ኤ', 'እ', 'ኦ', 'ኧ', 'በ', 'ቡ', 'ቢ', 'ቤ', 'ብ', 'ቦ', 'ቧ', 'ገ', 'ጉ', 'ጊ', 'ጌ', 'ግ', 'ጎ', 'ጓ', 'ደ', 'ዱ', 'ዲ', 'ዴ', 'ድ', 'ዶ', 'ዷ', 'ሀ', 'ሁ', 'ሂ', 'ሄ', 'ህ', 'ሆ', 'ሃ', 'ወ', 'ዉ', 'ዊ', 'ዌ', 'ው', 'ዎ', 'ዋ', 'ዘ', 'ዙ', 'ዚ', 'ዜ', 'ዝ', 'ዞ', 'ዛ', 'ሠ', 'ሡ', 'ሢ', 'ሤ', 'ሥ', 'ሦ', 'ሣ', 'የ', 'ዩ', 'ዪ', 'ዬ', 'ይ', 'ዮ', 'ያ', 'ለ', 'ሉ', 'ሊ', 'ሌ', 'ል', 'ሎ', 'ላ', 'መ', 'ሙ', 'ሚ', 'ሜ', 'ም', 'ሞ', 'ማ', 'ነ', 'ኑ', 'ኒ', 'ኔ', 'ን', 'ኖ', 'ና', 'ሰ', 'ሱ', 'ሲ', 'ሴ', 'ስ', 'ሶ', 'ሳ', 'ዐ', 'ዑ', 'ዒ', 'ዔ', 'ዕ', 'ዖ', 'ዓ', 'ፈ', 'ፉ', 'ፊ', 'ፌ', 'ፍ', 'ፎ', 'ፋ', 'ጸ', 'ጹ', 'ጺ', 'ጼ', 'ጽ', 'ጾ', 'ጻ', 'ቀ', 'ቁ', 'ቂ', 'ቄ', 'ቅ', 'ቆ', 'ቃ', 'ረ', 'ሩ', 'ሪ', 'ሬ', 'ር', 'ሮ', 'ራ', 'ሸ', 'ሹ', 'ሺ', 'ሼ', 'ሽ', 'ሾ', 'ሻ', 'ቸ', 'ቹ', 'ቺ', 'ቼ', 'ች', 'ቾ', 'ቻ', 'ከ', 'ኩ', 'ኪ', 'ኬ', 'ክ', 'ኮ', 'ካ', 'ጨ', 'ጩ', 'ጪ', 'ጬ', 'ጭ', 'ጮ', 'ጫ', 'ፐ', 'ፑ', 'ፒ', 'ፔ', 'ፕ', 'ፖ', 'ፓ'];
@@ -488,16 +476,27 @@ startInactivityTracking();
             document.getElementById('lightbox').style.display = 'none';
         }
         
-        function calculateRemainingBalance() {
+        // Share calculation function
+        function calculateSharePayment() {
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-            const TOTAL_SHARE_VALUE = 1000;
-            const totalSharesValue = shareCount * TOTAL_SHARE_VALUE;
-            const remaining = totalSharesValue - sharePricePaid;
-            document.getElementById('remainingBalance').value = remaining > 0 ? remaining.toFixed(2) : '0.00';
-            if (remaining <= 0) document.getElementById('paymentStatus').value = 'ተከፍሏል';
-            else if (sharePricePaid > 0 && remaining > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
-            else document.getElementById('paymentStatus').value = 'አልተከፈለም';
+            const amountPaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+            
+            const totalPayable = shareCount * PRICE_PER_SHARE;
+            document.getElementById('totalPayable').value = totalPayable.toLocaleString() + ' ብር';
+            
+            const remainingBalance = totalPayable - amountPaid;
+            document.getElementById('remainingBalance').value = remainingBalance.toLocaleString() + ' ብር';
+            
+            const sharePercentage = (shareCount / TOTAL_SHARES) * 100;
+            document.getElementById('sharePercentage').value = sharePercentage.toFixed(4) + '%';
+            
+            if (amountPaid <= 0) {
+                document.getElementById('paymentStatus').value = 'አልተከፈለም';
+            } else if (amountPaid >= totalPayable) {
+                document.getElementById('paymentStatus').value = 'ተከፍሏል';
+            } else if (amountPaid > 0 && amountPaid < totalPayable) {
+                document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
+            }
         }
         
         function getPaymentStatusClass(status) {
@@ -652,17 +651,6 @@ startInactivityTracking();
         
         // ==================== TOGGLE FUNCTIONS ====================
         
-        function toggleOtherRelationship() {
-            const relationship = document.getElementById('beneficiaryRelationship').value;
-            const otherDiv = document.getElementById('otherRelationshipDiv');
-            if (relationship === 'ሌላ') {
-                otherDiv.style.display = 'block';
-            } else {
-                otherDiv.style.display = 'none';
-                document.getElementById('beneficiaryOtherRelationship').value = '';
-            }
-        }
-        
         function togglePowerOfAttorneyOptions() {
             const type = document.getElementById('powerOfAttorneyType').value;
             const detailsDiv = document.getElementById('powerOfAttorneyDetails');
@@ -710,7 +698,7 @@ startInactivityTracking();
                                 <span class="serial-number">#${index + 1}</span>
                                 ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
                                 <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
-                                ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
+                                ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን (${(m.sharePercentage || 0).toFixed(2)}%)</span>` : ''}
                                 <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
                             </div>
                             <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
@@ -773,8 +761,9 @@ startInactivityTracking();
             
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-            const TOTAL_SHARE_VALUE = 1000;
-            const remainingBalance = (shareCount * TOTAL_SHARE_VALUE) - sharePricePaid;
+            const totalPayable = shareCount * PRICE_PER_SHARE;
+            const remainingBalance = totalPayable - sharePricePaid;
+            const sharePercentage = (shareCount / TOTAL_SHARES) * 100;
             
             // Collect beneficiaries data
             const beneficiaries = await collectBeneficiariesData();
@@ -791,8 +780,9 @@ startInactivityTracking();
                 taxId: document.getElementById('taxId').value,
                 role: document.getElementById('role').value,
                 shareCount: shareCount,
-                sharePercentage: parseFloat(document.getElementById('sharePercentage').value) || 0,
+                sharePercentage: sharePercentage,
                 sharePricePaid: sharePricePaid,
+                totalPayable: totalPayable,
                 remainingBalance: remainingBalance > 0 ? remainingBalance : 0,
                 paymentStatus: document.getElementById('paymentStatus').value,
                 bankAccountNumber: document.getElementById('bankAccountNumber').value,
@@ -834,9 +824,10 @@ startInactivityTracking();
             e.target.reset();
             document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             document.getElementById('shareCount').value = '0';
-            document.getElementById('sharePercentage').value = '0';
             document.getElementById('sharePricePaid').value = '0';
-            document.getElementById('remainingBalance').value = '0';
+            document.getElementById('totalPayable').value = '';
+            document.getElementById('remainingBalance').value = '';
+            document.getElementById('sharePercentage').value = '';
             document.getElementById('powerOfAttorneyDetails').style.display = 'none';
             document.getElementById('beneficiariesContainer').innerHTML = '';
             document.getElementById('beneficiaryCount').value = '0';
@@ -874,9 +865,11 @@ startInactivityTracking();
                         <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(member.taxId)}</div></div>
                         <div class="info-item"><div class="info-label">👔 ሚና/ኃላፊነት</div><div class="info-value">${escapeHtml(member.role)}</div></div>
                         <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value">${member.shareCount || 0}</div></div>
-                        <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value">${member.sharePercentage || 0}%</div></div>
-                        <div class="info-item"><div class="info-label">💰 የተከፈለ</div><div class="info-value">${(member.sharePricePaid || 0).toFixed(2)} ብር</div></div>
-                        <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><div class="info-value">${(member.remainingBalance || 0).toFixed(2)} ብር</div></div>
+                        <div class="info-item"><div class="info-label">💰 የአንድ አክሲዬን ዋጋ</div><div class="info-value">${PRICE_PER_SHARE.toLocaleString()} ብር</div></div>
+                        <div class="info-item"><div class="info-label">💵 አጠቃላይ የሚከፈል</div><div class="info-value">${((member.shareCount || 0) * PRICE_PER_SHARE).toLocaleString()} ብር</div></div>
+                        <div class="info-item"><div class="info-label">💵 የተከፈለ</div><div class="info-value">${(member.sharePricePaid || 0).toLocaleString()} ብር</div></div>
+                        <div class="info-item"><div class="info-label">💰 ቀሪ ገንዘብ</div><div class="info-value">${(member.remainingBalance || 0).toLocaleString()} ብር</div></div>
+                        <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ</div><div class="info-value">${(member.sharePercentage || 0).toFixed(4)}%</div></div>
                         <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(member.paymentStatus)}</div></div>
                         <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ</div><div class="info-value">${escapeHtml(member.bankAccountNumber)}</div></div>
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
@@ -1197,7 +1190,7 @@ startInactivityTracking();
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
             const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ብዛት', 'ማስታወሻ'];
-            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaries ? m.beneficiaries.length : 0, m.financialNotes || '']);
+            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, (m.sharePercentage || 0).toFixed(4), m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaries ? m.beneficiaries.length : 0, m.financialNotes || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -1226,8 +1219,8 @@ startInactivityTracking();
         document.getElementById('pricePerKg')?.addEventListener('input', calculateTotalAmount);
         document.getElementById('saleDate').valueAsDate = new Date();
         document.getElementById('transferDate').valueAsDate = new Date();
-        document.getElementById('shareCount')?.addEventListener('input', calculateRemainingBalance);
-        document.getElementById('sharePricePaid')?.addEventListener('input', calculateRemainingBalance);
+        document.getElementById('shareCount')?.addEventListener('input', calculateSharePayment);
+        document.getElementById('sharePricePaid')?.addEventListener('input', calculateSharePayment);
         
         document.getElementById('userName').innerHTML = `👤 ${escapeHtml(currentUser.fullName) || 'Admin'}`;
         
@@ -1252,7 +1245,7 @@ startInactivityTracking();
         window.closeLightbox = closeLightbox;
         window.previewImage = previewImage;
         window.logout = logout;
-        window.calculateRemainingBalance = calculateRemainingBalance;
+        window.calculateSharePayment = calculateSharePayment;
         window.approveTradingRequest = approveTradingRequest;
         window.rejectTradingRequest = rejectTradingRequest;
         window.updateUserProfile = updateUserProfile;
