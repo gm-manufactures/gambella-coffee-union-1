@@ -63,7 +63,7 @@
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
         
         /* Bottom-Right Modal */
-        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:600px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:650px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
         @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
         .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
         .modal-header h3{margin:0}
@@ -89,14 +89,14 @@
         .photo-with-info img{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid #ddd;cursor:pointer}
         .info-flex{flex:1}
         
+        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+        .doc-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
+        
         /* Beneficiary Card Styles */
         .beneficiary-card{background:#fff8e1;border:1px solid #ffecb3;border-radius:8px;padding:15px;margin-top:15px;margin-bottom:15px}
         .beneficiary-title{background:#2d6a1a;color:white;padding:8px 12px;border-radius:6px;margin-bottom:15px;font-weight:bold}
         .remove-beneficiary{background:#dc3545;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;float:right;font-size:12px}
         .remove-beneficiary:hover{background:#c82333}
-        
-        .photo-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-        .doc-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid #ddd}
         
         .lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
         .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
@@ -179,7 +179,7 @@
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
                 </div>
                 
-                <!-- ==================== BENEFICIARY SECTION (MULTIPLE BENEFICIARIES) ==================== -->
+                <!-- ==================== BENEFICIARY SECTION (Multiple Beneficiaries) ==================== -->
                 <div class="form-section">
                     <h3>👨‍👦 የወራሽ መረጃ (Beneficiaries Information)</h3>
                     
@@ -187,7 +187,7 @@
                         <div class="form-group">
                             <label>📊 የወራሽ ብዛት (Number of Beneficiaries)</label>
                             <input type="number" id="beneficiaryCount" min="0" max="20" value="0" step="1" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px" onchange="generateBeneficiaryForms()">
-                            <small>ከ0 እስከ 20 የሚደርስ ቁጥር ማስገባት ይቻላል (You can enter any number from 0 to 20)</small>
+                            <small>ከ0 እስከ 20 የሚደርስ ቁጥር ማስገባት ይቻላል</small>
                         </div>
                     </div>
                     
@@ -210,25 +210,25 @@
                 <div class="form-section">
                     <h3>📜 ውክልና (Power of Attorney)</h3>
                     <div class="form-group">
-                        <label>የውክልና አይነት (Type of Power of Attorney)</label>
+                        <label>የውክልና አይነት</label>
                         <select id="powerOfAttorneyType" onchange="togglePowerOfAttorneyOptions()">
                             <option value="">ምረጥ / Select</option>
-                            <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ">ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ (Federal Documents Registration Agency)</option>
-                            <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት">በፍትህ የተረጋገጠ የምስክር ወረቀት (Justice Certified Witness Certificate)</option>
+                            <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ">ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ</option>
+                            <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት">በፍትህ የተረጋገጠ የምስክር ወረቀት</option>
                         </select>
                     </div>
                     <div id="powerOfAttorneyDetails" style="display:none;">
                         <div class="form-row">
-                            <div class="form-group"><label>የውክልና ቁጥር (Power of Attorney Number)</label><input type="text" id="powerOfAttorneyNumber" placeholder="ለምሳሌ: ቁጥር 001/2016"></div>
-                            <div class="form-group"><label>ቀን (Date)</label><input type="date" id="powerOfAttorneyDate"></div>
+                            <div class="form-group"><label>የውክልና ቁጥር</label><input type="text" id="powerOfAttorneyNumber" placeholder="ለምሳሌ: ቁጥር 001/2016"></div>
+                            <div class="form-group"><label>ቀን</label><input type="date" id="powerOfAttorneyDate"></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>የሰጠው ተቋም (Issuing Authority)</label><input type="text" id="powerOfAttorneyIssuer" placeholder="የሰጠው ተቋም ስም"></div>
-                            <div class="form-group"><label>የሚቀጥልበት ቀን (Expiry Date)</label><input type="date" id="powerOfAttorneyExpiry"></div>
+                            <div class="form-group"><label>የሰጠው ተቋም</label><input type="text" id="powerOfAttorneyIssuer"></div>
+                            <div class="form-group"><label>የሚቀጥልበት ቀን</label><input type="date" id="powerOfAttorneyExpiry"></div>
                         </div>
-                        <div class="form-group"><label>ማስታወሻ (Notes)</label><textarea id="powerOfAttorneyNotes" rows="2" placeholder="ተጨማሪ መረጃ..."></textarea></div>
-                        <div class="form-group"><label>📸 የውክልና ሰነድ ፎቶ (Power of Attorney Document Photo)</label><input type="file" id="powerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'powerOfAttorneyPreview')"><div id="powerOfAttorneyPreview" class="image-preview"></div></div>
-                        <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ ፎቶ (Hard Copy Document Photo)</label><input type="file" id="hardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'hardCopyDocumentPreview')"><div id="hardCopyDocumentPreview" class="image-preview"></div></div>
+                        <div class="form-group"><label>ማስታወሻ</label><textarea id="powerOfAttorneyNotes" rows="2"></textarea></div>
+                        <div class="form-group"><label>📸 የውክልና ሰነድ ፎቶ</label><input type="file" id="powerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'powerOfAttorneyPreview')"><div id="powerOfAttorneyPreview" class="image-preview"></div></div>
+                        <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ ፎቶ</label><input type="file" id="hardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'hardCopyDocumentPreview')"><div id="hardCopyDocumentPreview" class="image-preview"></div></div>
                     </div>
                 </div>
                 
@@ -375,53 +375,6 @@
     </div>
 
     <script>
-        // ==================== SESSION TIMEOUT (1 MINUTE INACTIVITY) ====================
-let inactivityTimer;
-const INACTIVITY_TIMEOUT = 120000; // 1 minute in milliseconds
-
-// Function to reset the inactivity timer
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
-}
-
-// Function to handle logout due to inactivity
-function logoutDueToInactivity() {
-    if (confirm('እንቅስቃሴ ባለመኖሩ ምክንያት ክፍለ ጊዜዎ ተቋርጧል። እንደገና ይግቡ።\n\nYour session has expired due to inactivity. Please login again.')) {
-        logout();
-    } else {
-        logout();
-    }
-}
-
-// Function to start tracking user activity
-function startInactivityTracking() {
-    // Reset timer on user activity events
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
-    events.forEach(event => {
-        document.addEventListener(event, resetInactivityTimer);
-    });
-    resetInactivityTimer();
-}
-
-// Function to stop tracking (call when logging out)
-function stopInactivityTracking() {
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
-    events.forEach(event => {
-        document.removeEventListener(event, resetInactivityTimer);
-    });
-    clearTimeout(inactivityTimer);
-}
-
-// Modify the existing logout function to stop tracking
-const originalLogout = logout;
-logout = function() {
-    stopInactivityTracking();
-    originalLogout();
-};
-
-// Start tracking when page loads
-startInactivityTracking();
         const token = localStorage.getItem('token');
         if (!token) window.location.href = '/';
         
@@ -431,6 +384,32 @@ startInactivityTracking();
         let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         let currentEditingMemberId = null;
         let isEditMode = false;
+        
+        // Session Timeout (1 minute inactivity)
+        let inactivityTimer;
+        const INACTIVITY_TIMEOUT = 60000;
+        
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
+        }
+        
+        function logoutDueToInactivity() {
+            alert('⏰ እንቅስቃሴ ባለመኖሩ ምክንያት ክፍለ ጊዜዎ ተቋርጧል! እንደገና ይግቡ።');
+            logout();
+        }
+        
+        function startInactivityTracking() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+            events.forEach(event => document.addEventListener(event, resetInactivityTimer));
+            resetInactivityTimer();
+        }
+        
+        function stopInactivityTracking() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+            events.forEach(event => document.removeEventListener(event, resetInactivityTimer));
+            clearTimeout(inactivityTimer);
+        }
         
         // Amharic sorting function
         const amharicOrder = ['አ', 'ኡ', 'ኢ', 'ኤ', 'እ', 'ኦ', 'ኧ', 'በ', 'ቡ', 'ቢ', 'ቤ', 'ብ', 'ቦ', 'ቧ', 'ገ', 'ጉ', 'ጊ', 'ጌ', 'ግ', 'ጎ', 'ጓ', 'ደ', 'ዱ', 'ዲ', 'ዴ', 'ድ', 'ዶ', 'ዷ', 'ሀ', 'ሁ', 'ሂ', 'ሄ', 'ህ', 'ሆ', 'ሃ', 'ወ', 'ዉ', 'ዊ', 'ዌ', 'ው', 'ዎ', 'ዋ', 'ዘ', 'ዙ', 'ዚ', 'ዜ', 'ዝ', 'ዞ', 'ዛ', 'ሠ', 'ሡ', 'ሢ', 'ሤ', 'ሥ', 'ሦ', 'ሣ', 'የ', 'ዩ', 'ዪ', 'ዬ', 'ይ', 'ዮ', 'ያ', 'ለ', 'ሉ', 'ሊ', 'ሌ', 'ል', 'ሎ', 'ላ', 'መ', 'ሙ', 'ሚ', 'ሜ', 'ም', 'ሞ', 'ማ', 'ነ', 'ኑ', 'ኒ', 'ኔ', 'ን', 'ኖ', 'ና', 'ሰ', 'ሱ', 'ሲ', 'ሴ', 'ስ', 'ሶ', 'ሳ', 'ዐ', 'ዑ', 'ዒ', 'ዔ', 'ዕ', 'ዖ', 'ዓ', 'ፈ', 'ፉ', 'ፊ', 'ፌ', 'ፍ', 'ፎ', 'ፋ', 'ጸ', 'ጹ', 'ጺ', 'ጼ', 'ጽ', 'ጾ', 'ጻ', 'ቀ', 'ቁ', 'ቂ', 'ቄ', 'ቅ', 'ቆ', 'ቃ', 'ረ', 'ሩ', 'ሪ', 'ሬ', 'ር', 'ሮ', 'ራ', 'ሸ', 'ሹ', 'ሺ', 'ሼ', 'ሽ', 'ሾ', 'ሻ', 'ቸ', 'ቹ', 'ቺ', 'ቼ', 'ች', 'ቾ', 'ቻ', 'ከ', 'ኩ', 'ኪ', 'ኬ', 'ክ', 'ኮ', 'ካ', 'ጨ', 'ጩ', 'ጪ', 'ጬ', 'ጭ', 'ጮ', 'ጫ', 'ፐ', 'ፑ', 'ፒ', 'ፔ', 'ፕ', 'ፖ', 'ፓ'];
@@ -515,7 +494,7 @@ startInactivityTracking();
             const container = document.getElementById('beneficiariesContainer');
             
             if (count > 20) {
-                alert('እባክዎ ከ20 በታች ቁጥር ያስገቡ! / Please enter a number less than 20');
+                alert('እባክዎ ከ20 በታች ቁጥር ያስገቡ!');
                 document.getElementById('beneficiaryCount').value = 20;
                 generateBeneficiaryForms();
                 return;
@@ -535,41 +514,41 @@ startInactivityTracking();
                             <button type="button" class="remove-beneficiary" onclick="removeBeneficiary(${i})">✖ አጥፋ</button>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>ሙሉ ስም (Full Name)</label><input type="text" id="beneficiaryName_${i}" placeholder="ሙሉ ስም"></div>
-                            <div class="form-group"><label>ፆታ (Gender)</label>
+                            <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName_${i}" placeholder="ሙሉ ስም"></div>
+                            <div class="form-group"><label>ፆታ</label>
                                 <select id="beneficiaryGender_${i}">
                                     <option value="">ምረጥ</option>
-                                    <option value="ወንድ">ወንድ (Male)</option>
-                                    <option value="ሴት">ሴት (Female)</option>
+                                    <option value="ወንድ">ወንድ</option>
+                                    <option value="ሴት">ሴት</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group"><label>ዝምድና (Relationship)</label>
+                            <div class="form-group"><label>ዝምድና</label>
                                 <select id="beneficiaryRelationship_${i}" onchange="toggleOtherRelationshipBeneficiary(${i})">
                                     <option value="">ምረጥ</option>
-                                    <option value="አባት">አባት (Father)</option>
-                                    <option value="እናት">እናት (Mother)</option>
-                                    <option value="ወንድም">ወንድም (Brother)</option>
-                                    <option value="እህት">እህት (Sister)</option>
-                                    <option value="ልጅ">ልጅ (Child)</option>
-                                    <option value="ሚስት">ሚስት (Wife)</option>
-                                    <option value="አክስት">አክስት (Aunt)</option>
-                                    <option value="አጎት">አጎት (Uncle)</option>
-                                    <option value="የአጎት ልጅ">የአጎት ልጅ (Cousin)</option>
-                                    <option value="የአክስት ልጅ">የአክስት ልጅ (Cousin)</option>
-                                    <option value="ሌላ">ሌላ (Other)</option>
+                                    <option value="አባት">አባት</option>
+                                    <option value="እናት">እናት</option>
+                                    <option value="ወንድም">ወንድም</option>
+                                    <option value="እህት">እህት</option>
+                                    <option value="ልጅ">ልጅ</option>
+                                    <option value="ሚስት">ሚስት</option>
+                                    <option value="አክስት">አክስት</option>
+                                    <option value="አጎት">አጎት</option>
+                                    <option value="የአጎት ልጅ">የአጎት ልጅ</option>
+                                    <option value="የአክስት ልጅ">የአክስት ልጅ</option>
+                                    <option value="ሌላ">ሌላ</option>
                                 </select>
                             </div>
                             <div class="form-group" id="otherRelationshipDiv_${i}" style="display:none">
                                 <label>ሌላ (ዝምድናውን ይግለጹ)</label>
-                                <input type="text" id="beneficiaryOtherRelationship_${i}" placeholder="ለምሳሌ: አያት, የአጎት ልጅ, ወዘተ">
+                                <input type="text" id="beneficiaryOtherRelationship_${i}" placeholder="ለምሳሌ: አያት, የአጎት ልጅ">
                             </div>
                         </div>
-                        <div class="form-group"><label>አድራሻ (Address)</label><textarea id="beneficiaryAddress_${i}" rows="2"></textarea></div>
+                        <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress_${i}" rows="2"></textarea></div>
                         <div class="form-row">
-                            <div class="form-group"><label>📸 የወራሽ ፎቶ (Photo)</label><input type="file" id="beneficiaryPhoto_${i}" accept="image/*" onchange="previewBeneficiaryImage(this, ${i})"><div id="beneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
-                            <div class="form-group"><label>🆔 የወራሽ የፋይዳ መታወቂያ (Tax ID)</label><input type="file" id="beneficiaryTaxDoc_${i}" accept="image/*" onchange="previewBeneficiaryDoc(this, ${i})"><div id="beneficiaryTaxPreview_${i}" class="image-preview"></div></div>
+                            <div class="form-group"><label>📸 ፎቶ</label><input type="file" id="beneficiaryPhoto_${i}" accept="image/*" onchange="previewBeneficiaryImage(this, ${i})"><div id="beneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
+                            <div class="form-group"><label>🆔 የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc_${i}" accept="image/*" onchange="previewBeneficiaryDoc(this, ${i})"><div id="beneficiaryTaxPreview_${i}" class="image-preview"></div></div>
                         </div>
                     </div>
                 `;
@@ -600,8 +579,7 @@ startInactivityTracking();
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const previewDiv = document.getElementById(`beneficiaryPhotoPreview_${index}`);
-                    previewDiv.innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
+                    document.getElementById(`beneficiaryPhotoPreview_${index}`).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -611,8 +589,7 @@ startInactivityTracking();
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const previewDiv = document.getElementById(`beneficiaryTaxPreview_${index}`);
-                    previewDiv.innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
+                    document.getElementById(`beneficiaryTaxPreview_${index}`).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -646,11 +623,15 @@ startInactivityTracking();
                     taxDoc: taxDocBase64
                 });
             }
-            
             return beneficiaries;
         }
         
-        // ==================== TOGGLE FUNCTIONS ====================
+        // Toggle functions for Power of Attorney
+        function togglePowerOfAttorneyOptions() {
+            const type = document.getElementById('powerOfAttorneyType').value;
+            const detailsDiv = document.getElementById('powerOfAttorneyDetails');
+            detailsDiv.style.display = type !== '' ? 'block' : 'none';
+        }
         
         function toggleOtherRelationship() {
             const relationship = document.getElementById('beneficiaryRelationship').value;
@@ -663,19 +644,8 @@ startInactivityTracking();
             }
         }
         
-        function togglePowerOfAttorneyOptions() {
-            const type = document.getElementById('powerOfAttorneyType').value;
-            const detailsDiv = document.getElementById('powerOfAttorneyDetails');
-            if (type !== '') {
-                detailsDiv.style.display = 'block';
-            } else {
-                detailsDiv.style.display = 'none';
-            }
-        }
-        
         // ==================== LOAD MEMBERS ====================
         async function loadMembers() {
-            console.log("Loading members...");
             try {
                 const response = await fetch('/api/members', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -734,27 +704,14 @@ startInactivityTracking();
                 if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
             } catch (error) {
                 console.error('Error loading members:', error);
-                document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
             }
         }
         
-        // ==================== DELETE MEMBER ====================
         async function deleteMember(id) {
             if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
-                try {
-                    const response = await fetch(`/api/members/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        alert('አባል ተሰርዟል!');
-                        loadMembers();
-                    } else {
-                        alert('Delete failed');
-                    }
-                } catch (error) {
-                    alert('Error: ' + error.message);
-                }
+                await apiCall(`/members/${id}`, { method: 'DELETE' });
+                loadMembers();
+                alert('አባል ተሰርዟል!');
             }
         }
         
@@ -767,7 +724,6 @@ startInactivityTracking();
             const repPhoto = document.getElementById('repPhoto').files[0];
             const repTaxDoc = document.getElementById('repTaxDoc').files[0];
             const hardCopyForm = document.getElementById('hardCopyForm').files[0];
-            
             const powerOfAttorneyPhoto = document.getElementById('powerOfAttorneyPhoto').files[0];
             const hardCopyDocumentPhoto = document.getElementById('hardCopyDocumentPhoto').files[0];
             
@@ -776,7 +732,6 @@ startInactivityTracking();
             const TOTAL_SHARE_VALUE = 1000;
             const remainingBalance = (shareCount * TOTAL_SHARE_VALUE) - sharePricePaid;
             
-            // Collect beneficiaries data
             const beneficiaries = await collectBeneficiariesData();
             
             const member = {
@@ -797,25 +752,17 @@ startInactivityTracking();
                 paymentStatus: document.getElementById('paymentStatus').value,
                 bankAccountNumber: document.getElementById('bankAccountNumber').value,
                 financialNotes: document.getElementById('financialNotes').value,
-                
-                // Multiple beneficiaries
                 beneficiaries: beneficiaries,
                 beneficiaryCount: parseInt(document.getElementById('beneficiaryCount').value) || 0,
-                
-                // Legal Representative
                 legalRepName: document.getElementById('legalRepName').value,
                 legalRepAddress: document.getElementById('legalRepAddress').value,
                 legalRepPhone: document.getElementById('legalRepPhone').value,
-                
-                // Power of Attorney
                 powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
                 powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
                 powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
                 powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
                 powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
                 powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
-                
-                // Photos
                 memberPhoto: memberPhoto ? await fileToBase64(memberPhoto) : null,
                 memberTaxDoc: memberTaxDoc ? await fileToBase64(memberTaxDoc) : null,
                 repPhoto: repPhoto ? await fileToBase64(repPhoto) : null,
@@ -882,15 +829,14 @@ startInactivityTracking();
                         <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><div class="info-value">${escapeHtml(member.financialNotes)}</div></div>
                     </div>
                     
-                    <!-- Beneficiaries Section -->
                     <div class="section-card">
-                        <div class="section-title">👨‍👦 የወራሾች መረጃ (Beneficiaries Information)</div>
+                        <div class="section-title">👨‍👦 የወራሾች መረጃ (Beneficiaries)</div>
                         <div><strong>📊 ጠቅላላ ብዛት:</strong> ${member.beneficiaries ? member.beneficiaries.length : 0}</div>
                         ${member.beneficiaries && member.beneficiaries.length > 0 ? member.beneficiaries.map((ben, idx) => `
                             <div class="beneficiary-card" style="margin-top:10px; padding:10px; background:#fff; border-left:3px solid #2d6a1a">
                                 <div class="section-title" style="font-size:0.9em">👤 ወራሽ ${idx + 1}</div>
                                 <div class="photo-with-info">
-                                    ${ben.photo ? `<img src="${ben.photo}" class="doc-thumb" onclick="openLightbox('${ben.photo}')" title="የወራሽ ፎቶ">` : '<div style="width:50px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                                    ${ben.photo ? `<img src="${ben.photo}" class="doc-thumb" onclick="openLightbox('${ben.photo}')">` : '<div style="width:50px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
                                     <div class="info-flex">
                                         <div><strong>ሙሉ ስም:</strong> ${escapeHtml(ben.name) || 'N/A'}</div>
                                         <div><strong>ፆታ:</strong> ${escapeHtml(ben.gender) || 'N/A'}</div>
@@ -904,9 +850,9 @@ startInactivityTracking();
                     </div>
                     
                     <div class="section-card">
-                        <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ (Legal Representative)</div>
+                        <div class="section-title">⚖️ ህጋዊ ተወካይ</div>
                         <div class="photo-with-info">
-                            ${member.repPhoto ? `<img src="${member.repPhoto}" onclick="openLightbox('${member.repPhoto}')" title="የተወካይ ፎቶ">` : '<div style="width:60px;height:60px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
+                            ${member.repPhoto ? `<img src="${member.repPhoto}" class="doc-thumb" onclick="openLightbox('${member.repPhoto}')">` : '<div style="width:50px;height:50px;background:#eee;border-radius:8px;display:flex;align-items:center;justify-content:center">📷</div>'}
                             <div class="info-flex">
                                 <div><strong>ስም:</strong> ${escapeHtml(member.legalRepName) || 'N/A'}</div>
                                 <div><strong>አድራሻ:</strong> ${escapeHtml(member.legalRepAddress) || 'N/A'}</div>
@@ -916,7 +862,7 @@ startInactivityTracking();
                         </div>
                     </div>
                     
-                    ${(member.powerOfAttorneyType) ? `
+                    ${member.powerOfAttorneyType ? `
                     <div class="section-card">
                         <div class="section-title">📜 ውክልና (Power of Attorney)</div>
                         <div class="info-grid">
@@ -928,25 +874,24 @@ startInactivityTracking();
                             <div class="info-item full-width"><div class="info-label">ማስታወሻ:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyNotes) || 'N/A'}</div></div>
                         </div>
                         <div class="photo-grid">
-                            ${member.powerOfAttorneyPhoto ? `<img src="${member.powerOfAttorneyPhoto}" class="doc-thumb" onclick="openLightbox('${member.powerOfAttorneyPhoto}')" title="የውክልና ሰነድ">` : ''}
-                            ${member.hardCopyDocumentPhoto ? `<img src="${member.hardCopyDocumentPhoto}" class="doc-thumb" onclick="openLightbox('${member.hardCopyDocumentPhoto}')" title="የሀርድ ኮፒ ቅጂ">` : ''}
+                            ${member.powerOfAttorneyPhoto ? `<img src="${member.powerOfAttorneyPhoto}" class="doc-thumb" onclick="openLightbox('${member.powerOfAttorneyPhoto}')">` : ''}
+                            ${member.hardCopyDocumentPhoto ? `<img src="${member.hardCopyDocumentPhoto}" class="doc-thumb" onclick="openLightbox('${member.hardCopyDocumentPhoto}')">` : ''}
                         </div>
                     </div>
                     ` : ''}
                     
                     ${(member.memberTaxDoc || member.hardCopyForm) ? `
                     <div class="section-card">
-                        <div class="section-title">📄 የአባሉ ሰነዶች (Member Documents)</div>
+                        <div class="section-title">📄 ሰነዶች</div>
                         <div class="photo-grid">
-                            ${member.memberTaxDoc ? `<img src="${member.memberTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.memberTaxDoc}')" title="የፋይዳ መታወቂያ">` : ''}
-                            ${member.hardCopyForm ? `<img src="${member.hardCopyForm}" class="doc-thumb" onclick="openLightbox('${member.hardCopyForm}')" title="የሃርድ ኮፒ ቅፅ">` : ''}
+                            ${member.memberTaxDoc ? `<img src="${member.memberTaxDoc}" class="doc-thumb" onclick="openLightbox('${member.memberTaxDoc}')">` : ''}
+                            ${member.hardCopyForm ? `<img src="${member.hardCopyForm}" class="doc-thumb" onclick="openLightbox('${member.hardCopyForm}')">` : ''}
                         </div>
                     </div>
                     ` : ''}
                 </div>
-                
                 <div id="editMode" style="display:none">
-                    <div style="text-align:center; padding:20px; color:#999">Edit mode - Click Save to update</div>
+                    <p style="text-align:center; padding:20px">Edit mode loaded. Click Save to update.</p>
                 </div>
             `;
             
@@ -957,7 +902,11 @@ startInactivityTracking();
         }
         
         function enableEditMode() {
-            alert('Edit mode functionality - You can implement full edit features here');
+            alert('Edit mode - You can edit member information here');
+            document.getElementById('editModeBtn').style.display = 'none';
+            document.getElementById('saveEditBtn').style.display = 'inline-block';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            isEditMode = true;
         }
         
         function cancelEditMode() {
@@ -965,7 +914,9 @@ startInactivityTracking();
         }
         
         async function saveMemberEdit() {
-            alert('Save functionality - Implement full save here');
+            alert('Save functionality - Update member data here');
+            closeMemberModal();
+            loadMembers();
         }
         
         function closeMemberModal() {
@@ -983,12 +934,7 @@ startInactivityTracking();
         
         async function loadMemberSales() {
             const memberId = document.getElementById('selectedMemberId').value;
-            if (!memberId) { 
-                document.getElementById('selectedMemberInfo').innerHTML = ''; 
-                document.getElementById('salesHistoryList').innerHTML = ''; 
-                document.getElementById('salesStats').innerHTML = ''; 
-                return; 
-            }
+            if (!memberId) return;
             const member = members.find(m => m.id === memberId);
             if (member) document.getElementById('selectedMemberInfo').innerHTML = `<h4>✅ ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 👔 ${member.role}</p>`;
             const memberSales = sales.filter(s => s.memberId === memberId);
@@ -999,15 +945,25 @@ startInactivityTracking();
         function displaySalesStats(memberSales) {
             const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
             const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
-            document.getElementById('salesStats').innerHTML = `<div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales.length}</div><div>ግብይቶች</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div><div>ጠቅላላ ብዛት</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div><div>ጠቅላላ ገቢ</div></div>`;
+            document.getElementById('salesStats').innerHTML = `
+                <div class="stat-card"><div class="stat-value">${memberSales.length}</div><div>ግብይቶች</div></div>
+                <div class="stat-card"><div class="stat-value">${totalQty.toFixed(2)} kg</div><div>ጠቅላላ ብዛት</div></div>
+                <div class="stat-card"><div class="stat-value">${totalAmt.toFixed(2)} ብር</div><div>ጠቅላላ ገቢ</div></div>
+            `;
         }
         
         function displaySalesHistory(memberSales) {
-            if (!memberSales.length) { 
-                document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>'; 
-                return; 
+            if (!memberSales.length) {
+                document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>';
+                return;
             }
-            document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `<div class="member-card"><div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div><div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg | 💳 ${s.paymentMethod}</div><button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');
+            document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `
+                <div class="member-card">
+                    <div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div>
+                    <div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg | 💳 ${s.paymentMethod}</div>
+                    <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
+                </div>
+            `).join('');
         }
         
         function calculateTotalAmount() {
@@ -1044,6 +1000,11 @@ startInactivityTracking();
                 loadMemberSales();
                 alert('ሽያጭ ተሰርዟል!');
             }
+        }
+        
+        async function loadAllSales() {
+            const salesData = await apiCall('/sales');
+            sales = salesData;
         }
         
         // ==================== TRANSFER FUNCTIONS ====================
@@ -1083,7 +1044,13 @@ startInactivityTracking();
             const transfersData = await apiCall('/transfers');
             const container = document.getElementById('transferHistoryList');
             if (!transfersData.length) { container.innerHTML = '<div class="no-data">📭 ምንም ዝውውር የለም</div>'; return; }
-            container.innerHTML = transfersData.map(t => `<div class="member-card"><div class="member-header"><span>📅 ${new Date(t.transferDate).toLocaleDateString()}</span><span class="member-role">✅ ተጠናቋል</span></div><div>👤 ${escapeHtml(t.oldMemberName)} → ${escapeHtml(t.newMemberName)}</div><button onclick="deleteTransfer('${t.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');
+            container.innerHTML = transfersData.map(t => `
+                <div class="member-card">
+                    <div class="member-header"><span>📅 ${new Date(t.transferDate).toLocaleDateString()}</span><span class="member-role">✅ ተጠናቋል</span></div>
+                    <div>👤 ${escapeHtml(t.oldMemberName)} → ${escapeHtml(t.newMemberName)}</div>
+                    <button onclick="deleteTransfer('${t.id}')" class="btn-danger">🗑️ ሰርዝ</button>
+                </div>
+            `).join('');
         }
         
         async function deleteTransfer(transferId) {
@@ -1099,14 +1066,23 @@ startInactivityTracking();
             const term = document.getElementById('searchTerm').value;
             if (!term) { document.getElementById('searchResults').innerHTML = ''; return; }
             const results = members.filter(m => m.fullName?.toLowerCase().includes(term.toLowerCase()) || m.phone?.includes(term));
-            document.getElementById('searchResults').innerHTML = results.map(m => `<div class="member-card" onclick="showMemberDetails('${m.id}')"><div class="member-header"><div class="member-name">👤 ${escapeHtml(m.fullName)}</div><div class="member-role">${escapeHtml(m.role)}</div></div><div>📞 ${escapeHtml(m.phone)} | 🏠 ${escapeHtml(m.address)}</div></div>`).join('');
+            document.getElementById('searchResults').innerHTML = results.map(m => `
+                <div class="member-card" onclick="showMemberDetails('${m.id}')">
+                    <div class="member-header"><div class="member-name">👤 ${escapeHtml(m.fullName)}</div><div class="member-role">${escapeHtml(m.role)}</div></div>
+                    <div>📞 ${escapeHtml(m.phone)} | 🏠 ${escapeHtml(m.address)}</div>
+                </div>
+            `).join('');
         }
         
         // ==================== TRADING FUNCTIONS ====================
         async function loadTradingStats() {
             try {
                 const stats = await apiCall('/share-trading/stats');
-                document.getElementById('tradingStats').innerHTML = `<div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div><div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center"><div class="stat-value" style="font-size:1.5em;font-weight:bold">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>`;
+                document.getElementById('tradingStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-value">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div>
+                    <div class="stat-card"><div class="stat-value">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div>
+                    <div class="stat-card"><div class="stat-value">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>
+                `;
             } catch(e) { console.error(e); }
         }
         
@@ -1115,7 +1091,16 @@ startInactivityTracking();
                 const requests = await apiCall('/share-trading/pending');
                 const container = document.getElementById('pendingRequestsList');
                 if (!requests.length) { container.innerHTML = '<div class="no-data">⏳ ምንም በመጠባበቅ ላይ ያሉ ጥያቄዎች የሉም</div>'; return; }
-                container.innerHTML = requests.map(r => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div><div>📊 ${r.shareAmount} አክሲዬን | 💰 ${r.totalValue.toFixed(2)} ብር</div><div class="member-actions"><button class="btn-primary" onclick="approveTradingRequest('${r.id}')">✅ ጸድቋል</button><button class="btn-danger" onclick="rejectTradingRequest('${r.id}')">❌ ውድቅ ተደርጓል</button></div></div>`).join('');
+                container.innerHTML = requests.map(r => `
+                    <div class="member-card">
+                        <div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div>
+                        <div>📊 ${r.shareAmount} አክሲዬን | 💰 ${r.totalValue.toFixed(2)} ብር</div>
+                        <div class="member-actions">
+                            <button class="btn-primary" onclick="approveTradingRequest('${r.id}')">✅ ጸድቋል</button>
+                            <button class="btn-danger" onclick="rejectTradingRequest('${r.id}')">❌ ውድቅ ተደርጓል</button>
+                        </div>
+                    </div>
+                `).join('');
             } catch(e) { console.error(e); }
         }
         
@@ -1141,7 +1126,12 @@ startInactivityTracking();
                 const requests = await apiCall('/share-trading/requests');
                 const container = document.getElementById('allRequestsList');
                 if (!requests.length) { container.innerHTML = '<div class="no-data">📭 ምንም ጥያቄዎች የሉም</div>'; return; }
-                container.innerHTML = requests.slice(0, 20).map(r => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div><div>📅 ${new Date(r.createdAt).toLocaleDateString()} | 📊 ${r.shareAmount} አክሲዬን | 💰 ${r.totalValue.toFixed(2)} ብር</div></div>`).join('');
+                container.innerHTML = requests.slice(0, 20).map(r => `
+                    <div class="member-card">
+                        <div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div>
+                        <div>📅 ${new Date(r.createdAt).toLocaleDateString()} | 📊 ${r.shareAmount} አክሲዬን | 💰 ${r.totalValue.toFixed(2)} ብር</div>
+                    </div>
+                `).join('');
             } catch(e) { console.error(e); }
         }
         
@@ -1161,7 +1151,13 @@ startInactivityTracking();
             const users = await apiCall('/auth/users');
             const container = document.getElementById('usersList');
             if (!users.length) { container.innerHTML = '<p>No users found</p>'; return; }
-            container.innerHTML = users.map(u => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="share-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div><div>Username: ${escapeHtml(u.username)} | Email: ${escapeHtml(u.email)}</div>${u.id !== currentUser.id ? `<div class="member-actions"><button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button><button class="btn-edit" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button></div>` : ''}</div>`).join('');
+            container.innerHTML = users.map(u => `
+                <div class="member-card">
+                    <div class="member-header"><div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="share-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div>
+                    <div>Username: ${escapeHtml(u.username)} | Email: ${escapeHtml(u.email)}</div>
+                    ${u.id !== currentUser.id ? `<div class="member-actions"><button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button><button class="btn-edit" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button></div>` : ''}
+                </div>
+            `).join('');
         }
         
         async function createNewUser() {
@@ -1187,17 +1183,11 @@ startInactivityTracking();
             }
         }
         
-        // ==================== LOAD ALL SALES ====================
-        async function loadAllSales() {
-            const salesData = await apiCall('/sales');
-            sales = salesData;
-        }
-        
         // ==================== EXPORT TO CSV ====================
         function exportToCSV() {
             if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ', 'የወራሽ ብዛት', 'ማስታወሻ'];
-            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '', m.beneficiaries ? m.beneficiaries.length : 0, m.financialNotes || '']);
+            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ሙሉ ስም', 'ዜግነት', 'የትምህርት ደረጃ', 'አድራሻ', 'ስልክ', 'የፋይዳ መለያ', 'ሚና', 'የአክሲዬን ብዛት', 'የአክሲዬን ድርሻ %', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'የባንክ ሂሳብ'];
+            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, m.nationality, m.education, m.address, m.phone, m.taxId, m.role, m.shareCount || 0, m.sharePercentage || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankAccountNumber || '']);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -1219,7 +1209,11 @@ startInactivityTracking();
             if (tabId === 'trading') { loadTradingStats(); loadPendingRequests(); loadAllRequests(); }
         }
         
-        function logout() { localStorage.clear(); window.location.href = '/'; }
+        function logout() { 
+            stopInactivityTracking();
+            localStorage.clear(); 
+            window.location.href = '/'; 
+        }
         
         // Event listeners
         document.getElementById('quantity')?.addEventListener('input', calculateTotalAmount);
@@ -1235,6 +1229,7 @@ startInactivityTracking();
         loadMembers();
         loadAllSales();
         loadTransfers();
+        startInactivityTracking();
         
         // Make functions global
         window.showTab = showTab;
