@@ -52,7 +52,7 @@
         .status-partial{background:#fff3cd;color:#856404}
         .status-pending{background:#f8d7da;color:#721c24}
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
-        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:700px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:750px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:auto;animation:slideUp 0.3s ease}
         @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
         .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
         .modal-header h3{margin:0}
@@ -96,16 +96,16 @@
     </nav>
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('register')">📝 አዲስ አባል</button>
-            <button class="tab-btn" onclick="showTab('list')">📋 የአባላት ዝርዝር</button>
-            <button class="tab-btn" onclick="showTab('sales')">💰 ሽያጭ</button>
-            <button class="tab-btn" onclick="showTab('transfer')">🔄 የስም ዝውውር</button>
-            <button class="tab-btn" onclick="showTab('trading')">📊 የአክሲዬን ግብይት</button>
-            <button class="tab-btn" onclick="showTab('search')">🔍 ፈልግ</button>
-            <button class="tab-btn" onclick="showTab('admin')">⚙️ አስተዳዳሪ</button>
+            <button class="tab-btn active" onclick="showTab(event,'register')">📝 አዲስ አባል</button>
+            <button class="tab-btn" onclick="showTab(event,'list')">📋 የአባላት ዝርዝር</button>
+            <button class="tab-btn" onclick="showTab(event,'sales')">💰 ሽያጭ</button>
+            <button class="tab-btn" onclick="showTab(event,'transfer')">🔄 የስም ዝውውር</button>
+            <button class="tab-btn" onclick="showTab(event,'trading')">📊 ግብይት</button>
+            <button class="tab-btn" onclick="showTab(event,'search')">🔍 ፈልግ</button>
+            <button class="tab-btn" onclick="showTab(event,'admin')">⚙️ አስተዳዳሪ</button>
         </div>
 
-        <!-- ==================== REGISTER TAB ==================== -->
+        <!-- REGISTER TAB -->
         <div id="register" class="tab-content active">
             <h2>📝 የአባልነት ምዝገባ ቅፅ</h2>
             <form id="memberForm">
@@ -187,7 +187,7 @@
                     </div>
                 </div>
 
-                <!-- Beneficiaries (multiple) -->
+                <!-- Beneficiaries -->
                 <div class="form-section">
                     <h3>👨‍👦 የወራሽ መረጃ</h3>
                     <div class="form-group"><label>የወራሽ ብዛት</label><input type="number" id="beneficiaryCount" min="0" max="20" value="0" step="1" onchange="generateBeneficiaryForms()"></div>
@@ -235,14 +235,14 @@
             </form>
         </div>
 
-        <!-- ==================== MEMBERS LIST TAB ==================== -->
+        <!-- MEMBERS LIST TAB -->
         <div id="list" class="tab-content">
             <div class="list-header"><h2>📋 የአባላት ዝርዝር</h2><div class="stats"><span id="memberCount"></span><button onclick="exportToCSV()" class="btn-export">📊 CSV</button></div></div>
             <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 ፈልግ..." onkeyup="loadMembers()"></div>
             <div id="membersList"></div>
         </div>
 
-        <!-- ==================== MEMBER DETAILS MODAL (bottom-right) ==================== -->
+        <!-- MEMBER DETAILS MODAL -->
         <div id="memberModal" class="modal-bottom">
             <div class="modal-header"><h3>👤 የአባል መረጃ</h3><span class="close-modal" onclick="closeMemberModal()">&times;</span></div>
             <div id="modalBody" class="modal-body">Loading...</div>
@@ -253,8 +253,8 @@
             </div>
         </div>
 
-        <!-- Other tabs (simplified for brevity – you can keep your existing ones) -->
-        <div id="sales" class="tab-content"><h2>💰 ሽያጭ</h2><select id="selectedMemberId" onchange="loadMemberSales()"></select><div id="salesHistoryList"></div></div>
+        <!-- Other tabs (simplified) -->
+        <div id="sales" class="tab-content"><h2>💰 ሽያጭ</h2><select id="selectedMemberId" onchange="loadMemberSales()"><option value="">አባል ይምረጡ</option></select><div id="salesHistoryList"></div></div>
         <div id="transfer" class="tab-content"><h2>🔄 የስም ዝውውር</h2><div id="transferHistoryList"></div></div>
         <div id="trading" class="tab-content"><h2>📊 ግብይት</h2><div id="pendingRequestsList"></div></div>
         <div id="search" class="tab-content"><h2>🔍 ፈልግ</h2><input type="text" id="searchTerm" placeholder="በስም ወይም ስልክ..." onkeyup="searchMembers()" style="width:100%;padding:12px"><div id="searchResults"></div></div>
@@ -271,13 +271,11 @@
 
         const TOTAL_SHARES = 25000, PRICE_PER_SHARE = 10000;
 
-        // ========== Helper functions ==========
         async function apiCall(endpoint, options = {}) {
             const res = await fetch(`/api${endpoint}`, { ...options, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers } });
             if (res.status === 401) { localStorage.clear(); window.location.href = '/'; }
             return res.json();
         }
-
         function fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = reject; }); }
         function previewImage(input, previewId) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = e => document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`; reader.readAsDataURL(input.files[0]); } }
         function openLightbox(src) { document.getElementById('lightbox').style.display = 'block'; document.getElementById('lightboxImg').src = src; }
@@ -300,14 +298,13 @@
             else if (paid >= total) document.getElementById('paymentStatus').value = 'ተከፍሏል';
             else document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
         }
-
         function getPaymentStatusClass(status) {
             if (status === 'ተከፍሏል') return 'status-paid';
             if (status === 'በከፊል ተከፍሏል') return 'status-partial';
             return 'status-pending';
         }
 
-        // ========== Address hierarchy (Ethiopian) ==========
+        // Address hierarchy data (simplified – same as before)
         const addressData = {
             "ጋምቤላ": {
                 zones: ["ማጃንግ ዞን", "አኝዋ ዞን", "ኑዌር ዞን"],
@@ -325,14 +322,8 @@
         function loadCities() { let region = document.getElementById('region').value; let woreda = document.getElementById('woreda').value; let citySel = document.getElementById('city'); citySel.innerHTML = '<option value="">ከተማ ይምረጡ</option>'; if (region === 'ጋምቤላ' && woreda === 'ጎደሬ ወረዳ') { let opt = document.createElement('option'); opt.value = 'ሜጢ ከተማ አስተዳደር'; opt.textContent = 'ሜጢ ከተማ አስተዳደር'; citySel.appendChild(opt); } citySel.innerHTML += '<option value="ሌላ">ሌላ</option>'; loadKebelesForMeti(); }
         function loadKebelesForMeti() { let region = document.getElementById('region').value; let woreda = document.getElementById('woreda').value; let city = document.getElementById('city').value; let kebeleSel = document.getElementById('kebele'); kebeleSel.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>'; if (region === 'ጋምቤላ' && woreda === 'ጎደሬ ወረዳ' && city === 'ሜጢ ከተማ አስተዳደር') { addressData[region].cities[city].forEach(k => { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; kebeleSel.appendChild(opt); }); } kebeleSel.innerHTML += '<option value="ሌላ">ሌላ</option>'; updateFullAddress(); }
         function updateFullAddress() { let parts = [document.getElementById('region').value, document.getElementById('zone').value, document.getElementById('woreda').value, document.getElementById('city').value, document.getElementById('kebele').value, document.getElementById('houseNumber').value].filter(v => v && v !== 'ሌላ'); document.getElementById('fullAddress').value = parts.join('፣ '); }
-        document.getElementById('region')?.addEventListener('change', updateFullAddress);
-        document.getElementById('zone')?.addEventListener('change', updateFullAddress);
-        document.getElementById('woreda')?.addEventListener('change', updateFullAddress);
-        document.getElementById('city')?.addEventListener('change', updateFullAddress);
-        document.getElementById('kebele')?.addEventListener('change', updateFullAddress);
-        document.getElementById('houseNumber')?.addEventListener('input', updateFullAddress);
 
-        // ========== Beneficiary dynamic forms ==========
+        // Beneficiary dynamic forms
         function generateBeneficiaryForms() {
             let count = parseInt(document.getElementById('beneficiaryCount').value) || 0;
             let container = document.getElementById('beneficiariesContainer');
@@ -375,7 +366,7 @@
             return beneficiaries;
         }
 
-        // ========== Load members list ==========
+        // Load members list
         async function loadMembers() {
             let res = await fetch('/api/members', { headers: { 'Authorization': `Bearer ${token}` } });
             if (!res.ok) return;
@@ -394,10 +385,9 @@
             let saleSelect = document.getElementById('selectedMemberId');
             if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
         }
-
         async function deleteMember(id) { if (confirm('እርግጠኛ ነዎት?')) { await apiCall(`/members/${id}`, { method: 'DELETE' }); loadMembers(); } }
 
-        // ========== Show member details modal ==========
+        // Show member details modal (view mode)
         async function showMemberDetails(id) {
             let member = members.find(m => m.id === id);
             if (!member) return;
@@ -433,17 +423,78 @@
                     <div class="info-item"><div class="info-label">📜 ውክልና አይነት</div><div class="info-value">${escapeHtml(member.powerOfAttorneyType)}</div></div>
                 </div>
                 </div>
-                <div id="editMode" style="display:none"><p style="text-align:center">Edit mode – implement full edit fields here (similar to registration).</p></div>`;
+                <div id="editMode" style="display:none"><p style="text-align:center">Loading edit form...</p></div>`;
             document.getElementById('memberModal').style.display = 'block';
             document.getElementById('editModeBtn').style.display = 'inline-block';
             document.getElementById('saveEditBtn').style.display = 'none';
         }
-        function enableEditMode() { document.getElementById('viewMode').style.display = 'none'; document.getElementById('editMode').style.display = 'block'; document.getElementById('editModeBtn').style.display = 'none'; document.getElementById('saveEditBtn').style.display = 'inline-block'; }
-        function cancelEditMode() { showMemberDetails(currentEditingMemberId); }
-        async function saveMemberEdit() { alert('እባክዎ ማስተካከያ ያስገቡ (full edit implementation needed)'); }
+
+        // Enable edit mode – dynamically build edit form from member data
+        function enableEditMode() {
+            let member = members.find(m => m.id === currentEditingMemberId);
+            if (!member) return;
+            let editHtml = `<div class="info-grid">`;
+            // Simple editable fields (similar to registration, but we'll include the most important ones)
+            editHtml += `<div class="full-width"><label>ሙሉ ስም</label><input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" class="form-control"></div>`;
+            editHtml += `<div><label>ፆታ</label><select id="editGender"><option ${member.gender==='ወንድ'?'selected':''}>ወንድ</option><option ${member.gender==='ሴት'?'selected':''}>ሴት</option></select></div>`;
+            editHtml += `<div><label>ዕድሜ</label><input type="number" id="editAge" value="${member.age}"></div>`;
+            editHtml += `<div><label>የእናት ስም</label><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}"></div>`;
+            editHtml += `<div><label>ስልክ</label><input type="text" id="editPhone" value="${escapeHtml(member.phone)}"></div>`;
+            editHtml += `<div><label>ሚና</label><input type="text" id="editRole" value="${escapeHtml(member.role)}"></div>`;
+            editHtml += `<div><label>አክሲዬን ብዛት</label><input type="number" id="editShareCount" value="${member.shareCount}" oninput="updateEditShareCalc()"></div>`;
+            editHtml += `<div><label>የተከፈለ</label><input type="number" id="editSharePricePaid" value="${member.sharePricePaid}" oninput="updateEditShareCalc()"></div>`;
+            editHtml += `<div><label>ቀሪ ገንዘብ</label><input type="text" id="editRemainingBalance" readonly value="${member.remainingBalance?.toLocaleString()}"></div>`;
+            editHtml += `<div class="full-width"><label>አድራሻ</label><textarea id="editAddress">${escapeHtml(member.address)}</textarea></div>`;
+            editHtml += `</div>`;
+            document.getElementById('editMode').innerHTML = editHtml;
+            document.getElementById('viewMode').style.display = 'none';
+            document.getElementById('editMode').style.display = 'block';
+            document.getElementById('editModeBtn').style.display = 'none';
+            document.getElementById('saveEditBtn').style.display = 'inline-block';
+            window.updateEditShareCalc = function() {
+                let shares = parseInt(document.getElementById('editShareCount').value) || 0;
+                let paid = parseFloat(document.getElementById('editSharePricePaid').value) || 0;
+                let total = shares * PRICE_PER_SHARE;
+                document.getElementById('editRemainingBalance').value = (total - paid).toLocaleString() + ' ብር';
+            };
+            updateEditShareCalc();
+        }
+
+        async function saveMemberEdit() {
+            let memberId = currentEditingMemberId;
+            let updatedData = {
+                fullName: document.getElementById('editFullName').value,
+                gender: document.getElementById('editGender').value,
+                age: parseInt(document.getElementById('editAge').value),
+                motherName: document.getElementById('editMotherName').value,
+                phone: document.getElementById('editPhone').value,
+                role: document.getElementById('editRole').value,
+                shareCount: parseInt(document.getElementById('editShareCount').value),
+                sharePricePaid: parseFloat(document.getElementById('editSharePricePaid').value),
+                address: document.getElementById('editAddress').value
+            };
+            // Also update share percentage and remaining balance on server
+            let shares = updatedData.shareCount;
+            let paid = updatedData.sharePricePaid;
+            updatedData.totalPayable = shares * PRICE_PER_SHARE;
+            updatedData.remainingBalance = updatedData.totalPayable - paid;
+            updatedData.sharePercentage = (shares / TOTAL_SHARES) * 100;
+            if (paid <= 0) updatedData.paymentStatus = 'አልተከፈለም';
+            else if (paid >= updatedData.totalPayable) updatedData.paymentStatus = 'ተከፍሏል';
+            else updatedData.paymentStatus = 'በከፊል ተከፍሏል';
+            let res = await apiCall(`/members/${memberId}`, { method: 'PUT', body: JSON.stringify(updatedData) });
+            if (res.id || res.message === 'Member updated successfully') {
+                alert('✅ ለውጦች ተቀባይነት አግኝተዋል!');
+                closeMemberModal();
+                loadMembers();
+            } else {
+                alert('❌ ዝመና አልተሳካም');
+            }
+        }
+
         function closeMemberModal() { document.getElementById('memberModal').style.display = 'none'; }
 
-        // ========== Registration submit ==========
+        // Registration submit (fixed: no event.target error)
         document.getElementById('memberForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -501,38 +552,65 @@
                 document.getElementById('beneficiariesContainer').innerHTML = '';
                 document.getElementById('beneficiaryCount').value = 0;
                 loadMembers();
-                showTab('list');
+                showTab(null, 'list');   // programmatic call without event
             } catch (err) { console.error(err); alert('❌ ስህተት: ' + err.message); }
         });
 
-        // Other placeholder functions (sales, transfers, etc.)
-        async function loadMemberSales() { let mid = document.getElementById('selectedMemberId').value; if (!mid) return; let salesData = await apiCall(`/sales/member/${mid}`); document.getElementById('salesHistoryList').innerHTML = salesData.map(s => `<div class="member-card">📅 ${new Date(s.date).toLocaleDateString()} | ${s.quantity} kg | ${s.totalAmount} ብር</div>`).join(''); }
+        // Fixed showTab – works both with click event and programmatic call
+        function showTab(ev, tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (ev && ev.target) ev.target.classList.add('active');
+            else {
+                // if called programmatically, find button with matching onclick and activate it
+                let btns = document.querySelectorAll('.tab-btn');
+                for (let btn of btns) {
+                    if (btn.getAttribute('onclick')?.includes(`'${tabId}'`)) btn.classList.add('active');
+                }
+            }
+            if (tabId === 'list') loadMembers();
+            if (tabId === 'sales') { loadAllSales(); loadMemberSales(); }
+            if (tabId === 'transfer') loadTransfers();
+            if (tabId === 'trading') loadPendingRequests();
+        }
+
+        // Other helper functions (shortened for brevity, same as before)
         async function loadAllSales() { sales = await apiCall('/sales'); }
+        async function loadMemberSales() { let mid = document.getElementById('selectedMemberId').value; if (!mid) return; let memberSales = await apiCall(`/sales/member/${mid}`); document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `<div class="member-card">📅 ${new Date(s.date).toLocaleDateString()} | ${s.quantity} kg | ${s.totalAmount} ብር</div>`).join(''); }
         async function loadTransfers() { transfers = await apiCall('/transfers'); document.getElementById('transferHistoryList').innerHTML = transfers.map(t => `<div class="member-card">${escapeHtml(t.oldMemberName)} → ${escapeHtml(t.newMemberName)}</div>`).join(''); }
         async function loadPendingRequests() { let reqs = await apiCall('/share-trading/pending'); document.getElementById('pendingRequestsList').innerHTML = reqs.map(r => `<div class="member-card">${escapeHtml(r.memberName)} - ${r.shareAmount} አክሲዬን</div>`).join(''); }
         async function searchMembers() { let term = document.getElementById('searchTerm').value; if (!term) return; let results = members.filter(m => m.fullName?.toLowerCase().includes(term.toLowerCase()) || m.phone?.includes(term)); document.getElementById('searchResults').innerHTML = results.map(m => `<div class="member-card" onclick="showMemberDetails('${m.id}')"><strong>${escapeHtml(m.fullName)}</strong><br>📞 ${escapeHtml(m.phone)}</div>`).join(''); }
         async function loadAllUsers() { let users = await apiCall('/auth/users'); document.getElementById('usersList').innerHTML = users.map(u => `<div class="member-card">👤 ${escapeHtml(u.fullName)} (${escapeHtml(u.role)})</div>`).join(''); }
         function exportToCSV() { if (!members.length) { alert('ምንም አባላት የሉም'); return; } let headers = ['ተራ ቁጥር','ሙሉ ስም','ፆታ','ዕድሜ','ስልክ','ሚና','አክሲዬን','የተከፈለ','ቀሪ']; let rows = members.map((m,i)=>[i+1,m.fullName,m.gender,m.age,m.phone,m.role,m.shareCount,m.sharePricePaid,m.remainingBalance]); let csv = [headers,...rows].map(row=>row.map(c=>`"${c}"`).join(',')).join('\n'); let blob = new Blob(['\uFEFF'+csv],{type:'text/csv'}); let link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`members_${new Date().toISOString().split('T')[0]}.csv`; link.click(); }
-        function showTab(tabId) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); event.target.classList.add('active'); if(tabId==='list') loadMembers(); if(tabId==='sales'){loadAllSales();loadMemberSales();} if(tabId==='transfer') loadTransfers(); if(tabId==='trading') loadPendingRequests(); }
         function logout() { localStorage.clear(); window.location.href='/'; }
         function toggleOtherBank() { let sel=document.getElementById('bankName'); document.getElementById('otherBankDiv').style.display=sel.value==='ሌላ'?'block':'none'; }
         function togglePowerOfAttorney() { let sel=document.getElementById('powerOfAttorneyType'); document.getElementById('powerOfAttorneyDetails').style.display=sel.value?'block':'none'; }
 
-        // Event listeners
+        // Attach listeners
         document.getElementById('shareCount')?.addEventListener('input', calculateSharePayment);
         document.getElementById('sharePricePaid')?.addEventListener('input', calculateSharePayment);
+        document.getElementById('region')?.addEventListener('change', updateFullAddress);
+        document.getElementById('zone')?.addEventListener('change', updateFullAddress);
+        document.getElementById('woreda')?.addEventListener('change', updateFullAddress);
+        document.getElementById('city')?.addEventListener('change', updateFullAddress);
+        document.getElementById('kebele')?.addEventListener('change', updateFullAddress);
+        document.getElementById('houseNumber')?.addEventListener('input', updateFullAddress);
         document.getElementById('userName').innerHTML = `👤 ${escapeHtml(currentUser.fullName) || 'Admin'}`;
         loadMembers(); loadAllSales(); loadTransfers(); loadPendingRequests();
 
-        // Make functions global for onclick
-        window.showTab = showTab; window.deleteMember = deleteMember; window.exportToCSV = exportToCSV; window.loadMemberSales = loadMemberSales;
-        window.searchMembers = searchMembers; window.openLightbox = openLightbox; window.closeLightbox = closeLightbox; window.previewImage = previewImage;
-        window.logout = logout; window.showMemberDetails = showMemberDetails; window.closeMemberModal = closeMemberModal; window.enableEditMode = enableEditMode;
-        window.saveMemberEdit = saveMemberEdit; window.cancelEditMode = cancelEditMode; window.loadAllUsers = loadAllUsers;
-        window.generateBeneficiaryForms = generateBeneficiaryForms; window.removeBeneficiary = removeBeneficiary; window.toggleOtherRelationshipBeneficiary = toggleOtherRelationshipBeneficiary;
-        window.previewBeneficiaryImage = previewBeneficiaryImage; window.previewBeneficiaryDoc = previewBeneficiaryDoc; window.calculateSharePayment = calculateSharePayment;
+        // Expose globals
+        window.showTab = showTab; window.deleteMember = deleteMember; window.exportToCSV = exportToCSV;
+        window.loadMemberSales = loadMemberSales; window.searchMembers = searchMembers; window.openLightbox = openLightbox;
+        window.closeLightbox = closeLightbox; window.previewImage = previewImage; window.logout = logout;
+        window.showMemberDetails = showMemberDetails; window.closeMemberModal = closeMemberModal; window.enableEditMode = enableEditMode;
+        window.saveMemberEdit = saveMemberEdit; window.loadAllUsers = loadAllUsers;
+        window.generateBeneficiaryForms = generateBeneficiaryForms; window.removeBeneficiary = removeBeneficiary;
+        window.toggleOtherRelationshipBeneficiary = toggleOtherRelationshipBeneficiary; window.previewBeneficiaryImage = previewBeneficiaryImage;
+        window.previewBeneficiaryDoc = previewBeneficiaryDoc; window.calculateSharePayment = calculateSharePayment;
         window.loadZones = loadZones; window.loadWoredas = loadWoredas; window.loadCities = loadCities; window.loadKebelesForMeti = loadKebelesForMeti;
         window.toggleOtherBank = toggleOtherBank; window.togglePowerOfAttorney = togglePowerOfAttorney;
+        window.updateFullAddress = updateFullAddress;
     </script>
 </body>
 </html>
