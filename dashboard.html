@@ -544,9 +544,10 @@
             YEAR2: 0.40,
             YEAR3: 0.30
         };
-        // ==================== ETHIOPIAN ADDRESS HIERARCHY DATA ====================
+    // ==================== UPDATED ETHIOPIAN ADDRESS DATA ====================
 
 const ethiopianAddressData = {
+    // ==================== TIGRAY REGION ====================
     "ትግራይ": {
         zones: ["ምዕራብ ትግራይ", "ምስራቅ ትግራይ", "ደቡብ ትግራይ", "ማዕከላዊ ትግራይ", "መቀሌ ዞን"],
         woredas: {
@@ -555,6 +556,8 @@ const ethiopianAddressData = {
             "መቀሌ ዞን": ["መቀሌ ከተማ", "ቆላ ተምቤን", "እንዳ መቆኒ"]
         }
     },
+    
+    // ==================== AMHARA REGION ====================
     "አማራ": {
         zones: ["ጎንደር", "ወሎ", "ጎጃም", "ሸዋ", "ባህር ዳር", "ደሴ", "ኮምቦልቻ"],
         woredas: {
@@ -563,6 +566,8 @@ const ethiopianAddressData = {
             "ጎጃም": ["ባህር ዳር ዙሪያ", "ፋግታ ለኮማ", "መቻ", "ደንገልቤር"]
         }
     },
+    
+    // ==================== OROMIA REGION ====================
     "ኦሮሚያ": {
         zones: ["ሸዋ", "አርሲ", "ባሌ", "ጅማ", "ወለጋ", "ኢሉባቦር", "ቦረና", "ጉጂ"],
         woredas: {
@@ -571,22 +576,75 @@ const ethiopianAddressData = {
             "ጅማ": ["ጅማ ከተማ", "ጅማ ዙሪያ", "ማኑ", "ሎማ ሳካ"]
         }
     },
+    
+    // ==================== ADDIS ABABA (ወረዳ ብቻ - Sub-cities only) ====================
     "አዲስ አበባ": {
         zones: ["አዲስ አበባ"],
         woredas: {
             "አዲስ አበባ": ["ቃሊቲ", "ቦሌ", "አዳማ", "ከራኒዮ", "ሊዳታ", "አራዳ", "ጉለሌ", "የካ", "ንፋስ ስልክ", "ቁልፌ"]
         }
     },
+    
+    // ==================== DIRE DAWA ====================
     "ድሬዳዋ": {
         zones: ["ድሬዳዋ"],
         woredas: {
             "ድሬዳዋ": ["ድሬዳዋ 01", "ድሬዳዋ 02", "ድሬዳዋ 03", "ድሬዳዋ 04", "ድሬዳዋ 05"]
         }
     },
+    
+    // ==================== GAMBELLA REGION (UPDATED) ====================
     "ጋምቤላ": {
-        zones: ["አጎል ዞን", "ኢታንግ ዞን", "ኒዋንግ ዞን", "ጋምቤላ ዞን"],
+        zones: ["ማጃንግ ዞን", "አኝዋ (አኙዋክ) ዞን", "ኑዌር ዞን", "ሌላ"],
         woredas: {
-            "ጋምቤላ ዞን": ["ጋምቤላ ከተማ", "ኢታንግ", "ጂካው", "ሉቅ", "ሜትቸከል"]
+            "ማጃንግ ዞን": ["ጎደሬ ወረዳ", "መንገሽ ወረዳ", "ሌላ"],
+            "አኝዋ (አኙዋክ) ዞን": ["ጋምቤላ ወረዳ", "ዲማ ወረዳ", "አበቦ ወረዳ", "ጋምቤላ ዙሪያ ወረዳ", "ጎግ ወረዳ", "ጆር ወረዳ", "ሌላ"],
+            "ኑዌር ዞን": ["ላሬ ወረዳ", "አኮቦ ወረዳ", "ዋንቱዋር (ዋንቱዋ) ወረዳ", "ማኩዌይ ወረዳ", "ጂካዋ ወረዳ", "ሌላ"],
+            "ሌላ": ["ሌላ"]
+        }
+    },
+    
+    // ==================== SOUTH WEST ETHIOPIA PEOPLES' REGION (UPDATED) ====================
+    "ደቡብ ምዕራብ ኢትዮጵያ": {
+        zones: ["የካፋ ዞን", "የቤንች ሸኮ ዞን", "የሸካ ዞን", "የምዕራብ ኦሞ ዞን", "የዳውሮ ዞን", "የኮንታ ዞን", "ሌላ"],
+        woredas: {
+            "የካፋ ዞን": ["ባሮ", "ቢታ", "ቦንጋ", "ቼታ", "ዴቻ", "ገውኛ", "ካፋ", "ሻሻጎ", "ታሎ", "ሌላ"],
+            "የቤንች ሸኮ ዞን": ["ቤንች", "ሸኮ", "ማጂ", "ሚዛን ተፈሪ", "ሌላ"],
+            "የሸካ ዞን": ["እንደ ሸካ", "ማሻ", "አንዳንካ", "ያኪ", "ሌላ"],
+            "የምዕራብ ኦሞ ዞን": ["ማጂ", "ሱሪ", "አማኖት", "ቲማ", "ሌላ"],
+            "የዳውሮ ዞን": ["ዳውሮ", "ኢስራ", "ኮይሳ", "ሌላ"],
+            "የኮንታ ዞን": ["ኮንታ", "ቻራ ከተማ", "ሌላ"],
+            "ሌላ": ["ሌላ"]
+        }
+    },
+    
+    // ==================== OTHER REGIONS (Simplified) ====================
+    "አፋር": {
+        zones: ["ዞን 1", "ዞን 2", "ዞን 3", "ዞን 4", "ዞን 5", "ሌላ"],
+        woredas: { "ሌላ": ["ሌላ"] }
+    },
+    "ሶማሌ": {
+        zones: ["ዞን 1", "ዞን 2", "ዞን 3", "ዞን 4", "ዞን 5", "ዞን 6", "ዞን 7", "ሌላ"],
+        woredas: { "ሌላ": ["ሌላ"] }
+    },
+    "ቤንሻንጉል ጉሙዝ": {
+        zones: ["አሶሳ ዞን", "ካማሽ ዞን", "መተከል ዞን", "ሌላ"],
+        woredas: { "ሌላ": ["ሌላ"] }
+    },
+    "ደቡብ ኢትዮጵያ": {
+        zones: ["የወላይታ ዞን", "የጋሞ ዞን", "የጎፋ ዞን", "የቡርጂ ዞን", "ሌላ"],
+        woredas: { "ሌላ": ["ሌላ"] }
+    },
+    "ሲዳማ": {
+        zones: ["ሲዳማ ዞን"],
+        woredas: {
+            "ሲዳማ ዞን": ["አሮሬሳ", "ቦረቻ", "ቡልቡላ", "ደላ", "ጎሮቼ", "ሀዋሳ ዙሪያ", "ሌላ"]
+        }
+    },
+    "ሀረሪ": {
+        zones: ["ሀረሪ"],
+        woredas: {
+            "ሀረሪ": ["ሀረር ከተማ", "አሚር ኑር", "ሌላ"]
         }
     }
 };
@@ -641,27 +699,56 @@ function loadWoredas() {
     woredaSelect.innerHTML = '<option value="">ወረዳ ይምረጡ / Select Woreda</option>';
     citySelect.innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
     
-    if (region && zone && ethiopianAddressData[region] && ethiopianAddressData[region].woredas[zone]) {
-        ethiopianAddressData[region].woredas[zone].forEach(woreda => {
+    if (region && zone && ethiopianAddressData[region] && ethiopianAddressData[region].woredas) {
+        // Check if zone exists in the woredas data
+        if (ethiopianAddressData[region].woredas[zone]) {
+            ethiopianAddressData[region].woredas[zone].forEach(woreda => {
+                const option = document.createElement('option');
+                option.value = woreda;
+                option.textContent = woreda;
+                woredaSelect.appendChild(option);
+            });
+        } else if (ethiopianAddressData[region].woredas["ሌላ"]) {
+            // If zone not found, show the "ሌላ" option
             const option = document.createElement('option');
-            option.value = woreda;
-            option.textContent = woreda;
+            option.value = "ሌላ";
+            option.textContent = "ሌላ (Other)";
             woredaSelect.appendChild(option);
-        });
+        }
     }
     
     updateFullAddress();
 }
 
 function loadCities() {
+    const region = document.getElementById('region').value;
+    const zone = document.getElementById('zone').value;
     const woreda = document.getElementById('woreda').value;
     const citySelect = document.getElementById('city');
     
     citySelect.innerHTML = '<option value="">ከተማ/ቀበሌ ይምረጡ / Select City</option>';
+    
+    // Add "ሌላ" option for all cases
     citySelect.innerHTML += '<option value="ሌላ">ሌላ (Other)</option>';
+    
+    // Check if there are specific cities for the selected woreda
+    if (region && zone && woreda && ethiopianAddressData[region] && 
+        ethiopianAddressData[region].woredas && 
+        ethiopianAddressData[region].woredas[zone]) {
+        // If the woreda has specific cities defined in a separate structure
+        if (ethiopianAddressData[region].cities && ethiopianAddressData[region].cities[woreda]) {
+            ethiopianAddressData[region].cities[woreda].forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+        }
+    }
     
     updateFullAddress();
 }
+
 
 // Add event listeners for all address fields
 document.getElementById('region')?.addEventListener('change', updateFullAddress);
