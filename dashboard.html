@@ -150,7 +150,62 @@
                         <div class="form-group"><label>ዜግነት</label><input type="text" id="nationality" value="ኢትዮጵያዊ"></div>
                         <div class="form-group"><label>የትምህርት ደረጃ</label><select id="education"><option>አንደኛ ደረጃ</option><option>ሁለተኛ ደረጃ</option><option>ዲፕሎማ</option><option>ዲግሪ</option><option>ማስተርስ</option></select></div>
                     </div>
-                    <div class="form-group"><label>አድራሻ</label><textarea id="address" rows="2"></textarea></div>
+                   <h4>📍 አድራሻ (Address)</h4>
+<div class="form-row">
+    <div class="form-group">
+        <label>ክልል (Region)</label>
+        <select id="region" onchange="loadZones()">
+            <option value="">ምረጥ / Select Region</option>
+            <option value="ትግራይ">ትግራይ (Tigray)</option>
+            <option value="አፋር">አፋር (Afar)</option>
+            <option value="አማራ">አማራ (Amhara)</option>
+            <option value="ኦሮሚያ">ኦሮሚያ (Oromia)</option>
+            <option value="ሶማሌ">ሶማሌ (Somali)</option>
+            <option value="ቤንሻንጉል ጉሙዝ">ቤንሻንጉል ጉሙዝ (Benishangul-Gumuz)</option>
+            <option value="ደቡብ ኢትዮጵያ">ደቡብ ኢትዮጵያ (South Ethiopia)</option>
+            <option value="ሲዳማ">ሲዳማ (Sidama)</option>
+            <option value="ደቡብ ምዕራብ ኢትዮጵያ">ደቡብ ምዕራብ ኢትዮጵያ (South West Ethiopia)</option>
+            <option value="ጋምቤላ">ጋምቤላ (Gambella)</option>
+            <option value="ሀረሪ">ሀረሪ (Harari)</option>
+            <option value="አዲስ አበባ">አዲስ አበባ (Addis Ababa)</option>
+            <option value="ድሬዳዋ">ድሬዳዋ (Dire Dawa)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>ዞን (Zone)</label>
+        <select id="zone" onchange="loadWoredas()">
+            <option value="">በመጀመሪያ ክልል ይምረጡ</option>
+        </select>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group">
+        <label>ወረዳ/ከተማ (Woreda/City)</label>
+        <select id="woreda" onchange="loadCities()">
+            <option value="">በመጀመሪያ ዞን ይምረጡ</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>ከተማ/ቀበሌ (City/Town)</label>
+        <select id="city">
+            <option value="">በመጀመሪያ ወረዳ ይምረጡ</option>
+        </select>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group">
+        <label>ቀበሌ (Kebele)</label>
+        <input type="text" id="kebele" placeholder="ለምሳሌ: ቀበሌ 01">
+    </div>
+    <div class="form-group">
+        <label>ቤት ቁጥር (House Number)</label>
+        <input type="text" id="houseNumber" placeholder="ለምሳሌ: ቁጥር 123">
+    </div>
+</div>
+<div class="form-group">
+    <label>ሙሉ አድራሻ (Full Address - for reference)</label>
+    <textarea id="fullAddress" rows="2" readonly style="background:#f9f9f9"></textarea>
+</div>
                     <div class="form-row">
                         <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="phone"></div>
                         <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
@@ -489,6 +544,132 @@
             YEAR2: 0.40,
             YEAR3: 0.30
         };
+        // ==================== ETHIOPIAN ADDRESS HIERARCHY DATA ====================
+
+const ethiopianAddressData = {
+    "ትግራይ": {
+        zones: ["ምዕራብ ትግራይ", "ምስራቅ ትግራይ", "ደቡብ ትግራይ", "ማዕከላዊ ትግራይ", "መቀሌ ዞን"],
+        woredas: {
+            "ምዕራብ ትግራይ": ["ሽሮ", "አስቤ", "ላላይ ኣድያቦ", "ማይ ጨው", "ታንቃ ሚሊሽ"],
+            "ምስራቅ ትግራይ": ["ገራልታ", "አህፈረም", "አጋሜ", "ሰሜን ምስራቅ", "ኢሮብ"],
+            "መቀሌ ዞን": ["መቀሌ ከተማ", "ቆላ ተምቤን", "እንዳ መቆኒ"]
+        }
+    },
+    "አማራ": {
+        zones: ["ጎንደር", "ወሎ", "ጎጃም", "ሸዋ", "ባህር ዳር", "ደሴ", "ኮምቦልቻ"],
+        woredas: {
+            "ጎንደር": ["ደምበያ", "ጎንደር ዙሪያ", "በልሳ", "ላይ አርማጭሆ", "ተለምት"],
+            "ወሎ": ["ደሴ ዙሪያ", "ከምቦልቻ", "ሀይቅ እስቴ", "ቦሮሜዳ", "ወልዲያ"],
+            "ጎጃም": ["ባህር ዳር ዙሪያ", "ፋግታ ለኮማ", "መቻ", "ደንገልቤር"]
+        }
+    },
+    "ኦሮሚያ": {
+        zones: ["ሸዋ", "አርሲ", "ባሌ", "ጅማ", "ወለጋ", "ኢሉባቦር", "ቦረና", "ጉጂ"],
+        woredas: {
+            "ሸዋ": ["አዳማ", "ቢሾፍቱ", "ሞጆ", "ደብረ ዘይት", "ሱሉልታ", "ሰበታ", "አካኪ"],
+            "አርሲ": ["አሰላ", "ቤኮጂ", "ድደር", "ሂሮን", "ሮቤ", "ሰረሮ"],
+            "ጅማ": ["ጅማ ከተማ", "ጅማ ዙሪያ", "ማኑ", "ሎማ ሳካ"]
+        }
+    },
+    "አዲስ አበባ": {
+        zones: ["አዲስ አበባ"],
+        woredas: {
+            "አዲስ አበባ": ["ቃሊቲ", "ቦሌ", "አዳማ", "ከራኒዮ", "ሊዳታ", "አራዳ", "ጉለሌ", "የካ", "ንፋስ ስልክ", "ቁልፌ"]
+        }
+    },
+    "ድሬዳዋ": {
+        zones: ["ድሬዳዋ"],
+        woredas: {
+            "ድሬዳዋ": ["ድሬዳዋ 01", "ድሬዳዋ 02", "ድሬዳዋ 03", "ድሬዳዋ 04", "ድሬዳዋ 05"]
+        }
+    },
+    "ጋምቤላ": {
+        zones: ["አጎል ዞን", "ኢታንግ ዞን", "ኒዋንግ ዞን", "ጋምቤላ ዞን"],
+        woredas: {
+            "ጋምቤላ ዞን": ["ጋምቤላ ከተማ", "ኢታንግ", "ጂካው", "ሉቅ", "ሜትቸከል"]
+        }
+    }
+};
+
+function updateFullAddress() {
+    const region = document.getElementById('region').value;
+    const zone = document.getElementById('zone').value;
+    const woreda = document.getElementById('woreda').value;
+    const city = document.getElementById('city').value;
+    const kebele = document.getElementById('kebele').value;
+    const houseNumber = document.getElementById('houseNumber').value;
+    
+    let fullAddress = '';
+    if (region) fullAddress += region;
+    if (zone) fullAddress += '፣ ' + zone;
+    if (woreda) fullAddress += '፣ ' + woreda;
+    if (city && city !== 'ሌላ') fullAddress += '፣ ' + city;
+    if (kebele) fullAddress += '፣ ቀበሌ ' + kebele;
+    if (houseNumber) fullAddress += '፣ ቤት ቁጥር ' + houseNumber;
+    
+    document.getElementById('fullAddress').value = fullAddress;
+}
+
+function loadZones() {
+    const region = document.getElementById('region').value;
+    const zoneSelect = document.getElementById('zone');
+    const woredaSelect = document.getElementById('woreda');
+    const citySelect = document.getElementById('city');
+    
+    zoneSelect.innerHTML = '<option value="">ዞን ይምረጡ / Select Zone</option>';
+    woredaSelect.innerHTML = '<option value="">በመጀመሪያ ዞን ይምረጡ</option>';
+    citySelect.innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
+    
+    if (region && ethiopianAddressData[region]) {
+        ethiopianAddressData[region].zones.forEach(zone => {
+            const option = document.createElement('option');
+            option.value = zone;
+            option.textContent = zone;
+            zoneSelect.appendChild(option);
+        });
+    }
+    
+    updateFullAddress();
+}
+
+function loadWoredas() {
+    const region = document.getElementById('region').value;
+    const zone = document.getElementById('zone').value;
+    const woredaSelect = document.getElementById('woreda');
+    const citySelect = document.getElementById('city');
+    
+    woredaSelect.innerHTML = '<option value="">ወረዳ ይምረጡ / Select Woreda</option>';
+    citySelect.innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
+    
+    if (region && zone && ethiopianAddressData[region] && ethiopianAddressData[region].woredas[zone]) {
+        ethiopianAddressData[region].woredas[zone].forEach(woreda => {
+            const option = document.createElement('option');
+            option.value = woreda;
+            option.textContent = woreda;
+            woredaSelect.appendChild(option);
+        });
+    }
+    
+    updateFullAddress();
+}
+
+function loadCities() {
+    const woreda = document.getElementById('woreda').value;
+    const citySelect = document.getElementById('city');
+    
+    citySelect.innerHTML = '<option value="">ከተማ/ቀበሌ ይምረጡ / Select City</option>';
+    citySelect.innerHTML += '<option value="ሌላ">ሌላ (Other)</option>';
+    
+    updateFullAddress();
+}
+
+// Add event listeners for all address fields
+document.getElementById('region')?.addEventListener('change', updateFullAddress);
+document.getElementById('zone')?.addEventListener('change', updateFullAddress);
+document.getElementById('woreda')?.addEventListener('change', updateFullAddress);
+document.getElementById('city')?.addEventListener('change', updateFullAddress);
+document.getElementById('kebele')?.addEventListener('input', updateFullAddress);
+document.getElementById('houseNumber')?.addEventListener('input', updateFullAddress);
         
         // Amharic sorting function
         const amharicOrder = ['አ', 'ኡ', 'ኢ', 'ኤ', 'እ', 'ኦ', 'ኧ', 'በ', 'ቡ', 'ቢ', 'ቤ', 'ብ', 'ቦ', 'ቧ', 'ገ', 'ጉ', 'ጊ', 'ጌ', 'ግ', 'ጎ', 'ጓ', 'ደ', 'ዱ', 'ዲ', 'ዴ', 'ድ', 'ዶ', 'ዷ', 'ሀ', 'ሁ', 'ሂ', 'ሄ', 'ህ', 'ሆ', 'ሃ', 'ወ', 'ዉ', 'ዊ', 'ዌ', 'ው', 'ዎ', 'ዋ', 'ዘ', 'ዙ', 'ዚ', 'ዜ', 'ዝ', 'ዞ', 'ዛ', 'ሠ', 'ሡ', 'ሢ', 'ሤ', 'ሥ', 'ሦ', 'ሣ', 'የ', 'ዩ', 'ዪ', 'ዬ', 'ይ', 'ዮ', 'ያ', 'ለ', 'ሉ', 'ሊ', 'ሌ', 'ል', 'ሎ', 'ላ', 'መ', 'ሙ', 'ሚ', 'ሜ', 'ም', 'ሞ', 'ማ', 'ነ', 'ኑ', 'ኒ', 'ኔ', 'ን', 'ኖ', 'ና', 'ሰ', 'ሱ', 'ሲ', 'ሴ', 'ስ', 'ሶ', 'ሳ', 'ዐ', 'ዑ', 'ዒ', 'ዔ', 'ዕ', 'ዖ', 'ዓ', 'ፈ', 'ፉ', 'ፊ', 'ፌ', 'ፍ', 'ፎ', 'ፋ', 'ጸ', 'ጹ', 'ጺ', 'ጼ', 'ጽ', 'ጾ', 'ጻ', 'ቀ', 'ቁ', 'ቂ', 'ቄ', 'ቅ', 'ቆ', 'ቃ', 'ረ', 'ሩ', 'ሪ', 'ሬ', 'ር', 'ሮ', 'ራ', 'ሸ', 'ሹ', 'ሺ', 'ሼ', 'ሽ', 'ሾ', 'ሻ', 'ቸ', 'ቹ', 'ቺ', 'ቼ', 'ች', 'ቾ', 'ቻ', 'ከ', 'ኩ', 'ኪ', 'ኬ', 'ክ', 'ኮ', 'ካ', 'ጨ', 'ጩ', 'ጪ', 'ጬ', 'ጭ', 'ጮ', 'ጫ', 'ፐ', 'ፑ', 'ፒ', 'ፔ', 'ፕ', 'ፖ', 'ፓ'];
@@ -866,6 +1047,13 @@
                 phone: document.getElementById('phone').value,
                 taxId: document.getElementById('taxId').value,
                 role: document.getElementById('role').value,
+                region: document.getElementById('region').value,
+    zone: document.getElementById('zone').value,
+    woreda: document.getElementById('woreda').value,
+    city: document.getElementById('city').value,
+    kebele: document.getElementById('kebele').value,
+    houseNumber: document.getElementById('houseNumber').value,
+    address: document.getElementById('fullAddress').value,
                 shareCount: shareCount,
                 sharePercentage: sharePercentage,
                 sharePricePaid: sharePricePaid,
@@ -936,7 +1124,13 @@
                         <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><div class="info-value">${escapeHtml(member.motherName)}</div></div>
                         <div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(member.nationality)}</div></div>
                         <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><div class="info-value">${escapeHtml(member.education)}</div></div>
-                        <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(member.address)}</div></div>
+                       <div class="info-item"><div class="info-label">📍 ክልል (Region)</div><div class="info-value">${escapeHtml(member.region) || 'N/A'}</div></div>
+<div class="info-item"><div class="info-label">📍 ዞን (Zone)</div><div class="info-value">${escapeHtml(member.zone) || 'N/A'}</div></div>
+<div class="info-item"><div class="info-label">📍 ወረዳ (Woreda)</div><div class="info-value">${escapeHtml(member.woreda) || 'N/A'}</div></div>
+<div class="info-item"><div class="info-label">📍 ከተማ/ቀበሌ</div><div class="info-value">${escapeHtml(member.city) || 'N/A'}</div></div>
+<div class="info-item"><div class="info-label">📍 ቀበሌ</div><div class="info-value">${escapeHtml(member.kebele) || 'N/A'}</div></div>
+<div class="info-item"><div class="info-label">🏠 ቤት ቁጥር</div><div class="info-value">${escapeHtml(member.houseNumber) || 'N/A'}</div></div>
+<div class="info-item full-width"><div class="info-label">📍 ሙሉ አድራሻ</div><div class="info-value">${escapeHtml(member.address) || 'N/A'}</div></div>
                         <div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value">${escapeHtml(member.phone)}</div></div>
                         <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(member.taxId)}</div></div>
                         <div class="info-item"><div class="info-label">👔 ሚና</div><div class="info-value">${escapeHtml(member.role)}</div></div>
@@ -1214,6 +1408,13 @@
         window.toggleOtherRelationshipBeneficiary = toggleOtherRelationshipBeneficiary;
         window.previewBeneficiaryImage = previewBeneficiaryImage;
         window.previewBeneficiaryDoc = previewBeneficiaryDoc;
+        // Address field event listeners
+document.getElementById('region')?.addEventListener('change', updateFullAddress);
+document.getElementById('zone')?.addEventListener('change', updateFullAddress);
+document.getElementById('woreda')?.addEventListener('change', updateFullAddress);
+document.getElementById('city')?.addEventListener('change', updateFullAddress);
+document.getElementById('kebele')?.addEventListener('input', updateFullAddress);
+document.getElementById('houseNumber')?.addEventListener('input', updateFullAddress);
     </script>
 </body>
 </html>
