@@ -221,6 +221,13 @@ app.post('/api/members/register', async (req, res) => {
             motherName: req.body.motherName,
             nationality: req.body.nationality,
             education: req.body.education,
+            // Address fields (Ethiopian hierarchy)
+            region: req.body.region,
+            zone: req.body.zone,
+            woreda: req.body.woreda,
+            city: req.body.city,
+            kebele: req.body.kebele,
+            houseNumber: req.body.houseNumber,
             address: req.body.address,
             phone: req.body.phone,
             taxId: req.body.taxId,
@@ -229,20 +236,23 @@ app.post('/api/members/register', async (req, res) => {
             shareCount: req.body.shareCount,
             sharePercentage: req.body.sharePercentage,
             sharePricePaid: req.body.sharePricePaid,
+            totalPayable: req.body.totalPayable,
             remainingBalance: req.body.remainingBalance,
             paymentStatus: req.body.paymentStatus,
-            bankAccountNumber: req.body.bankAccountNumber,
             financialNotes: req.body.financialNotes,
-            // Beneficiary Information
-            beneficiaryName: req.body.beneficiaryName,
-            beneficiaryGender: req.body.beneficiaryGender,
-            beneficiaryRelationship: req.body.beneficiaryRelationship,
-            beneficiaryAddress: req.body.beneficiaryAddress,
+            // Bank Information for Profit Distribution
+            bankName: req.body.bankName,
+            bankBranch: req.body.bankBranch,
+            bankAccountNumber: req.body.bankAccountNumber,
+            bankAccountName: req.body.bankAccountName,
+            // Beneficiaries (array)
+            beneficiaries: req.body.beneficiaries || [],
+            beneficiaryCount: req.body.beneficiaryCount || 0,
             // Legal Representative
             legalRepName: req.body.legalRepName,
             legalRepAddress: req.body.legalRepAddress,
             legalRepPhone: req.body.legalRepPhone,
-            // Power of Attorney (ውክልና)
+            // Power of Attorney
             powerOfAttorneyType: req.body.powerOfAttorneyType,
             powerOfAttorneyNumber: req.body.powerOfAttorneyNumber,
             powerOfAttorneyDate: req.body.powerOfAttorneyDate,
@@ -252,8 +262,6 @@ app.post('/api/members/register', async (req, res) => {
             // Photos and Documents
             memberPhoto: req.body.memberPhoto,
             memberTaxDoc: req.body.memberTaxDoc,
-            beneficiaryPhoto: req.body.beneficiaryPhoto,
-            beneficiaryTaxDoc: req.body.beneficiaryTaxDoc,
             repPhoto: req.body.repPhoto,
             repTaxDoc: req.body.repTaxDoc,
             hardCopyForm: req.body.hardCopyForm,
