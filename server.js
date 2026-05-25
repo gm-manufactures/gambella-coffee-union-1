@@ -37,15 +37,45 @@ if (!fs.existsSync(TRANSFERS_FILE)) fs.writeFileSync(TRANSFERS_FILE, JSON.string
 if (!fs.existsSync(TRADING_REQUESTS_FILE)) fs.writeFileSync(TRADING_REQUESTS_FILE, JSON.stringify([]));
 
 // Helper functions
-function readUsers() { return JSON.parse(fs.readFileSync(USERS_FILE)); }
+function readUsers() { 
+    try {
+        return JSON.parse(fs.readFileSync(USERS_FILE));
+    } catch(e) {
+        return [];
+    }
+}
 function writeUsers(users) { fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2)); }
-function readMembers() { return JSON.parse(fs.readFileSync(MEMBERS_FILE)); }
+function readMembers() { 
+    try {
+        return JSON.parse(fs.readFileSync(MEMBERS_FILE));
+    } catch(e) {
+        return [];
+    }
+}
 function writeMembers(members) { fs.writeFileSync(MEMBERS_FILE, JSON.stringify(members, null, 2)); }
-function readSales() { return JSON.parse(fs.readFileSync(SALES_FILE)); }
+function readSales() { 
+    try {
+        return JSON.parse(fs.readFileSync(SALES_FILE));
+    } catch(e) {
+        return [];
+    }
+}
 function writeSales(sales) { fs.writeFileSync(SALES_FILE, JSON.stringify(sales, null, 2)); }
-function readTransfers() { return JSON.parse(fs.readFileSync(TRANSFERS_FILE)); }
+function readTransfers() { 
+    try {
+        return JSON.parse(fs.readFileSync(TRANSFERS_FILE));
+    } catch(e) {
+        return [];
+    }
+}
 function writeTransfers(transfers) { fs.writeFileSync(TRANSFERS_FILE, JSON.stringify(transfers, null, 2)); }
-function readTradingRequests() { return JSON.parse(fs.readFileSync(TRADING_REQUESTS_FILE)); }
+function readTradingRequests() { 
+    try {
+        return JSON.parse(fs.readFileSync(TRADING_REQUESTS_FILE));
+    } catch(e) {
+        return [];
+    }
+}
 function writeTradingRequests(requests) { fs.writeFileSync(TRADING_REQUESTS_FILE, JSON.stringify(requests, null, 2)); }
 
 // Generate username and password
@@ -89,7 +119,9 @@ const authMiddleware = (req, res, next) => {
     try {
         req.user = jwt.verify(token, JWT_SECRET);
         next();
-    } catch { res.status(401).json({ message: 'Invalid token' }); }
+    } catch { 
+        res.status(401).json({ message: 'Invalid token' }); 
+    }
 };
 
 // ==================== AUTH ROUTES ====================
@@ -200,8 +232,9 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 
 // ==================== MEMBER ROUTES ====================
 
-// Register member (creates both member and user account)
+// Register member
 app.post('/api/members/register', async (req, res) => {
+    console.log("📝 Registration request received for:", req.body.fullName);
     try {
         const members = readMembers();
         const users = readUsers();
@@ -211,67 +244,34 @@ app.post('/api/members/register', async (req, res) => {
             return res.status(400).json({ message: 'Phone number already registered' });
         }
         
-        // Create new member with all fields
+        // Create new member
         const newMember = {
             id: 'member_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-            // Basic Information
-            fullName: req.body.fullName,
-            gender: req.body.gender,
-            age: req.body.age,
-            motherName: req.body.motherName,
-            nationality: req.body.nationality,
-            education: req.body.education,
-            // Address fields (Ethiopian hierarchy)
-            region: req.body.region,
-            zone: req.body.zone,
-            woreda: req.body.woreda,
-            city: req.body.city,
-            kebele: req.body.kebele,
-            houseNumber: req.body.houseNumber,
-            address: req.body.address,
-            phone: req.body.phone,
-            taxId: req.body.taxId,
-            role: req.body.role,
-            // Share Information
-            shareCount: req.body.shareCount,
-            sharePercentage: req.body.sharePercentage,
-            sharePricePaid: req.body.sharePricePaid,
-            totalPayable: req.body.totalPayable,
-            remainingBalance: req.body.remainingBalance,
-            paymentStatus: req.body.paymentStatus,
-            financialNotes: req.body.financialNotes,
-            // Bank Information for Profit Distribution
-            bankName: req.body.bankName,
-            bankBranch: req.body.bankBranch,
-            bankAccountNumber: req.body.bankAccountNumber,
-            bankAccountName: req.body.bankAccountName,
-            // Beneficiaries (array)
+            fullName: req.body.fullName || '',
+            gender: req.body.gender || '',
+            age: req.body.age || 0,
+            motherName: req.body.motherName || '',
+            nationality: req.body.nationality || 'ኢትዮጵያዊ',
+            education: req.body.education || '',
+            address: req.body.address || '',
+            phone: req.body.phone || '',
+            taxId: req.body.taxId || '',
+            role: req.body.role || '',
+            shareCount: req.body.shareCount || 0,
+            sharePercentage: req.body.sharePercentage || 0,
+            sharePricePaid: req.body.sharePricePaid || 0,
+            totalPayable: req.body.totalPayable || 0,
+            remainingBalance: req.body.remainingBalance || 0,
+            paymentStatus: req.body.paymentStatus || 'አልተከፈለም',
+            financialNotes: req.body.financialNotes || '',
+            bankAccountNumber: req.body.bankAccountNumber || '',
             beneficiaries: req.body.beneficiaries || [],
             beneficiaryCount: req.body.beneficiaryCount || 0,
-            // Legal Representative
-            legalRepName: req.body.legalRepName,
-            legalRepAddress: req.body.legalRepAddress,
-            legalRepPhone: req.body.legalRepPhone,
-            // Power of Attorney
-            powerOfAttorneyType: req.body.powerOfAttorneyType,
-            powerOfAttorneyNumber: req.body.powerOfAttorneyNumber,
-            powerOfAttorneyDate: req.body.powerOfAttorneyDate,
-            powerOfAttorneyIssuer: req.body.powerOfAttorneyIssuer,
-            powerOfAttorneyExpiry: req.body.powerOfAttorneyExpiry,
-            powerOfAttorneyNotes: req.body.powerOfAttorneyNotes,
-            // Photos and Documents
-            memberPhoto: req.body.memberPhoto,
-            memberTaxDoc: req.body.memberTaxDoc,
-            repPhoto: req.body.repPhoto,
-            repTaxDoc: req.body.repTaxDoc,
-            hardCopyForm: req.body.hardCopyForm,
-            powerOfAttorneyPhoto: req.body.powerOfAttorneyPhoto,
-            hardCopyDocumentPhoto: req.body.hardCopyDocumentPhoto,
-            // Metadata
-            createdBy: null,
+            memberPhoto: req.body.memberPhoto || null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
+        
         members.push(newMember);
         writeMembers(members);
         
@@ -295,7 +295,7 @@ app.post('/api/members/register', async (req, res) => {
         users.push(newUser);
         writeUsers(users);
         
-        console.log(`✅ New member registered: ${newMember.fullName} | Username: ${username} | Password: ${plainPassword}`);
+        console.log(`✅ Member registered: ${newMember.fullName} | Username: ${username} | Password: ${plainPassword}`);
         
         res.status(201).json({
             success: true,
@@ -315,9 +315,7 @@ app.post('/api/members/register', async (req, res) => {
 // Get all members
 app.get('/api/members', authMiddleware, (req, res) => {
     const members = readMembers();
-    if (req.user.role === 'member') {
-        return res.json({ count: members.length, members: [] });
-    }
+    console.log(`📋 Sending ${members.length} members`);
     res.json(members);
 });
 
@@ -348,7 +346,7 @@ app.get('/api/members/profile/my', authMiddleware, (req, res) => {
     res.json(member);
 });
 
-// Update member (admin only)
+// Update member
 app.put('/api/members/:id', authMiddleware, (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
     const members = readMembers();
@@ -359,7 +357,7 @@ app.put('/api/members/:id', authMiddleware, (req, res) => {
     res.json(members[index]);
 });
 
-// Delete member (admin only)
+// Delete member
 app.delete('/api/members/:id', authMiddleware, (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
     let members = readMembers();
@@ -372,7 +370,7 @@ app.delete('/api/members/:id', authMiddleware, (req, res) => {
     res.json({ message: 'Member deleted successfully' });
 });
 
-// Search members (admin only)
+// Search members
 app.get('/api/members/search/:query', authMiddleware, (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
     const members = readMembers();
@@ -595,8 +593,12 @@ const PORT = process.env.PORT || 10000;
 
 createDefaultAdmin().then(() => {
     app.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`\n🚀 ========================================`);
+        console.log(`🚀 SERVER RUNNING SUCCESSFULLY!`);
+        console.log(`🚀 ========================================`);
         console.log(`📱 Admin Login: http://localhost:${PORT}`);
-        console.log(`👤 Admin: admin / Admin123!`);
+        console.log(`👤 Username: admin`);
+        console.log(`🔐 Password: Admin123!`);
+        console.log(`========================================\n`);
     });
 });
