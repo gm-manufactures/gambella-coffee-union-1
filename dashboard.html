@@ -662,7 +662,9 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-        
+        function closeMemberModal() { 
+    document.getElementById('memberModal').style.display = 'none'; 
+}
         function previewBeneficiaryDoc(input, index) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
