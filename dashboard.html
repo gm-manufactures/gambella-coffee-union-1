@@ -1921,7 +1921,7 @@ function validateShareAvailability(requestedShares) {
         loadZones();
         
         // Initialize
-        loadMembers(); loadAllSales(); loadTransfers(); startInactivityTracking();
+        loadMembers(); loadAllSales(); loadTransfers(); startInactivityTracking();updateShareStatistics(); 
         
         // Make functions global
         window.cancelEditMode = cancelEditMode;
