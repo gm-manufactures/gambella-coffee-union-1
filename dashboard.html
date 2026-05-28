@@ -399,7 +399,313 @@
         });
         
         function showMemberDetails(id){let m=members.find(x=>x.id===id);if(!m)return;currentEditingMemberId=id;let sn=members.findIndex(x=>x.id===id)+1,mb=document.getElementById('modalBody');mb.innerHTML=`<div id="viewMode"><div class="profile-header"><div class="profile-photo" style="background:#ddd;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div><div class="profile-name">${escapeHtml(m.fullName)}</div></div><div class="info-grid"><div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${sn}</div></div><div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(m.gender)}</div></div><div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value">${m.age||'N/A'}</div></div><div class="info-item"><div class="info-label">👩 የእናት ስም</div><div class="info-value">${escapeHtml(m.motherName)}</div></div><div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(m.nationality)}</div></div><div class="info-item"><div class="info-label">📚 ትምህርት</div><div class="info-value">${escapeHtml(m.education)}</div></div><div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(m.address||'')}</div></div><div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value">${escapeHtml(m.phone)}</div></div><div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(m.taxId)}</div></div><div class="info-item"><div class="info-label">👔 ሚና</div><div class="info-value">${escapeHtml(m.role)}</div></div><div class="info-item"><div class="info-label">📊 አክሲዬን</div><div class="info-value">${m.shareCount||0}</div></div><div class="info-item"><div class="info-label">💰 የተከፈለ</div><div class="info-value">${(m.sharePricePaid||0).toLocaleString()} ብር</div></div><div class="info-item"><div class="info-label">💵 ቀሪ</div><div class="info-value">${(m.remainingBalance||0).toLocaleString()} ብር</div></div><div class="info-item"><div class="info-label">📋 ክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(m.paymentStatus)}</div></div><div class="info-item"><div class="info-label">🏦 ባንክ</div><div class="info-value">${escapeHtml(m.bankName)}</div></div></div><div class="section-card"><div class="section-title">👨‍👦 ወራሾች</div>${m.beneficiaries&&m.beneficiaries.length>0?m.beneficiaries.map((b,i)=>`<div><strong>${i+1}. ${escapeHtml(b.name)}</strong> (${escapeHtml(b.relationship)})</div>`).join(''):'<div>ምንም ወራሽ የለም</div>'}</div><div class="section-card"><div class="section-title">⚖️ ህጋዊ ተወካይ</div><div>${escapeHtml(m.legalRepName)||'N/A'}</div></div>${m.powerOfAttorneyType?`<div class="section-card"><div class="section-title">📜 ውክልና</div><div>${escapeHtml(m.powerOfAttorneyType)}</div></div>`:''}</div><div id="editMode" style="display:none"><div style="text-align:center;padding:20px">Loading edit form...</div></div>`;document.getElementById('memberModal').style.display='block';document.getElementById('editModeBtn').style.display='inline-block';document.getElementById('saveEditBtn').style.display='none';document.getElementById('cancelEditBtn').style.display='none';}
-        function enableEditMode(){alert('Edit mode - You can edit member information here. Full edit functionality coming soon.');}
+       // ==================== EDIT MEMBER FUNCTIONS ====================
+
+function enableEditMode() {
+    const member = members.find(m => m.id === currentEditingMemberId);
+    if (!member) return;
+    
+    // Hide view mode, show edit mode
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+    document.getElementById('editModeBtn').style.display = 'none';
+    document.getElementById('saveEditBtn').style.display = 'inline-block';
+    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+    
+    // Build edit form with current member data
+    const editHtml = `
+        <div class="profile-header">
+            <div>
+                <img id="editMemberPhotoPreview" src="${member.memberPhoto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23ddd%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E👤%3C/text%3E%3C/svg%3E'}" class="profile-photo" onclick="openLightbox(this.src)">
+                <input type="file" id="editMemberPhoto" accept="image/*" onchange="previewEditPhoto(this, 'editMemberPhotoPreview')" style="margin-top:10px">
+                <small>አዲስ ፎቶ ለመጫን</small>
+            </div>
+            <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; padding:8px; width:100%; border:1px solid #ddd; border-radius:6px">
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><select id="editGender" class="form-control"><option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option><option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option></select></div>
+            <div class="info-item"><div class="info-label">📅 ዕድሜ</div><input type="number" id="editAge" value="${member.age || ''}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">🌍 ዜግነት</div><input type="text" id="editNationality" value="${escapeHtml(member.nationality)}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><input type="text" id="editEducation" value="${escapeHtml(member.education)}" class="form-control"></div>
+            <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><textarea id="editAddress" rows="2" class="form-control">${escapeHtml(member.address || '')}</textarea></div>
+            <div class="info-item"><div class="info-label">📞 ስልክ</div><input type="tel" id="editPhone" value="${escapeHtml(member.phone)}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><input type="text" id="editTaxId" value="${escapeHtml(member.taxId)}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">👔 ሚና</div><input type="text" id="editRole" value="${escapeHtml(member.role)}" class="form-control"></div>
+            <div class="info-item"><div class="info-label">📊 አክሲዬን ብዛት</div><input type="number" id="editShareCount" value="${member.shareCount || 0}" class="form-control" oninput="calculateEditRemainingBalance()"></div>
+            <div class="info-item"><div class="info-label">💰 የተከፈለ (ብር)</div><input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}" class="form-control" oninput="calculateEditRemainingBalance()"></div>
+            <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><input type="text" id="editRemainingBalance" readonly style="background:#e9ecef" class="form-control"></div>
+            <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><select id="editPaymentStatus" class="form-control"><option ${member.paymentStatus === 'ተከፍሏል' ? 'selected' : ''}>ተከፍሏል</option><option ${member.paymentStatus === 'በከፊል ተከፍሏል' ? 'selected' : ''}>በከፊል ተከፍሏል</option><option ${member.paymentStatus === 'አልተከፈለም' ? 'selected' : ''}>አልተከፈለም</option></select></div>
+            <div class="info-item"><div class="info-label">🏦 ባንክ ሂሳብ</div><input type="text" id="editBankAccountNumber" value="${escapeHtml(member.bankAccountNumber)}" class="form-control"></div>
+            <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" class="form-control">${escapeHtml(member.financialNotes)}</textarea></div>
+        </div>
+        
+        <div class="section-card">
+            <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ</div>
+            <div class="form-row">
+                <div class="form-group"><label>ስም</label><input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}" class="form-control"></div>
+                <div class="form-group"><label>አድራሻ</label><textarea id="editLegalRepAddress" rows="2" class="form-control">${escapeHtml(member.legalRepAddress)}</textarea></div>
+            </div>
+            <div class="form-group"><label>ስልክ</label><input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}" class="form-control"></div>
+        </div>
+        
+        <div class="section-card">
+            <div class="section-title">📜 ውክልና (Power of Attorney)</div>
+            <div class="form-group"><label>አይነት</label>
+                <select id="editPowerOfAttorneyType" class="form-control" onchange="toggleEditPowerOfAttorneyOptions()">
+                    <option value="">ምረጥ</option>
+                    <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ" ${member.powerOfAttorneyType === 'ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ' ? 'selected' : ''}>ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ</option>
+                    <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት" ${member.powerOfAttorneyType === 'በፍትህ የተረጋገጠ የምስክር ወረቀት' ? 'selected' : ''}>በፍትህ የተረጋገጠ የምስክር ወረቀት</option>
+                </select>
+            </div>
+            <div id="editPowerOfAttorneyDetails" style="display:${member.powerOfAttorneyType ? 'block' : 'none'}">
+                <div class="form-row">
+                    <div class="form-group"><label>ቁጥር</label><input type="text" id="editPowerOfAttorneyNumber" value="${escapeHtml(member.powerOfAttorneyNumber)}" class="form-control"></div>
+                    <div class="form-group"><label>ቀን</label><input type="date" id="editPowerOfAttorneyDate" value="${member.powerOfAttorneyDate || ''}" class="form-control"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>ሰጪ ተቋም</label><input type="text" id="editPowerOfAttorneyIssuer" value="${escapeHtml(member.powerOfAttorneyIssuer)}" class="form-control"></div>
+                    <div class="form-group"><label>የሚያበቃበት</label><input type="date" id="editPowerOfAttorneyExpiry" value="${member.powerOfAttorneyExpiry || ''}" class="form-control"></div>
+                </div>
+                <div class="form-group"><label>ማስታወሻ</label><textarea id="editPowerOfAttorneyNotes" rows="2" class="form-control">${escapeHtml(member.powerOfAttorneyNotes)}</textarea></div>
+            </div>
+        </div>
+        
+        <div class="section-card">
+            <div class="section-title">👨‍👦 የወራሾች መረጃ</div>
+            <div id="editBeneficiariesContainer"></div>
+            <button type="button" class="btn-primary" style="margin-top:10px" onclick="addEditBeneficiary()">+ ወራሽ ይጨምሩ</button>
+        </div>
+    `;
+    
+    document.getElementById('editMode').innerHTML = editHtml;
+    generateEditBeneficiaryForms();
+    calculateEditRemainingBalance();
+    toggleEditPowerOfAttorneyOptions();
+}
+
+function previewEditPhoto(input, previewId) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewDiv = document.getElementById(previewId);
+            if (previewDiv) {
+                previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width:100px; max-height:100px; border-radius:8px; border:2px solid #2d6a1a; cursor:pointer" onclick="openLightbox('${e.target.result}')">`;
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function generateEditBeneficiaryForms() {
+    const member = members.find(m => m.id === currentEditingMemberId);
+    const beneficiaries = member?.beneficiaries || [];
+    const container = document.getElementById('editBeneficiariesContainer');
+    if (!container) return;
+    
+    if (beneficiaries.length === 0) {
+        container.innerHTML = '<div class="no-data">📭 ምንም ወራሾች የሉም</div>';
+        return;
+    }
+    
+    let html = '';
+    beneficiaries.forEach((ben, idx) => {
+        const i = idx + 1;
+        html += `
+            <div class="beneficiary-card" id="editBeneficiary_${i}">
+                <div class="beneficiary-title">👨‍👦 ወራሽ ${i} <button type="button" class="remove-beneficiary" onclick="removeEditBeneficiary(${i})">✖ አጥፋ</button></div>
+                <div class="form-row">
+                    <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="editBeneficiaryName_${i}" value="${escapeHtml(ben.name || '')}" class="form-control"></div>
+                    <div class="form-group"><label>ፆታ</label>
+                        <select id="editBeneficiaryGender_${i}" class="form-control">
+                            <option value="">ምረጥ</option>
+                            <option value="ወንድ" ${ben.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
+                            <option value="ሴት" ${ben.gender === 'ሴት' ? 'selected' : ''}>ሴት</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>ዝምድና</label>
+                        <select id="editBeneficiaryRelationship_${i}" class="form-control" onchange="toggleEditOtherRelationshipBeneficiary(${i})">
+                            <option value="">ምረጥ</option>
+                            <option value="አባት" ${ben.relationship === 'አባት' ? 'selected' : ''}>አባት</option>
+                            <option value="እናት" ${ben.relationship === 'እናት' ? 'selected' : ''}>እናት</option>
+                            <option value="ወንድም" ${ben.relationship === 'ወንድም' ? 'selected' : ''}>ወንድም</option>
+                            <option value="እህት" ${ben.relationship === 'እህት' ? 'selected' : ''}>እህት</option>
+                            <option value="ልጅ" ${ben.relationship === 'ልጅ' ? 'selected' : ''}>ልጅ</option>
+                            <option value="ሚስት" ${ben.relationship === 'ሚስት' ? 'selected' : ''}>ሚስት</option>
+                            <option value="አክስት" ${ben.relationship === 'አክስት' ? 'selected' : ''}>አክስት</option>
+                            <option value="አጎት" ${ben.relationship === 'አጎት' ? 'selected' : ''}>አጎት</option>
+                            <option value="የአጎት ልጅ" ${ben.relationship === 'የአጎት ልጅ' ? 'selected' : ''}>የአጎት ልጅ</option>
+                            <option value="የአክስት ልጅ" ${ben.relationship === 'የአክስት ልጅ' ? 'selected' : ''}>የአክስት ልጅ</option>
+                            <option value="ሌላ" ${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) && ben.relationship ? 'selected' : ''}>ሌላ</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editOtherRelationshipDiv_${i}" style="display:${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) && ben.relationship ? 'block' : 'none'}">
+                        <label>ሌላ (ዝምድናውን ይግለጹ)</label>
+                        <input type="text" id="editBeneficiaryOtherRelationship_${i}" value="${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) ? escapeHtml(ben.relationship) : ''}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group"><label>አድራሻ</label><textarea id="editBeneficiaryAddress_${i}" rows="2" class="form-control">${escapeHtml(ben.address || '')}</textarea></div>
+                <div class="form-group"><label>📸 አዲስ ፎቶ (ካለ)</label><input type="file" id="editBeneficiaryPhoto_${i}" accept="image/*" onchange="previewEditPhoto(this, 'editBeneficiaryPhotoPreview_${i}')"><div id="editBeneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
+                <div class="form-group"><label>🆔 አዲስ የፋይዳ መታወቂያ (ካለ)</label><input type="file" id="editBeneficiaryTaxDoc_${i}" accept="image/*" onchange="previewEditPhoto(this, 'editBeneficiaryTaxPreview_${i}')"><div id="editBeneficiaryTaxPreview_${i}" class="image-preview"></div></div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function addEditBeneficiary() {
+    const member = members.find(m => m.id === currentEditingMemberId);
+    if (!member) return;
+    if (!member.beneficiaries) member.beneficiaries = [];
+    member.beneficiaries.push({ name: '', gender: '', relationship: '', address: '', photo: null, taxDoc: null });
+    generateEditBeneficiaryForms();
+}
+
+function removeEditBeneficiary(index) {
+    const member = members.find(m => m.id === currentEditingMemberId);
+    if (member && member.beneficiaries) {
+        member.beneficiaries.splice(index - 1, 1);
+        generateEditBeneficiaryForms();
+    }
+}
+
+function toggleEditOtherRelationshipBeneficiary(index) {
+    const relationship = document.getElementById(`editBeneficiaryRelationship_${index}`).value;
+    const otherDiv = document.getElementById(`editOtherRelationshipDiv_${index}`);
+    if (relationship === 'ሌላ') otherDiv.style.display = 'block';
+    else otherDiv.style.display = 'none';
+}
+
+function calculateEditRemainingBalance() {
+    const shareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
+    const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid')?.value) || 0;
+    const totalPayable = shareCount * SHARE_PRICE;
+    const remaining = totalPayable - sharePricePaid;
+    const remainingField = document.getElementById('editRemainingBalance');
+    if (remainingField) remainingField.value = remaining > 0 ? remaining.toLocaleString() + ' ብር' : '0 ብር';
+    
+    const paymentStatus = document.getElementById('editPaymentStatus');
+    if (paymentStatus) {
+        if (remaining <= 0) paymentStatus.value = 'ተከፍሏል';
+        else if (sharePricePaid > 0 && remaining > 0) paymentStatus.value = 'በከፊል ተከፍሏል';
+        else paymentStatus.value = 'አልተከፈለም';
+    }
+}
+
+function toggleEditPowerOfAttorneyOptions() {
+    const type = document.getElementById('editPowerOfAttorneyType')?.value;
+    const detailsDiv = document.getElementById('editPowerOfAttorneyDetails');
+    if (detailsDiv) detailsDiv.style.display = type && type !== '' ? 'block' : 'none';
+}
+
+async function saveMemberEdit() {
+    if (!currentEditingMemberId) {
+        alert('No member selected for editing');
+        return;
+    }
+    
+    try {
+        // Collect beneficiaries data from edit forms
+        const editBeneficiaries = [];
+        const beneficiaryDivs = document.querySelectorAll('[id^="editBeneficiaryName_"]');
+        
+        for (let i = 1; i <= beneficiaryDivs.length; i++) {
+            let relationship = document.getElementById(`editBeneficiaryRelationship_${i}`)?.value || '';
+            if (relationship === 'ሌላ') {
+                relationship = document.getElementById(`editBeneficiaryOtherRelationship_${i}`)?.value || '';
+            }
+            
+            const photoFile = document.getElementById(`editBeneficiaryPhoto_${i}`)?.files[0];
+            const taxDocFile = document.getElementById(`editBeneficiaryTaxDoc_${i}`)?.files[0];
+            const name = document.getElementById(`editBeneficiaryName_${i}`)?.value;
+            
+            if (name) {
+                editBeneficiaries.push({
+                    name: name,
+                    gender: document.getElementById(`editBeneficiaryGender_${i}`)?.value || '',
+                    relationship: relationship,
+                    address: document.getElementById(`editBeneficiaryAddress_${i}`)?.value || '',
+                    photo: photoFile ? await fileToBase64(photoFile) : null,
+                    taxDoc: taxDocFile ? await fileToBase64(taxDocFile) : null
+                });
+            }
+        }
+        
+        // Collect new photo files
+        const memberPhotoFile = document.getElementById('editMemberPhoto')?.files[0];
+        const repPhotoFile = document.getElementById('editRepPhoto')?.files[0];
+        
+        let memberPhotoBase64 = null;
+        let repPhotoBase64 = null;
+        
+        if (memberPhotoFile) memberPhotoBase64 = await fileToBase64(memberPhotoFile);
+        if (repPhotoFile) repPhotoBase64 = await fileToBase64(repPhotoFile);
+        
+        const shareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
+        const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid')?.value) || 0;
+        const totalPayable = shareCount * SHARE_PRICE;
+        
+        const updatedMember = {
+            fullName: document.getElementById('editFullName')?.value,
+            gender: document.getElementById('editGender')?.value,
+            age: parseInt(document.getElementById('editAge')?.value) || 0,
+            motherName: document.getElementById('editMotherName')?.value,
+            nationality: document.getElementById('editNationality')?.value,
+            education: document.getElementById('editEducation')?.value,
+            address: document.getElementById('editAddress')?.value,
+            phone: document.getElementById('editPhone')?.value,
+            taxId: document.getElementById('editTaxId')?.value,
+            role: document.getElementById('editRole')?.value,
+            shareCount: shareCount,
+            sharePricePaid: sharePricePaid,
+            remainingBalance: totalPayable - sharePricePaid,
+            paymentStatus: document.getElementById('editPaymentStatus')?.value,
+            bankAccountNumber: document.getElementById('editBankAccountNumber')?.value,
+            financialNotes: document.getElementById('editFinancialNotes')?.value,
+            beneficiaries: editBeneficiaries,
+            beneficiaryCount: editBeneficiaries.length,
+            legalRepName: document.getElementById('editLegalRepName')?.value,
+            legalRepAddress: document.getElementById('editLegalRepAddress')?.value,
+            legalRepPhone: document.getElementById('editLegalRepPhone')?.value,
+            powerOfAttorneyType: document.getElementById('editPowerOfAttorneyType')?.value,
+            powerOfAttorneyNumber: document.getElementById('editPowerOfAttorneyNumber')?.value,
+            powerOfAttorneyDate: document.getElementById('editPowerOfAttorneyDate')?.value,
+            powerOfAttorneyIssuer: document.getElementById('editPowerOfAttorneyIssuer')?.value,
+            powerOfAttorneyExpiry: document.getElementById('editPowerOfAttorneyExpiry')?.value,
+            powerOfAttorneyNotes: document.getElementById('editPowerOfAttorneyNotes')?.value,
+            updatedAt: new Date().toISOString()
+        };
+        
+        if (memberPhotoBase64) updatedMember.memberPhoto = memberPhotoBase64;
+        if (repPhotoBase64) updatedMember.repPhoto = repPhotoBase64;
+        
+        const response = await fetch(`/api/members/${currentEditingMemberId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedMember)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('✅ አባል በሚገባ ተሻሽሏል!');
+            closeMemberModal();
+            loadMembers();
+            updateShareStatistics();
+        } else {
+            alert('❌ ስህተት: ' + (result.message || 'Update failed'));
+        }
+    } catch (error) {
+        console.error('Error saving member edit:', error);
+        alert('❌ ስህተት: ' + error.message);
+    }
+}
         function cancelEditMode(){closeMemberModal();}
         async function saveMemberEdit(){alert('Save functionality - Update member data here');closeMemberModal();loadMembers();}
         
