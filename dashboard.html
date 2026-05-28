@@ -1590,7 +1590,16 @@ function displayMemberSalesHistory(memberSales) {
         </div>
     `).join('');
 }
-
+// ==================== CALCULATE TOTAL AMOUNT ====================
+function calculateTotalAmount() {
+    const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+    const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
+    const total = quantity * pricePerKg;
+    const totalAmountField = document.getElementById('totalAmount');
+    if (totalAmountField) {
+        totalAmountField.value = total.toFixed(2) + ' ብር';
+    }
+}
 // Update deleteSale to refresh coffee summary
 async function deleteSale(saleId) {
     if (confirm('ሽያጭ ይሰረዛል?')) {
@@ -1790,6 +1799,7 @@ function initializeCollectionType() {
         window.toggleCollectionType = toggleCollectionType;
 window.filterSalesHistory = filterSalesHistory;
 window.initializeCollectionType = initializeCollectionType;
+        window.calculateTotalAmount = calculateTotalAmount;
     </script>
 </body>
 </html>
