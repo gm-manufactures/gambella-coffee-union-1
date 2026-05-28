@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Portal - Gambella Coffee Union</title>
+    <title>GMFC - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e,#2d5a1a);min-height:100vh}
@@ -23,8 +23,10 @@
         .login-form{padding:30px}
         .form-group{margin-bottom:20px}
         .form-group label{display:block;margin-bottom:8px;font-weight:bold}
-        .form-group input{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px}
+        .form-group input{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:14px}
+        .form-group input:focus{outline:none;border-color:#2d6a1a}
         .btn-login{width:100%;padding:12px;background:#2d6a1a;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer}
+        .btn-login:hover{background:#1a4a0e}
         .error-message{background:#f8d7da;color:#721c24;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
         
         /* Profile Card */
@@ -39,12 +41,13 @@
         .info-label{font-weight:bold;color:#555;margin-bottom:5px}
         .info-value{font-size:1.1em}
         
-        .stat-card{background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white;padding:20px;border-radius:10px;text-align:center}
+        .stat-card{background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white;padding:20px;border-radius:10px;text-align:center;margin-bottom:20px}
         .stat-value{font-size:2em;font-weight:bold}
         
         .section-title{color:#2d6a1a;margin:20px 0 15px 0;padding-bottom:10px;border-bottom:2px solid #2d6a1a}
         
-        .sale-card{border:1px solid #ddd;padding:15px;margin-bottom:10px;border-radius:8px;background:#fafafa}
+        .beneficiary-card{background:#fff8e1;border:1px solid #ffecb3;border-radius:8px;padding:15px;margin-bottom:15px}
+        .beneficiary-name{font-weight:bold;color:#2d6a1a;font-size:1.1em}
         
         .footer-note{text-align:center;padding:20px;color:#666;font-size:0.85em;border-top:1px solid #ddd;margin-top:30px}
         
@@ -56,8 +59,8 @@
         <div class="login-container">
             <div class="login-header">
                 <div class="logo">🌿☕</div>
-                <h2>የአባል መግቢያ</h2>
-                <p>Member Login Portal</p>
+                <h2>GMFC - የአባል መግቢያ</h2>
+                <p>Gambella Majang Forest Coffee - Member Portal</p>
             </div>
             <div class="login-form">
                 <div id="errorMessage" class="error-message"></div>
@@ -80,7 +83,7 @@
         <nav class="navbar">
             <div class="logo-area">
                 <img src="logo.jpg" alt="Logo" class="union-logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f5c542%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23333%22%3E🌿%3C/text%3E%3C/svg%3E';">
-                <div><strong>የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</strong><br><small>Member Portal</small></div>
+                <div><strong>GMFC - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</strong><br><small>Gambella Majang Forest Coffee - Member Portal</small></div>
             </div>
             <div>
                 <span id="userName"></span>
@@ -90,7 +93,7 @@
         
         <div class="container">
             <!-- Member Count Stat -->
-            <div class="stat-card" style="margin-bottom:20px">
+            <div class="stat-card">
                 <div>👥 ጠቅላላ የአባላት ብዛት</div>
                 <div class="stat-value" id="totalMembers">0</div>
             </div>
@@ -110,8 +113,10 @@
                     <div class="info-item"><div class="info-label">📞 ስልክ (Phone)</div><div class="info-value" id="profilePhone"></div></div>
                     <div class="info-item"><div class="info-label">♂/♀ ፆታ (Gender)</div><div class="info-value" id="profileGender"></div></div>
                     <div class="info-item"><div class="info-label">📅 ዕድሜ (Age)</div><div class="info-value" id="profileAge"></div></div>
-                    <div class="info-item"><div class="info-label">👩 የናት ስም (Mother's Name)</div><div class="info-value" id="profileMotherName"></div></div>
-                    <div class="info-item"><div class="info-label">🏠 አድራሻ (Address)</div><div class="info-value" id="profileAddress"></div></div>
+                    <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም (Mother's Name)</div><div class="info-value" id="profileMotherName"></div></div>
+                    <div class="info-item"><div class="info-label">🌍 ዜግነት (Nationality)</div><div class="info-value" id="profileNationality"></div></div>
+                    <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ (Education)</div><div class="info-value" id="profileEducation"></div></div>
+                    <div class="info-item full-width"><div class="info-label">🏠 አድራሻ (Address)</div><div class="info-value" id="profileAddress"></div></div>
                     <div class="info-item"><div class="info-label">👔 ሚና/ኃላፊነት (Role)</div><div class="info-value" id="profileRoleValue"></div></div>
                 </div>
                 
@@ -119,17 +124,14 @@
                 <div class="info-grid">
                     <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት (Number of Shares)</div><div class="info-value" id="profileShareCount"></div></div>
                     <div class="info-item"><div class="info-label">📈 የአክሲዬን ድርሻ (Share Percentage)</div><div class="info-value" id="profileSharePercentage"></div></div>
-                    <div class="info-item"><div class="info-label">💰 የተከፈለ (Amount Paid)</div><div class="info-value" id="profileSharePaid"></div></div>
+                    <div class="info-item"><div class="info-label">💰 አጠቃላይ የሚከፈል (Total Payable)</div><div class="info-value" id="profileTotalPayable"></div></div>
+                    <div class="info-item"><div class="info-label">💵 የተከፈለ (Amount Paid)</div><div class="info-value" id="profileSharePaid"></div></div>
                     <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ (Remaining Balance)</div><div class="info-value" id="profileRemaining"></div></div>
                     <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ (Payment Status)</div><div class="info-value" id="profilePaymentStatus"></div></div>
-                    <div class="info-item"><div class="info-label">🏦 የባንክ ሂሳብ (Bank Account)</div><div class="info-value" id="profileBankAccount"></div></div>
                 </div>
                 
-                <h3 class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary)</h3>
-                <div class="info-grid">
-                    <div class="info-item"><div class="info-label">ስም (Name)</div><div class="info-value" id="profileBeneficiaryName"></div></div>
-                    <div class="info-item"><div class="info-label">አድራሻ (Address)</div><div class="info-value" id="profileBeneficiaryAddress"></div></div>
-                </div>
+                <h3 class="section-title">👨‍👦 የወራሽ መረጃ (Beneficiary Information)</h3>
+                <div id="beneficiariesList"></div>
                 
                 <h3 class="section-title">⚖️ የህጋዊ ተወካይ መረጃ (Legal Representative)</h3>
                 <div class="info-grid">
@@ -137,6 +139,9 @@
                     <div class="info-item"><div class="info-label">አድራሻ (Address)</div><div class="info-value" id="profileLegalAddress"></div></div>
                     <div class="info-item"><div class="info-label">ስልክ (Phone)</div><div class="info-value" id="profileLegalPhone"></div></div>
                 </div>
+                
+                <h3 class="section-title">📜 ውክልና (Power of Attorney)</h3>
+                <div class="info-grid" id="powerOfAttorneyInfo"></div>
                 
                 <div class="footer-note">
                     ⚠️ ማስታወሻ: መረጃዎን ማስተካከል ከፈለጉ እባክዎ የማህበሩን አስተዳዳሪ ያግኙ።<br>
@@ -148,7 +153,7 @@
 
     <script>
         const API_URL = '';
-        let token = localStorage.getItem('memberToken');
+        let token = localStorage.getItem('gmfc_token');
         
         if (token) {
             checkAuth();
@@ -172,7 +177,8 @@
         function showLogin() {
             document.getElementById('loginSection').style.display = 'block';
             document.getElementById('dashboardSection').style.display = 'none';
-            localStorage.removeItem('memberToken');
+            localStorage.removeItem('gmfc_token');
+            localStorage.removeItem('gmfc_user');
         }
         
         document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
@@ -193,8 +199,8 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    localStorage.setItem('memberToken', data.token);
-                    localStorage.setItem('memberUser', JSON.stringify(data.user));
+                    localStorage.setItem('gmfc_token', data.token);
+                    localStorage.setItem('gmfc_user', JSON.stringify(data.user));
                     token = data.token;
                     loadDashboard();
                 } else {
@@ -211,7 +217,7 @@
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
             
-            const user = JSON.parse(localStorage.getItem('memberUser') || '{}');
+            const user = JSON.parse(localStorage.getItem('gmfc_user') || '{}');
             document.getElementById('userName').innerHTML = `👤 ${escapeHtml(user.fullName)}`;
             
             // Load total members count
@@ -232,37 +238,76 @@
                 });
                 const member = await profileResponse.json();
                 
+                // Basic Information
                 document.getElementById('profileFullName').innerHTML = escapeHtml(member.fullName);
                 document.getElementById('profileRole').innerHTML = escapeHtml(member.role);
                 document.getElementById('profilePhone').innerHTML = escapeHtml(member.phone);
                 document.getElementById('profileGender').innerHTML = escapeHtml(member.gender);
-                document.getElementById('profileAge').innerHTML = member.age;
+                document.getElementById('profileAge').innerHTML = member.age || 'N/A';
                 document.getElementById('profileMotherName').innerHTML = escapeHtml(member.motherName);
+                document.getElementById('profileNationality').innerHTML = escapeHtml(member.nationality);
+                document.getElementById('profileEducation').innerHTML = escapeHtml(member.education);
                 document.getElementById('profileAddress').innerHTML = escapeHtml(member.address);
                 document.getElementById('profileRoleValue').innerHTML = escapeHtml(member.role);
+                
+                // Share Information
                 document.getElementById('profileShareCount').innerHTML = member.shareCount || 0;
                 document.getElementById('profileSharePercentage').innerHTML = (member.sharePercentage || 0) + '%';
-                document.getElementById('profileSharePaid').innerHTML = (member.sharePricePaid || 0).toFixed(2) + ' ብር';
-                document.getElementById('profileRemaining').innerHTML = (member.remainingBalance || 0).toFixed(2) + ' ብር';
+                document.getElementById('profileTotalPayable').innerHTML = (member.totalPayable || 0).toLocaleString() + ' ብር';
+                document.getElementById('profileSharePaid').innerHTML = (member.sharePricePaid || 0).toLocaleString() + ' ብር';
+                document.getElementById('profileRemaining').innerHTML = (member.remainingBalance || 0).toLocaleString() + ' ብር';
                 document.getElementById('profilePaymentStatus').innerHTML = escapeHtml(member.paymentStatus || 'አልተከፈለም');
-                document.getElementById('profileBankAccount').innerHTML = escapeHtml(member.bankAccountNumber) || 'N/A';
-                document.getElementById('profileBeneficiaryName').innerHTML = escapeHtml(member.beneficiaryName) || 'N/A';
-                document.getElementById('profileBeneficiaryAddress').innerHTML = escapeHtml(member.beneficiaryAddress) || 'N/A';
+                
+                // Legal Representative
                 document.getElementById('profileLegalName').innerHTML = escapeHtml(member.legalRepName) || 'N/A';
                 document.getElementById('profileLegalAddress').innerHTML = escapeHtml(member.legalRepAddress) || 'N/A';
                 document.getElementById('profileLegalPhone').innerHTML = escapeHtml(member.legalRepPhone) || 'N/A';
                 
+                // Power of Attorney
+                const poaContainer = document.getElementById('powerOfAttorneyInfo');
+                if (member.powerOfAttorneyType) {
+                    poaContainer.innerHTML = `
+                        <div class="info-item"><div class="info-label">የውክልና አይነት:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyType)}</div></div>
+                        <div class="info-item"><div class="info-label">ቁጥር:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyNumber) || 'N/A'}</div></div>
+                        <div class="info-item"><div class="info-label">ቀን:</div><div class="info-value">${member.powerOfAttorneyDate || 'N/A'}</div></div>
+                        <div class="info-item"><div class="info-label">ሰጪ ተቋም:</div><div class="info-value">${escapeHtml(member.powerOfAttorneyIssuer) || 'N/A'}</div></div>
+                        <div class="info-item"><div class="info-label">የሚያበቃበት:</div><div class="info-value">${member.powerOfAttorneyExpiry || 'N/A'}</div></div>
+                    `;
+                } else {
+                    poaContainer.innerHTML = '<div class="info-item full-width"><div class="info-value">ምንም ውክልና የለም / No Power of Attorney</div></div>';
+                }
+                
+                // Beneficiaries
+                const beneficiariesContainer = document.getElementById('beneficiariesList');
+                if (member.beneficiaries && member.beneficiaries.length > 0) {
+                    beneficiariesContainer.innerHTML = member.beneficiaries.map((ben, idx) => `
+                        <div class="beneficiary-card">
+                            <div class="beneficiary-name">👤 ወራሽ ${idx + 1}: ${escapeHtml(ben.name)}</div>
+                            <div class="info-grid" style="margin-top:10px">
+                                <div><strong>ፆታ:</strong> ${escapeHtml(ben.gender) || 'N/A'}</div>
+                                <div><strong>ዝምድና:</strong> ${escapeHtml(ben.relationship) || 'N/A'}</div>
+                                <div><strong>አድራሻ:</strong> ${escapeHtml(ben.address) || 'N/A'}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    beneficiariesContainer.innerHTML = '<div class="beneficiary-card">ምንም ወራሾች የሉም / No beneficiaries</div>';
+                }
+                
+                // Member Photo
                 if (member.memberPhoto) {
                     document.getElementById('memberPhoto').src = member.memberPhoto;
                 }
+                
             } catch (error) {
                 console.error('Error loading profile:', error);
+                alert('Error loading profile data. Please try again.');
             }
         }
         
         function logout() {
-            localStorage.removeItem('memberToken');
-            localStorage.removeItem('memberUser');
+            localStorage.removeItem('gmfc_token');
+            localStorage.removeItem('gmfc_user');
             showLogin();
         }
         
