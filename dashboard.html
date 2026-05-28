@@ -461,11 +461,31 @@
             <div class="form-section"><h3>📜 ታሪክ</h3><div id="transferHistoryList"></div></div>
         </div>
         
-        <!-- Trading Tab -->
-        <div id="trading" class="tab-content"><h2>📊 የአክሲዬን ግብይት</h2><div id="tradingStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:20px"></div>
-            <div class="form-section"><h3>⏳ በመጠባበቅ ላይ</h3><div id="pendingRequestsList"></div></div>
-            <div class="form-section"><h3>📜 ታሪክ</h3><div id="allRequestsList"></div></div>
+       <!-- Trading Tab -->
+<div id="trading" class="tab-content">
+    <h2>📊 የአክሲዬን ግብይት</h2>
+    
+    <!-- Share Statistics Cards -->
+    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
+        <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">📊 ጠቅላላ አክሲዬን (Total Shares)</div>
+            <div class="stat-value" id="totalSharesLimit" style="font-size:1.8em; font-weight:bold">25,000</div>
         </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">✅ የተሸጠ አክሲዬን (Sold Shares)</div>
+            <div class="stat-value" id="soldShares" style="font-size:1.8em; font-weight:bold">0</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">📈 የቀረ አክሲዬን (Remaining Shares)</div>
+            <div class="stat-value" id="remainingShares" style="font-size:1.8em; font-weight:bold">25,000</div>
+        </div>
+    </div>
+    
+    <!-- Existing trading content below -->
+    <div id="tradingStats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px"></div>
+    <div class="form-section"><h3>⏳ በመጠባበቅ ላይ</h3><div id="pendingRequestsList"></div></div>
+    <div class="form-section"><h3>📜 ታሪክ</h3><div id="allRequestsList"></div></div>
+</div>
         
         <!-- Search Tab -->
         <div id="search" class="tab-content"><h2>🔍 አባል ይፈልጉ</h2><div class="form-group"><input type="text" id="searchTerm" placeholder="በስም ይፈልጉ..." onkeyup="searchMembers()"></div><div id="searchResults"></div></div>
@@ -682,6 +702,15 @@
             else if (paid > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
             else document.getElementById('paymentStatus').value = 'አልተከፈለም';
         }
+        // Inside the memberForm submit event, after getting shareCount
+const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+
+// Validate share availability
+const remainingShares = updateShareStatistics();
+if (shareCount > remainingShares) {
+    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
+    return;
+}
         
         function toggleOtherBank() {
             const bankSelect = document.getElementById('bankName');
@@ -872,7 +901,8 @@
                 alert('አባል ተሰርዟል!');
             }
         }
-        
+        // After member registration success
+                 updateShareStatistics();
         // ==================== REGISTER MEMBER ====================
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -948,6 +978,8 @@
             document.getElementById('otherBankDiv').style.display = 'none';
             loadMembers();
             showTab('list');
+            // After member registration success
+updateShareStatistics();
         });
         
         // ==================== SHOW MEMBER DETAILS ====================
@@ -1321,6 +1353,22 @@ async function saveMemberEdit() {
             },
             body: JSON.stringify(updatedMember)
         });
+        // Inside saveMemberEdit function, before saving
+const newShareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
+const oldMember = members.find(m => m.id === currentEditingMemberId);
+const oldShareCount = oldMember?.shareCount || 0;
+const shareDifference = newShareCount - oldShareCount;
+
+if (shareDifference > 0) {
+    const remainingShares = updateShareStatistics();
+    if (shareDifference > remainingShares + oldShareCount) {
+        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}`);
+        return;
+    }
+}
+
+// After successful update
+updateShareStatistics();
         
         const result = await response.json();
         
@@ -1328,6 +1376,7 @@ async function saveMemberEdit() {
             alert('✅ አባል በሚገባ ተሻሽሏል! / Member updated successfully!');
             closeMemberModal();
             loadMembers();
+            
         } else {
             alert('❌ ስህተት: ' + (result.message || 'Update failed'));
         }
@@ -1698,13 +1747,79 @@ function initializeCollectionType() {
                 else alert(result.message || 'Rejection failed');
             }
         }
+        async function approveTradingRequest(requestId) {
+    if (confirm('ይህን ጥያቄ ማጽደቅ ይፈልጋሉ?')) {
+        const request = tradingRequests.find(r => r.id === requestId);
         
+        // Validate share availability for buy requests
+        if (request.requestType === 'buy') {
+            const remainingShares = updateShareStatistics();
+            if (request.shareAmount > remainingShares) {
+                alert(`⚠️ በቂ አክሲዬን የለም! የቀረው: ${remainingShares}`);
+                return;
+            }
+        }
+        
+        const result = await apiCall(`/share-trading/approve/${requestId}`, { method: 'POST' });
+        if (result.success) { 
+            alert('✅ ጥያቄ ጸድቋል!'); 
+            loadPendingRequests(); 
+            loadAllRequests(); 
+            loadTradingStats(); 
+            loadMembers();
+            updateShareStatistics(); // Update share stats
+        } else {
+            alert(result.message || 'Approval failed');
+        }
+    }
+}
         async function loadAllRequests() {
             const requests = await apiCall('/share-trading/requests');
             const container = document.getElementById('allRequestsList');
             if (!requests.length) { container.innerHTML = '<div class="no-data">📭 ምንም ጥያቄ የለም</div>'; return; }
             container.innerHTML = requests.slice(0, 20).map(r => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div><div>📅 ${new Date(r.createdAt).toLocaleDateString()} | 📊 ${r.shareAmount} አክሲዬን</div></div>`).join('');
         }
+        // ==================== SHARE STATISTICS FUNCTIONS ====================
+
+function updateShareStatistics() {
+    const totalSharesLimit = 25000;
+    const soldShares = members.reduce((sum, member) => sum + (member.shareCount || 0), 0);
+    const remainingShares = totalSharesLimit - soldShares;
+    
+    document.getElementById('soldShares').innerHTML = soldShares.toLocaleString();
+    document.getElementById('remainingShares').innerHTML = remainingShares.toLocaleString();
+    
+    // Also update the trading stats
+    const tradingStatsDiv = document.getElementById('tradingStats');
+    if (tradingStatsDiv) {
+        tradingStatsDiv.innerHTML = `
+            <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${soldShares}</div>
+                <div>የተሸጠ አክሲዬን</div>
+            </div>
+            <div class="stat-card" style="background:#f5c542;color:#333;padding:15px;border-radius:10px;text-align:center">
+                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${remainingShares}</div>
+                <div>የቀረ አክሲዬን</div>
+            </div>
+            <div class="stat-card" style="background:#17a2b8;color:white;padding:15px;border-radius:10px;text-align:center">
+                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${members.length}</div>
+                <div>ተመዝጋቢ አባላት</div>
+            </div>
+        `;
+    }
+    
+    return remainingShares;
+}
+
+// Validate if requested shares are available
+function validateShareAvailability(requestedShares) {
+    const remainingShares = updateShareStatistics();
+    if (requestedShares > remainingShares) {
+        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\nInsufficient shares! Remaining shares: ${remainingShares}`);
+        return false;
+    }
+    return true;
+}
         
         // ==================== ADMIN FUNCTIONS ====================
         async function updateUserProfile() {
