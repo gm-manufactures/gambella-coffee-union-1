@@ -703,12 +703,7 @@
         }
      
 
-// Validate share availability
-const remainingShares = updateShareStatistics();
-if (shareCount > remainingShares) {
-    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-    return;
-}
+
         
         function toggleOtherBank() {
             const bankSelect = document.getElementById('bankName');
@@ -896,11 +891,10 @@ if (shareCount > remainingShares) {
             if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
                 await apiCall(`/members/${id}`, { method: 'DELETE' });
                 loadMembers();
-                  updateShareStatistics();
+                 
                 alert('አባል ተሰርዟል!');
             }
         }
-        // After member registration success
                
         // ==================== REGISTER MEMBER ====================
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
@@ -911,14 +905,7 @@ if (shareCount > remainingShares) {
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
             const totalPayable = shareCount * SHARE_PRICE;
             const remainingBalance = totalPayable - sharePricePaid;
-// Update share statistics first
-const remainingShares = updateShareStatistics();
 
-// Validate share availability
-if (shareCount > remainingShares) {
-    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-    return;
-}
             // Get bank name
             let bankName = document.getElementById('bankName').value;
             if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
@@ -973,8 +960,7 @@ if (shareCount > remainingShares) {
                 hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
             };
             const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
-            // After the registration API call succeeds, add:
-updateShareStatistics();
+           
             if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
             else alert('✅ አባል ተመዝግቧል!');
             e.target.reset();
@@ -987,8 +973,7 @@ updateShareStatistics();
             document.getElementById('otherBankDiv').style.display = 'none';
             loadMembers();
             showTab('list');
-            // After member registration success
-updateShareStatistics();
+           
         });
         
         // ==================== SHOW MEMBER DETAILS ====================
@@ -1362,19 +1347,7 @@ async function saveMemberEdit() {
             },
             body: JSON.stringify(updatedMember)
         });
-        // Inside saveMemberEdit function, before saving
-const newShareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
-const oldMember = members.find(m => m.id === currentEditingMemberId);
-const oldShareCount = oldMember?.shareCount || 0;
-const shareDifference = newShareCount - oldShareCount;
-
-if (shareDifference > 0) {
-    const remainingShares = updateShareStatistics();
-    if (shareDifference > remainingShares + oldShareCount) {
-        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}`);
-        return;
-    }
-} 
+       
         const result = await response.json();
         
         if (response.ok) {
@@ -1757,14 +1730,7 @@ function initializeCollectionType() {
     if (confirm('ይህን ጥያቄ ማጽደቅ ይፈልጋሉ?')) {
         const request = tradingRequests.find(r => r.id === requestId);
         
-        // Validate share availability for buy requests
-        if (request.requestType === 'buy') {
-            const remainingShares = updateShareStatistics();
-            if (request.shareAmount > remainingShares) {
-                alert(`⚠️ በቂ አክሲዬን የለም! የቀረው: ${remainingShares}`);
-                return;
-            }
-        }
+      
         
         const result = await apiCall(`/share-trading/approve/${requestId}`, { method: 'POST' });
         if (result.success) { 
@@ -1773,7 +1739,7 @@ function initializeCollectionType() {
             loadAllRequests(); 
             loadTradingStats(); 
             loadMembers();
-            updateShareStatistics(); // Update share stats
+           
         } else {
             alert(result.message || 'Approval failed');
         }
@@ -1787,45 +1753,7 @@ function initializeCollectionType() {
         }
         // ==================== SHARE STATISTICS FUNCTIONS ====================
 
-// ==================== SHARE STATISTICS FUNCTIONS ====================
 
-function updateShareStatistics() {
-    console.log("Updating share statistics...");
-    
-    const totalSharesLimit = 25000;
-    
-    // Calculate total sold shares from all members
-    let soldShares = 0;
-    if (members && members.length > 0) {
-        soldShares = members.reduce((sum, member) => {
-            const shares = parseInt(member.shareCount) || 0;
-            return sum + shares;
-        }, 0);
-    }
-    
-    const remainingShares = totalSharesLimit - soldShares;
-    
-    // Update the display
-    const soldSharesElement = document.getElementById('soldShares');
-    const remainingSharesElement = document.getElementById('remainingShares');
-    
-    if (soldSharesElement) soldSharesElement.innerHTML = soldShares.toLocaleString();
-    if (remainingSharesElement) remainingSharesElement.innerHTML = remainingShares.toLocaleString();
-    
-    console.log(`Sold: ${soldShares}, Remaining: ${remainingShares}`);
-    
-    return remainingShares;
-}
-
-// Validate if requested shares are available
-function validateShareAvailability(requestedShares) {
-    const remainingShares = updateShareStatistics();
-    if (requestedShares > remainingShares) {
-        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\nInsufficient shares! Remaining shares: ${remainingShares}`);
-        return false;
-    }
-    return true;
-}
         
         // ==================== ADMIN FUNCTIONS ====================
         async function updateUserProfile() {
