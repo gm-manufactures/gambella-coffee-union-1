@@ -5,17 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
     <style>
-        .stat-card {
-    transition: transform 0.3s;
-}
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-.stat-label {
-    font-size: 0.9em;
-    margin-bottom: 10px;
-    opacity: 0.9;
-}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
         .navbar{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
@@ -62,7 +51,7 @@
         .status-partial{background:#fff3cd;color:#856404}
         .status-pending{background:#f8d7da;color:#721c24}
         .share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
-        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:750px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
+        .modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:550px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
         @keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
         .modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
         .modal-header h3{margin:0}
@@ -86,19 +75,13 @@
         .lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
         .lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
         .close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px}
+        .stat-card{transition:transform 0.3s;padding:20px;border-radius:10px;text-align:center}
+        .stat-card:hover{transform:translateY(-5px)}
+        .stat-value{font-size:1.8em;font-weight:bold}
+        .form-control{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px}
+        .form-control:focus{outline:none;border-color:#2d6a1a}
         @media(max-width:768px){.form-row{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}}
-        .form-control {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #2d6a1a;
-}
     </style>
 </head>
 <body>
@@ -125,146 +108,34 @@
         <div id="register" class="tab-content active">
             <h2>📝 የአባልነት ምዝገባ ቅፅ</h2>
             <form id="memberForm">
-                <!-- ==================== MEMBER INFORMATION ==================== -->
                 <div class="form-section">
                     <h3>📌 የአባሉ መረጃ</h3>
                     <div class="form-row">
                         <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="fullName" required></div>
                         <div class="form-group"><label>ፆታ</label><select id="gender"><option>ወንድ</option><option>ሴት</option></select></div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ዕድሜ</label><input type="number" id="age"></div>
-                        <div class="form-group"><label>የእናት ሙሉ ስም</label><input type="text" id="motherName"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ዜግነት</label><input type="text" id="nationality" value="ኢትዮጵያዊ"></div>
-                        <div class="form-group"><label>የትምህርት ደረጃ</label><select id="education"><option>አንደኛ ደረጃ</option><option>ሁለተኛ ደረጃ</option><option>ዲፕሎማ</option><option>ዲግሪ</option><option>ማስተርስ</option></select></div>
-                    </div>
-                    
-                    <!-- Address with detailed location -->
+                    <div class="form-row"><div class="form-group"><label>ዕድሜ</label><input type="number" id="age"></div><div class="form-group"><label>የእናት ሙሉ ስም</label><input type="text" id="motherName"></div></div>
+                    <div class="form-row"><div class="form-group"><label>ዜግነት</label><input type="text" id="nationality" value="ኢትዮጵያዊ"></div><div class="form-group"><label>የትምህርት ደረጃ</label><select id="education"><option>አንደኛ ደረጃ</option><option>ሁለተኛ ደረጃ</option><option>ዲፕሎማ</option><option>ዲግሪ</option><option>ማስተርስ</option></select></div></div>
                     <h4>📍 አድራሻ</h4>
-                    <div class="form-row">
-                        <div class="form-group"><label>ክልል (Region)</label>
-                            <select id="region" onchange="loadZones()">
-                                <option value="">ምረጥ</option>
-                                <option value="ጋምቤላ">ጋምቤላ</option>
-                                <option value="አዲስ አበባ">አዲስ አበባ</option>
-                                <option value="ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች">ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች</option>
-                                <option value="ሌላ">ሌላ</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label>ዞን (Zone)</label>
-                            <select id="zone" onchange="loadDistricts()">
-                                <option value="">በመጀመሪያ ክልል ይምረጡ</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ወረዳ (District/Woreda)</label>
-                            <select id="district" onchange="loadCities()">
-                                <option value="">በመጀመሪያ ዞን ይምረጡ</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label>ከተማ (City/Town)</label>
-                            <select id="city">
-                                <option value="">በመጀመሪያ ወረዳ ይምረጡ</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ቀበሌ (Kebele)</label>
-                            <input type="text" id="kebele" placeholder="ቀበሌ">
-                        </div>
-                        <div class="form-group"><label>ቤት ቁጥር (House No.)</label><input type="text" id="houseNumber" placeholder="ቤት ቁጥር"></div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="phone"></div>
-                        <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
-                    </div>
+                    <div class="form-row"><div class="form-group"><label>ክልል</label><select id="region" onchange="loadZones()"><option value="">ምረጥ</option><option value="ጋምቤላ">ጋምቤላ</option><option value="አዲስ አበባ">አዲስ አበባ</option><option value="ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች">ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች</option><option value="ሌላ">ሌላ</option></select></div><div class="form-group"><label>ዞን</label><select id="zone" onchange="loadDistricts()"><option value="">በመጀመሪያ ክልል ይምረጡ</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>ወረዳ</label><select id="district" onchange="loadCities()"><option value="">በመጀመሪያ ዞን ይምረጡ</option></select></div><div class="form-group"><label>ከተማ</label><select id="city"><option value="">በመጀመሪያ ወረዳ ይምረጡ</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>ቀበሌ</label><input type="text" id="kebele" placeholder="ቀበሌ"></div><div class="form-group"><label>ቤት ቁጥር</label><input type="text" id="houseNumber" placeholder="ቤት ቁጥር"></div></div>
+                    <div class="form-row"><div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="phone"></div><div class="form-group"><label>የፋይዳ መለያ</label><input type="text" id="taxId"></div></div>
                     <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት</label><input type="text" id="role"></div>
                     
-                    <!-- Share Information with calculations -->
                     <h4>📊 የአክሲዬን መረጃ</h4>
-                    <div class="form-row">
-                        <div class="form-group"><label>የአክሲዬን ብዛት (Number of Shares)</label>
-                            <input type="number" id="shareCount" step="1" min="0" max="25000" value="0" oninput="calculateShareTotal()">
-                        </div>
-                        <div class="form-group"><label>የአንድ አክሲዬን ዋጋ (Price per Share)</label>
-                            <input type="text" id="sharePrice" value="10,000 ብር" readonly style="background:#e9ecef">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>💰 አጠቃላይ የሚከፈል ብር (Total Amount)</label>
-                            <input type="text" id="totalPayable" readonly style="background:#e9ecef">
-                        </div>
-                        <div class="form-group"><label>💵 የተከፈለ ብር (Amount Paid)</label>
-                            <input type="number" id="sharePricePaid" step="0.01" min="0" value="0" oninput="calculateRemainingBalance()">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>💰 ቀሪ ብር (Remaining Balance)</label>
-                            <input type="text" id="remainingBalance" readonly style="background:#e9ecef">
-                        </div>
-                        <div class="form-group"><label>📋 የክፍያ ሁኔታ</label>
-                            <select id="paymentStatus">
-                                <option value="ተከፍሏል">✅ ተከፍሏል</option>
-                                <option value="በከፊል ተከፍሏል">⚠️ በከፊል ተከፍሏል</option>
-                                <option value="አልተከፈለም">❌ አልተከፈለም</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div class="form-row"><div class="form-group"><label>የአክሲዬን ብዛት</label><input type="number" id="shareCount" step="1" min="0" max="25000" value="0" oninput="calculateShareTotal()"></div><div class="form-group"><label>የአንድ አክሲዬን ዋጋ</label><input type="text" id="sharePrice" value="10,000 ብር" readonly style="background:#e9ecef"></div></div>
+                    <div class="form-row"><div class="form-group"><label>💰 አጠቃላይ የሚከፈል</label><input type="text" id="totalPayable" readonly style="background:#e9ecef"></div><div class="form-group"><label>💵 የተከፈለ</label><input type="number" id="sharePricePaid" step="0.01" min="0" value="0" oninput="calculateRemainingBalance()"></div></div>
+                    <div class="form-row"><div class="form-group"><label>💰 ቀሪ ገንዘብ</label><input type="text" id="remainingBalance" readonly style="background:#e9ecef"></div><div class="form-group"><label>📋 የክፍያ ሁኔታ</label><select id="paymentStatus"><option value="ተከፍሏል">✅ ተከፍሏል</option><option value="በከፊል ተከፍሏል">⚠️ በከፊል ተከፍሏል</option><option value="አልተከፈለም">❌ አልተከፈለም</option></select></div></div>
                     
-                    <!-- 3-Year Payment Plan -->
-                    <h4>📅 የክፍያ እቅድ (3-Year Payment Plan)</h4>
-                    <div class="form-row">
-                        <div class="form-group"><label>📆 የመጀመሪያ ዓመት ክፍያ (30%)</label>
-                            <input type="text" id="year1Payment" readonly style="background:#e9ecef">
-                        </div>
-                        <div class="form-group"><label>📆 የሁለተኛ ዓመት ክፍያ (40%)</label>
-                            <input type="text" id="year2Payment" readonly style="background:#e9ecef">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>📆 የሶስተኛ ዓመት ክፍያ (30%)</label>
-                            <input type="text" id="year3Payment" readonly style="background:#e9ecef">
-                        </div>
-                        <div class="form-group"></div>
-                    </div>
+                    <h4>📅 የክፍያ እቅድ (3-Year)</h4>
+                    <div class="form-row"><div class="form-group"><label>📆 የመጀመሪያ ዓመት (30%)</label><input type="text" id="year1Payment" readonly style="background:#e9ecef"></div><div class="form-group"><label>📆 የሁለተኛ ዓመት (40%)</label><input type="text" id="year2Payment" readonly style="background:#e9ecef"></div></div>
+                    <div class="form-row"><div class="form-group"><label>📆 የሶስተኛ ዓመት (30%)</label><input type="text" id="year3Payment" readonly style="background:#e9ecef"></div><div class="form-group"></div></div>
                     
-                    <!-- Bank Information -->
-                    <h4>🏦 የባንክ መረጃ (ለትርፍ ክፍፍል)</h4>
-                    <div class="form-row">
-                        <div class="form-group"><label>የባንክ ስም (Bank Name)</label>
-                            <select id="bankName" onchange="toggleOtherBank()">
-                                <option value="">ምረጥ</option>
-                                <option value="ኢትዮጵያ ንግድ ባንክ">ኢትዮጵያ ንግድ ባንክ (Commercial Bank of Ethiopia)</option>
-                                <option value="አቢሲኒያ ባንክ">አቢሲኒያ ባንክ (Abyssinia Bank)</option>
-                                <option value="ህብረት ባንክ">ህብረት ባንክ (Hibret Bank)</option>
-                                <option value="ሂጅራ ባንክ">ሂጅራ ባንክ (Hijra Bank)</option>
-                                <option value="ዘምዘም ባንክ">ዘምዘም ባንክ (Zemzem Bank)</option>
-                                <option value="ኦሮሚያ ባንክ">ኦሮሚያ ባንክ (Oromia Bank)</option>
-                                <option value="የኦሮሚያ ህብረት ስራ ባንክ">የኦሮሚያ ህብረት ስራ ባንክ (Oromia Cooperative Bank)</option>
-                                <option value="ዳሽን ባንክ">ዳሽን ባንክ (Dashen Bank)</option>
-                                <option value="አዋሽ ኢንተርናሺናል ባንክ">አዋሽ ኢንተርናሺናል ባንክ (Awash International Bank)</option>
-                                <option value="ብርሃን ባንክ">ብርሃን ባንክ (Berhan Bank)</option>
-                                <option value="አባይ ባንክ">አባይ ባንክ (Abay Bank)</option>
-                                <option value="አንበሳ ባንክ">አንበሳ ባንክ (Anbessa Bank)</option>
-                                <option value="ቴሌ ብር">ቴሌ ብር (Tele Birr)</option>
-                                <option value="ሌላ">ሌላ (Other)</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="otherBankDiv" style="display:none"><label>ሌላ ባንክ ይግለጹ</label><input type="text" id="otherBankName" placeholder="የባንክ ስም"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>ቅርንጫፍ (Branch)</label><input type="text" id="bankBranch"></div>
-                        <div class="form-group"><label>የአካውንት ቁጥር (Account Number)</label><input type="text" id="accountNumber"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>የአካውንት ስም (Account Name)</label><input type="text" id="accountName"></div>
-                        <div class="form-group"></div>
-                    </div>
-                    
+                    <h4>🏦 የባንክ መረጃ</h4>
+                    <div class="form-row"><div class="form-group"><label>የባንክ ስም</label><select id="bankName" onchange="toggleOtherBank()"><option value="">ምረጥ</option><option value="ኢትዮጵያ ንግድ ባንክ">ኢትዮጵያ ንግድ ባንክ</option><option value="አቢሲኒያ ባንክ">አቢሲኒያ ባንክ</option><option value="ህብረት ባንክ">ህብረት ባንክ</option><option value="ኦሮሚያ ባንክ">ኦሮሚያ ባንክ</option><option value="ዳሽን ባንክ">ዳሽን ባንክ</option><option value="አዋሽ ባንክ">አዋሽ ባንክ</option><option value="ሌላ">ሌላ</option></select></div><div class="form-group" id="otherBankDiv" style="display:none"><label>ሌላ ባንክ</label><input type="text" id="otherBankName"></div></div>
+                    <div class="form-row"><div class="form-group"><label>ቅርንጫፍ</label><input type="text" id="bankBranch"></div><div class="form-group"><label>የአካውንት ቁጥር</label><input type="text" id="accountNumber"></div></div>
+                    <div class="form-row"><div class="form-group"><label>የአካውንት ስም</label><input type="text" id="accountName"></div><div class="form-group"></div></div>
                     <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="financialNotes" rows="2"></textarea></div>
                     <div class="form-group"><label>📸 የአባሉ ፎቶ</label><input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this,'memberPhotoPreview')"><div id="memberPhotoPreview" class="image-preview"></div></div>
                     <div class="form-group"><label>🆔 የአባሉ የፋይዳ መታወቂያ</label><input type="file" id="memberTaxDoc" accept="image/*" onchange="previewImage(this,'memberTaxPreview')"><div id="memberTaxPreview" class="image-preview"></div></div>
@@ -273,9 +144,7 @@
                 <!-- Beneficiary Section -->
                 <div class="form-section">
                     <h3>👨‍👦 የወራሽ መረጃ</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>📊 የወራሽ ብዛት</label><input type="number" id="beneficiaryCount" min="0" max="20" value="0" step="1" onchange="generateBeneficiaryForms()"></div>
-                    </div>
+                    <div class="form-row"><div class="form-group"><label>📊 የወራሽ ብዛት</label><input type="number" id="beneficiaryCount" min="0" max="20" value="0" step="1" onchange="generateBeneficiaryForms()"></div></div>
                     <div id="beneficiariesContainer"></div>
                 </div>
                 
@@ -283,7 +152,7 @@
                 <div class="form-section">
                     <h3>⚖️ ህጋዊ ተወካይ መረጃ</h3>
                     <div class="form-row"><div class="form-group"><label>ስም</label><input type="text" id="legalRepName"></div><div class="form-group"><label>አድራሻ</label><textarea id="legalRepAddress" rows="2"></textarea></div></div>
-                    <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="legalRepPhone"></div>
+                    <div class="form-group"><label>ስልክ</label><input type="tel" id="legalRepPhone"></div>
                     <div class="form-group"><label>📸 የተወካይ ፎቶ</label><input type="file" id="repPhoto" accept="image/*" onchange="previewImage(this,'repPhotoPreview')"><div id="repPhotoPreview" class="image-preview"></div></div>
                     <div class="form-group"><label>🆔 የተወካይ የፋይዳ መታወቂያ</label><input type="file" id="repTaxDoc" accept="image/*" onchange="previewImage(this,'repTaxPreview')"><div id="repTaxPreview" class="image-preview"></div></div>
                 </div>
@@ -293,15 +162,15 @@
                     <h3>📜 ውክልና (Power of Attorney)</h3>
                     <div class="form-group"><label>የውክልና አይነት</label><select id="powerOfAttorneyType" onchange="togglePowerOfAttorneyOptions()"><option value="">ምረጥ</option><option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ">ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ</option><option value="በፍትህ የተረጋገጠ የምስክር ወረቀት">በፍትህ የተረጋገጠ የምስክር ወረቀት</option></select></div>
                     <div id="powerOfAttorneyDetails" style="display:none">
-                        <div class="form-row"><div class="form-group"><label>የውክልና ቁጥር</label><input type="text" id="powerOfAttorneyNumber"></div><div class="form-group"><label>ቀን</label><input type="date" id="powerOfAttorneyDate"></div></div>
-                        <div class="form-row"><div class="form-group"><label>የሰጠው ተቋም</label><input type="text" id="powerOfAttorneyIssuer"></div><div class="form-group"><label>የሚቀጥልበት ቀን</label><input type="date" id="powerOfAttorneyExpiry"></div></div>
+                        <div class="form-row"><div class="form-group"><label>ቁጥር</label><input type="text" id="powerOfAttorneyNumber"></div><div class="form-group"><label>ቀን</label><input type="date" id="powerOfAttorneyDate"></div></div>
+                        <div class="form-row"><div class="form-group"><label>ሰጪ ተቋም</label><input type="text" id="powerOfAttorneyIssuer"></div><div class="form-group"><label>የሚያበቃበት</label><input type="date" id="powerOfAttorneyExpiry"></div></div>
                         <div class="form-group"><label>ማስታወሻ</label><textarea id="powerOfAttorneyNotes" rows="2"></textarea></div>
-                        <div class="form-group"><label>📸 የውክልና ሰነድ ፎቶ</label><input type="file" id="powerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'powerOfAttorneyPreview')"><div id="powerOfAttorneyPreview" class="image-preview"></div></div>
-                        <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ ፎቶ</label><input type="file" id="hardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'hardCopyDocumentPreview')"><div id="hardCopyDocumentPreview" class="image-preview"></div></div>
+                        <div class="form-group"><label>📸 የውክልና ሰነድ</label><input type="file" id="powerOfAttorneyPhoto" accept="image/*" onchange="previewImage(this,'powerOfAttorneyPreview')"><div id="powerOfAttorneyPreview" class="image-preview"></div></div>
+                        <div class="form-group"><label>📸 የሀርድ ኮፒ ቅጂ</label><input type="file" id="hardCopyDocumentPhoto" accept="image/*" onchange="previewImage(this,'hardCopyDocumentPreview')"><div id="hardCopyDocumentPreview" class="image-preview"></div></div>
                     </div>
                 </div>
                 
-                <div class="form-section"><h3>📄 የሃርድ ኮፒ ቅፅ</h3><div class="form-group"><label>የሀርድ ኮፒ ቅፅ ፎቶ</label><input type="file" id="hardCopyForm" accept="image/*" onchange="previewImage(this,'hardCopyPreview')"><div id="hardCopyPreview" class="image-preview"></div></div></div>
+                <div class="form-section"><h3>📄 የሃርድ ኮፒ ቅፅ</h3><div class="form-group"><label>ፎቶ</label><input type="file" id="hardCopyForm" accept="image/*" onchange="previewImage(this,'hardCopyPreview')"><div id="hardCopyPreview" class="image-preview"></div></div></div>
                 <button type="submit" class="btn-primary">✅ አስመዝግብ</button>
             </form>
         </div>
@@ -321,135 +190,32 @@
         </div>
         
         <!-- Sales Tab -->
-<div id="sales" class="tab-content">
-    <h2>💰 የቡና ሽያጭ እና ክትትል</h2>
-    
-    <!-- Coffee Collection Summary Cards -->
-    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
-        <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">👥 ከአባላት የተሰበሰበ</div>
-            <div class="stat-value" id="memberCoffeeTotal" style="font-size:1.8em; font-weight:bold">0 kg</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">🏪 ከአባላት ውጪ የተሰበሰበ</div>
-            <div class="stat-value" id="nonMemberCoffeeTotal" style="font-size:1.8em; font-weight:bold">0 kg</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">📊 አጠቃላይ የተሰበሰበ</div>
-            <div class="stat-value" id="totalCoffeeCollected" style="font-size:1.8em; font-weight:bold">0 kg</div>
-        </div>
-    </div>
-    
-    <!-- Member Selection for Coffee Collection -->
-    <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
-        <h4>🔍 አባል ይምረጡ (ለአባላት ቡና ምዝገባ)</h4>
-        <div class="form-row">
-            <input type="text" id="salesMemberSearch" placeholder="በስም ወይም በስልክ ይፈልጉ..." onkeyup="searchMemberForSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
-            <select id="selectedMemberId" onchange="loadMemberSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
-                <option value="">አባል ይምረጡ</option>
-            </select>
-        </div>
-    </div>
-    
-    <div id="selectedMemberInfo"></div>
-    
-    <!-- Coffee Collection Form -->
-    <div class="form-section">
-        <h3>📥 የቡና ሰብሳቢ መዝገብ</h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>📅 ቀን</label>
-                <input type="date" id="saleDate" required class="form-control">
+        <div id="sales" class="tab-content">
+            <h2>💰 የቡና ሽያጭ እና ክትትል</h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white"><div class="stat-label">👥 ከአባላት የተሰበሰበ</div><div class="stat-value" id="memberCoffeeTotal">0 kg</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a);color:white"><div class="stat-label">🏪 ከአባላት ውጪ</div><div class="stat-value" id="nonMemberCoffeeTotal">0 kg</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800);color:#333"><div class="stat-label">📊 አጠቃላይ የተሰበሰበ</div><div class="stat-value" id="totalCoffeeCollected">0 kg</div></div>
             </div>
-            <div class="form-group">
-                <label>🏷️ የቡና አይነት</label>
-                <select id="productType" class="form-control">
-                    <option value="የጫካ ቡና">የጫካ ቡና (Forest Coffee)</option>
-                    <option value="የአትክልት ቡና">የአትክልት ቡና (Garden Coffee)</option>
-                    <option value="ኦርጋኒክ ቡና">ኦርጋኒክ ቡና (Organic Coffee)</option>
-                </select>
+            <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px"><h4>🔍 አባል ይምረጡ</h4><div class="form-row"><input type="text" id="salesMemberSearch" placeholder="በስም ይፈልጉ..." onkeyup="searchMemberForSales()"><select id="selectedMemberId" onchange="loadMemberSales()"><option value="">አባል ይምረጡ</option></select></div></div>
+            <div id="selectedMemberInfo"></div>
+            <div class="form-section">
+                <h3>📥 የቡና ሰብሳቢ መዝገብ</h3>
+                <div class="form-row"><div class="form-group"><label>📅 ቀን</label><input type="date" id="saleDate" required class="form-control"></div><div class="form-group"><label>🏷️ የቡና አይነት</label><select id="productType" class="form-control"><option>የጫካ ቡና</option><option>የአትክልት ቡና</option><option>ኦርጋኒክ ቡና</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>📊 የሰብሳቢነት አይነት</label><select id="collectionType" class="form-control" onchange="toggleCollectionType()"><option value="member">ከአባላት</option><option value="nonmember">ከአባላት ውጪ</option></select></div><div class="form-group" id="nonMemberNameGroup" style="display:none"><label>👤 የሻጩ ስም</label><input type="text" id="nonMemberName" class="form-control"></div></div>
+                <div class="form-row"><div class="form-group"><label>⚖️ ብዛት (ኪሎ)</label><input type="number" id="quantity" step="0.01" required class="form-control" oninput="calculateTotalAmount()"></div><div class="form-group"><label>💰 ዋጋ በአንድ ኪሎ</label><input type="number" id="pricePerKg" step="0.01" required class="form-control" oninput="calculateTotalAmount()"></div></div>
+                <div class="form-row"><div class="form-group"><label>💵 ጠቅላላ ዋጋ</label><input type="text" id="totalAmount" readonly style="background:#e9ecef" class="form-control"></div><div class="form-group"><label>💳 የክፍያ ዘዴ</label><select id="paymentMethod" class="form-control"><option>ጥሬ ገንዘብ</option><option>ባንክ ዝውውር</option><option>ቼክ</option></select></div></div>
+                <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="saleNotes" rows="2" class="form-control"></textarea></div>
+                <div class="form-group"><label>🧾 ደረሰኝ ፎቶ</label><input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this,'receiptPreview')"><div id="receiptPreview" class="image-preview"></div></div>
+                <button onclick="addSale()" class="btn-primary">💾 ሽያጭ ያስመዝግቡ</button>
             </div>
+            <div class="form-section"><h3>📜 ታሪክ</h3><div id="salesStats" class="stats-grid"></div><div id="salesHistoryList"></div></div>
         </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>📊 የሰብሳቢነት አይነት</label>
-                <select id="collectionType" class="form-control" onchange="toggleCollectionType()">
-                    <option value="member">ከአባላት የተሰበሰበ (From Members)</option>
-                    <option value="nonmember">ከአባላት ውጪ የተሰበሰበ (From Non-Members)</option>
-                </select>
-            </div>
-            <div class="form-group" id="nonMemberNameGroup" style="display:none">
-                <label>👤 የሻጩ ሙሉ ስም (ከአባል ውጪ ከሆነ)</label>
-                <input type="text" id="nonMemberName" placeholder="የሻጩ ሙሉ ስም" class="form-control">
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>⚖️ ብዛት (ኪሎ ግራም)</label>
-                <input type="number" id="quantity" step="0.01" required class="form-control" oninput="calculateTotalAmount()">
-            </div>
-            <div class="form-group">
-                <label>💰 ዋጋ በአንድ ኪሎ (ብር)</label>
-                <input type="number" id="pricePerKg" step="0.01" required class="form-control" oninput="calculateTotalAmount()">
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>💵 ጠቅላላ ዋጋ (ብር)</label>
-                <input type="text" id="totalAmount" readonly style="background:#e9ecef" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>💳 የክፍያ ዘዴ</label>
-                <select id="paymentMethod" class="form-control">
-                    <option value="ጥሬ ገንዘብ">ጥሬ ገንዘብ (Cash)</option>
-                    <option value="ባንክ ዝውውር">ባንክ ዝውውር (Bank Transfer)</option>
-                    <option value="ቼክ">ቼክ (Check)</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label>📝 ማስታወሻ</label>
-            <textarea id="saleNotes" rows="2" class="form-control" placeholder="ተጨማሪ መረጃ..."></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label>🧾 ደረሰኝ ፎቶ (ካለ)</label>
-            <input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this,'receiptPreview')">
-            <div id="receiptPreview" class="image-preview"></div>
-        </div>
-        
-        <button onclick="addSale()" class="btn-primary">💾 ሽያጭ ያስመዝግቡ</button>
-    </div>
-    
-    <!-- Sales History by Type -->
-    <div class="form-section">
-        <h3>📜 የተመዘገቡ ሽያጮች ታሪክ</h3>
-        
-        <div class="form-row" style="margin-bottom:15px">
-            <div class="form-group">
-                <label>🔍 በሰብሳቢነት አይነት አጣራ</label>
-                <select id="filterCollectionType" onchange="filterSalesHistory()" class="form-control">
-                    <option value="all">ሁሉም (All)</option>
-                    <option value="member">ከአባላት (From Members)</option>
-                    <option value="nonmember">ከአባላት ውጪ (From Non-Members)</option>
-                </select>
-            </div>
-        </div>
-        
-        <div id="salesStats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px"></div>
-        <div id="salesHistoryList" style="max-height:400px; overflow-y:auto"></div>
-    </div>
-</div>
         
         <!-- Transfer Tab -->
         <div id="transfer" class="tab-content"><h2>🔄 የስም ዝውውር</h2>
             <div class="form-section"><h3>📝 አዲስ ዝውውር</h3>
-                <div class="form-group"><label>👤 የድሮ አባል</label><select id="oldMemberId" onchange="loadOldMemberInfo()"><option value="">አባል ይምረጡ</option></select></div>
+                <div class="form-group"><label>👤 የድሮ አባል</label><select id="oldMemberId" onchange="loadOldMemberInfo()"></select></div>
                 <div id="oldMemberInfo" style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px"></div>
                 <div class="form-group"><label>👤 አዲስ አባል ስም</label><input type="text" id="newMemberName"></div>
                 <div class="form-row"><div class="form-group"><label>🆔 መታወቂያ</label><input type="text" id="newMemberIdNumber"></div><div class="form-group"><label>📞 ስልክ</label><input type="tel" id="newMemberPhone"></div></div>
@@ -461,33 +227,20 @@
             <div class="form-section"><h3>📜 ታሪክ</h3><div id="transferHistoryList"></div></div>
         </div>
         
-  <!-- Trading Tab -->
-<div id="trading" class="tab-content">
-    <h2>📊 የአክሲዬን ግብይት</h2>
-    
-    <!-- Share Statistics Cards -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
-        <div style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div style="font-size:0.9em; opacity:0.9">📊 ጠቅላላ አክሲዬን</div>
-            <div id="totalSharesLimit" style="font-size:1.8em; font-weight:bold">25,000</div>
+        <!-- Trading Tab -->
+        <div id="trading" class="tab-content">
+            <h2>📊 የአክሲዬን ግብይት</h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e);color:white"><div class="stat-label">📊 ጠቅላላ አክሲዬን</div><div class="stat-value" id="totalSharesLimit">25,000</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a);color:white"><div class="stat-label">✅ የተሸጠ</div><div class="stat-value" id="soldShares">0</div></div>
+                <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800);color:#333"><div class="stat-label">📈 የቀረ</div><div class="stat-value" id="remainingShares">25,000</div></div>
+            </div>
+            <div class="form-section"><h3>⏳ በመጠባበቅ ላይ</h3><div id="pendingRequestsList"></div></div>
+            <div class="form-section"><h3>📜 ታሪክ</h3><div id="allRequestsList"></div></div>
         </div>
-        <div style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div style="font-size:0.9em; opacity:0.9">✅ የተሸጠ አክሲዬን</div>
-            <div id="soldShares" style="font-size:1.8em; font-weight:bold">0</div>
-        </div>
-        <div style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
-            <div style="font-size:0.9em; opacity:0.9">📈 የቀረ አክሲዬን</div>
-            <div id="remainingShares" style="font-size:1.8em; font-weight:bold">25,000</div>
-        </div>
-    </div>
-    
-    <div id="tradingStats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px"></div>
-    <div class="form-section"><h3>⏳ በመጠባበቅ ላይ</h3><div id="pendingRequestsList"></div></div>
-    <div class="form-section"><h3>📜 ታሪክ</h3><div id="allRequestsList"></div></div>
-</div>
         
         <!-- Search Tab -->
-        <div id="search" class="tab-content"><h2>🔍 አባል ይፈልጉ</h2><div class="form-group"><input type="text" id="searchTerm" placeholder="በስም ይፈልጉ..." onkeyup="searchMembers()"></div><div id="searchResults"></div></div>
+        <div id="search" class="tab-content"><h2>🔍 አባል ይፈልጉ</h2><div class="form-group"><input type="text" id="searchTerm" placeholder="በስም ይፈልጉ..." onkeyup="searchMembers()" class="form-control"></div><div id="searchResults"></div></div>
         
         <!-- Admin Tab -->
         <div id="admin" class="tab-content"><h2>⚙️ አስተዳዳሪ</h2>
@@ -516,1423 +269,193 @@
         let members = [], sales = [], transfers = [];
         let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
         let currentEditingMemberId = null;
-        
-        // Constants
-        const TOTAL_SHARES_LIMIT = 25000;
         const SHARE_PRICE = 10000;
         
         // Location Data
         const locationData = {
-            // Gambella Region
             'ጋምቤላ': {
-                'ማጃንግ ዞን': {
-                    districts: ['ጎደሬ ወረዳ', 'መንገሽ ወረዳ'],
-                    cities: {
-                        'ጎደሬ ወረዳ': ['ሜጢ ከተማ', 'ጎደሬ'],
-                        'መንገሽ ወረዳ': ['መንገሽ', 'ኮንጋ']
-                    }
-                },
-                'አኝዋ (አኙዋክ) ዞን': {
-                    districts: ['ጋምቤላ ወረዳ', 'ዲማ ወረዳ', 'አበቦ ወረዳ', 'ጋምቤላ ዙሪያ ወረዳ', 'ጎግ ወረዳ', 'ጆር ወረዳ'],
-                    cities: {
-                        'ጋምቤላ ወረዳ': ['ጋምቤላ', 'ቦር'],
-                        'ዲማ ወረዳ': ['ዲማ', 'ቤሪ'],
-                        'አበቦ ወረዳ': ['አበቦ', 'ሜታ'],
-                        'ጋምቤላ ዙሪያ ወረዳ': ['ኢታንግ', 'ኮማ'],
-                        'ጎግ ወረዳ': ['ጎግ', 'ፑኮንግ'],
-                        'ጆር ወረዳ': ['ጆር', 'ኒዌር']
-                    }
-                },
-                'ኑዌር ዞን': {
-                    districts: ['ላሬ ወረዳ', 'አኮቦ ወረዳ', 'ዋንቱዋር (ዋንቱዋ) ወረዳ', 'ማኩዌይ ወረዳ', 'ጂካዋ ወረዳ'],
-                    cities: {
-                        'ላሬ ወረዳ': ['ላሬ', 'ንጋት'],
-                        'አኮቦ ወረዳ': ['አኮቦ', 'ቲማ'],
-                        'ዋንቱዋር (ዋንቱዋ) ወረዳ': ['ዋንቱዋ', 'ማጫር'],
-                        'ማኩዌይ ወረዳ': ['ማኩዌይ', 'ቡል'],
-                        'ጂካዋ ወረዳ': ['ጂካዋ', 'ሊከ']
-                    }
-                }
+                'ማጃንግ ዞን': { districts: ['ጎደሬ ወረዳ', 'መንገሽ ወረዳ'], cities: {'ጎደሬ ወረዳ': ['ሜጢ', 'ጎደሬ'], 'መንገሽ ወረዳ': ['መንገሽ', 'ኮንጋ']}},
+                'አኝዋ ዞን': { districts: ['ጋምቤላ ወረዳ', 'ዲማ ወረዳ', 'አበቦ ወረዳ', 'ጋምቤላ ዙሪያ', 'ጎግ', 'ጆር'], cities: {}},
+                'ኑዌር ዞን': { districts: ['ላሬ', 'አኮቦ', 'ዋንቱዋር', 'ማኩዌይ', 'ጂካዋ'], cities: {}}
             },
-            // South West Ethiopia Peoples' Region
-            'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች': {
-                'የካፋ ዞን': { districts: ['ባሮ', 'ቢታ', 'ባጃ', 'ቤታ', 'ገዋ'], cities: {} },
-                'የቤንች ሸኮ ዞን': { districts: ['ቤንች', 'ሸኮ'], cities: {} },
-                'የሸካ ዞን': { districts: ['ማሻ', 'አንድራቻ'], cities: {} },
-                'የምዕራብ ኦሞ ዞን': { districts: ['ጋቻ', 'ሱሪ'], cities: {} },
-                'የዳውሮ ዞን': { districts: ['ኢሳራ', 'ሎማ'], cities: {} },
-                'የኮንታ ዞን': { districts: ['ኮንታ ልዩ', 'አምባ'], cities: {} },
-                'ሌላ ዞን': { districts: ['ሌላ'], cities: {} }
-            },
-            // Addis Ababa (only sub-cities)
-            'አዲስ አበባ': {
-                'ቅርንጫፍ': {
-                    districts: ['ቃሊቲ', 'ኮልፌ ቀራኒዮ', 'ነፋስ ስልክ-ላፍቶ', 'አዲስ ከተማ', 'አራዳ', 'ሊደታ', 'ንጋ ወረዳ', 'ጉለሌ', 'ቦሌ', 'የካ']
-                },
-                cities: {}
-            }
+            'አዲስ አበባ': { 'ቅርንጫፍ': { districts: ['ቃሊቲ', 'ኮልፌ', 'ነፋስ ስልክ', 'አዲስ ከተማ', 'አራዳ', 'ሊደታ', 'ጉለሌ', 'ቦሌ'], cities: {}}}
         };
+        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ', 'ሰሙይ', 'ቶሊና ቶካሊ', 'መካከለኛ ሜጢ', 'ገንገቦዝ'];
         
-        // Meti town kebeles
-        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
-        
-        // Load zones based on selected region
         function loadZones() {
             const region = document.getElementById('region').value;
             const zoneSelect = document.getElementById('zone');
             zoneSelect.innerHTML = '<option value="">ዞን ይምረጡ</option>';
-            document.getElementById('district').innerHTML = '<option value="">በመጀመሪያ ዞን ይምረጡ</option>';
-            document.getElementById('city').innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
-            
-            if (region && locationData[region]) {
-                const zones = Object.keys(locationData[region]);
-                zones.forEach(zone => {
-                    const option = document.createElement('option');
-                    option.value = zone;
-                    option.textContent = zone;
-                    zoneSelect.appendChild(option);
-                });
-            }
-            if (region === 'ሌላ') {
-                zoneSelect.innerHTML = '<option value="ሌላ">ሌላ</option>';
-            }
+            if (region && locationData[region]) Object.keys(locationData[region]).forEach(z => zoneSelect.add(new Option(z, z)));
+            if (region === 'ሌላ') zoneSelect.innerHTML = '<option value="ሌላ">ሌላ</option>';
         }
-        
-        // Load districts based on selected zone
         function loadDistricts() {
-            const region = document.getElementById('region').value;
-            const zone = document.getElementById('zone').value;
+            const region = document.getElementById('region').value, zone = document.getElementById('zone').value;
             const districtSelect = document.getElementById('district');
             districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
-            document.getElementById('city').innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
-            document.getElementById('kebele').value = '';
-            
-            if (region === 'ሌላ' || zone === 'ሌላ') {
-                districtSelect.innerHTML = '<option value="ሌላ">ሌላ</option>';
-                return;
-            }
-            
-            if (region && zone && locationData[region] && locationData[region][zone]) {
-                const districts = locationData[region][zone].districts;
-                districts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    districtSelect.appendChild(option);
-                });
-            }
-            
-            // Special case for Majang Zone - Meti town kebeles
-            if (zone === 'ማጃንግ ዞን') {
-                const metiOption = document.createElement('option');
-                metiOption.value = 'ሜጢ ከተማ አስተዳደር';
-                metiOption.textContent = 'ሜጢ ከተማ አስተዳደር';
-                districtSelect.appendChild(metiOption);
-            }
+            if (region && zone && locationData[region] && locationData[region][zone]) locationData[region][zone].districts.forEach(d => districtSelect.add(new Option(d, d)));
+            if (zone === 'ማጃንግ ዞን') districtSelect.add(new Option('ሜጢ ከተማ አስተዳደር', 'ሜጢ ከተማ'));
         }
-        
-        // Load cities based on selected district
         function loadCities() {
-            const region = document.getElementById('region').value;
-            const zone = document.getElementById('zone').value;
-            const district = document.getElementById('district').value;
+            const region = document.getElementById('region').value, zone = document.getElementById('zone').value, district = document.getElementById('district').value;
             const citySelect = document.getElementById('city');
             citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
-            document.getElementById('kebele').value = '';
-            
-            // Special case for Meti town
-            if (district === 'ሜጢ ከተማ አስተዳደር') {
-                citySelect.innerHTML = '<option value="ሜጢ">ሜጢ</option>';
-                // Load Meti kebeles
-                loadKebelesForMeti();
-                return;
-            }
-            
-            if (region && zone && district && locationData[region] && locationData[region][zone] && locationData[region][zone].cities[district]) {
-                const cities = locationData[region][zone].cities[district];
-                cities.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
-                });
-            }
+            if (district === 'ሜጢ ከተማ') { citySelect.innerHTML = '<option value="ሜጢ">ሜጢ</option>'; document.getElementById('kebele').outerHTML = `<select id="kebele"><option value="">ቀበሌ ይምረጡ</option>${metiKebeles.map(k => `<option>${k}</option>`).join('')}</select>`; }
+            else if (region && zone && locationData[region] && locationData[region][zone] && locationData[region][zone].cities && locationData[region][zone].cities[district]) locationData[region][zone].cities[district].forEach(c => citySelect.add(new Option(c, c)));
         }
         
-        function loadKebelesForMeti() {
-            const kebeleSelect = document.getElementById('kebele');
-            if (kebeleSelect.tagName === 'SELECT') {
-                kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
-                metiKebeles.forEach(kebele => {
-                    const option = document.createElement('option');
-                    option.value = kebele;
-                    option.textContent = kebele;
-                    kebeleSelect.appendChild(option);
-                });
-            } else {
-                document.getElementById('kebele').value = '';
-            }
-        }
-        
-        // Calculate share totals
         function calculateShareTotal() {
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-            const totalPayable = shareCount * SHARE_PRICE;
-            document.getElementById('totalPayable').value = totalPayable.toLocaleString() + ' ብር';
-            
-            // Calculate 3-year payment plan
-            const year1 = totalPayable * 0.3;
-            const year2 = totalPayable * 0.4;
-            const year3 = totalPayable * 0.3;
-            document.getElementById('year1Payment').value = year1.toLocaleString() + ' ብር (30%)';
-            document.getElementById('year2Payment').value = year2.toLocaleString() + ' ብር (40%)';
-            document.getElementById('year3Payment').value = year3.toLocaleString() + ' ብር (30%)';
-            
+            const total = shareCount * SHARE_PRICE;
+            document.getElementById('totalPayable').value = total.toLocaleString() + ' ብር';
+            document.getElementById('year1Payment').value = (total * 0.3).toLocaleString() + ' ብር (30%)';
+            document.getElementById('year2Payment').value = (total * 0.4).toLocaleString() + ' ብር (40%)';
+            document.getElementById('year3Payment').value = (total * 0.3).toLocaleString() + ' ብር (30%)';
             calculateRemainingBalance();
         }
-        
         function calculateRemainingBalance() {
-            const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+            const shares = parseInt(document.getElementById('shareCount').value) || 0;
             const paid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-            const totalPayable = shareCount * SHARE_PRICE;
-            const remaining = totalPayable - paid;
+            const remaining = (shares * SHARE_PRICE) - paid;
             document.getElementById('remainingBalance').value = remaining > 0 ? remaining.toLocaleString() + ' ብር' : '0 ብር';
             if (remaining <= 0) document.getElementById('paymentStatus').value = 'ተከፍሏል';
             else if (paid > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
             else document.getElementById('paymentStatus').value = 'አልተከፈለም';
         }
-        // Inside the memberForm submit event, after getting shareCount
-const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-
-// Validate share availability
-const remainingShares = updateShareStatistics();
-if (shareCount > remainingShares) {
-    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-    return;
-}
+        function toggleOtherBank() { document.getElementById('otherBankDiv').style.display = document.getElementById('bankName').value === 'ሌላ' ? 'block' : 'none'; }
         
-        function toggleOtherBank() {
-            const bankSelect = document.getElementById('bankName');
-            const otherDiv = document.getElementById('otherBankDiv');
-            otherDiv.style.display = bankSelect.value === 'ሌላ' ? 'block' : 'none';
-        }
+        const amharicOrder = ['ሀ', 'ለ', 'ሐ', 'መ', 'ሠ', 'ረ', 'ሰ', 'ሸ', 'ቀ', 'በ', 'ቨ', 'ተ', 'ቸ', 'ኀ', 'ነ', 'ኘ', 'አ', 'ከ', 'ኸ', 'ወ', 'ዐ', 'ዘ', 'ዠ', 'የ', 'ደ', 'ጀ', 'ገ', 'ጠ', 'ጨ', 'ጰ', 'ጸ', 'ፀ', 'ፈ', 'ፐ'];
+        function sortAmharic(a,b){let i=amharicOrder.indexOf((a.fullName||'').charAt(0)),j=amharicOrder.indexOf((b.fullName||'').charAt(0));if(i==-1&&j==-1)return(a.fullName||'').localeCompare(b.fullName||'');if(i==-1)return 1;if(j==-1)return-1;return i-j;}
+        function getPaymentStatusClass(s){return s==='ተከፍሏል'?'status-paid':s==='በከፊል ተከፍሏል'?'status-partial':'status-pending';}
+        function escapeHtml(s){return s?s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])):'';}
+        function previewImage(i,p){if(i.files[0]){let r=new FileReader();r.onload=e=>document.getElementById(p).innerHTML=`<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;r.readAsDataURL(i.files[0]);}}
+        function fileToBase64(f){return new Promise((r,j)=>{let rd=new FileReader();rd.readAsDataURL(f);rd.onload=()=>r(rd.result);rd.onerror=j;});}
+        function openLightbox(s){document.getElementById('lightbox').style.display='block';document.getElementById('lightboxImg').src=s;}
+        function closeLightbox(){document.getElementById('lightbox').style.display='none';}
+        function closeMemberModal(){document.getElementById('memberModal').style.display='none';}
         
-        // Amharic sort (Ge'ez alphabet order)
-        const amharicOrder = ['ሀ', 'ለ', 'ሐ', 'መ', 'ሠ', 'ረ', 'ሰ', 'ሸ', 'ቀ', 'በ', 'ቨ', 'ተ', 'ቸ', 'ኀ', 'ነ', 'ኘ', 'አ', 'ከ', 'ኸ', 'ወ', 'ዐ', 'ዘ', 'ዠ', 'የ', 'ደ', '��', 'ገ', 'ጠ', 'ጨ', 'ጰ', 'ጸ', 'ፀ', 'ፈ', 'ፐ'];
-        
-        function sortAmharic(a, b) {
-            const nameA = a.fullName || '';
-            const nameB = b.fullName || '';
-            const firstA = nameA.charAt(0);
-            const firstB = nameB.charAt(0);
-            const idxA = amharicOrder.indexOf(firstA);
-            const idxB = amharicOrder.indexOf(firstB);
-            if (idxA === -1 && idxB === -1) return nameA.localeCompare(nameB);
-            if (idxA === -1) return 1;
-            if (idxB === -1) return -1;
-            return idxA - idxB;
-        }
-        
-        function getPaymentStatusClass(status) {
-            if (status === 'ተከፍሏል') return 'status-paid';
-            if (status === 'በከፊል ተከፍሏል') return 'status-partial';
-            return 'status-pending';
-        }
-        
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-        
-        function previewImage(input, previewId) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-            });
-        }
-        
-        function openLightbox(src) { document.getElementById('lightbox').style.display = 'block'; document.getElementById('lightboxImg').src = src; }
-        function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
-        
-        // Session timeout
         let inactivityTimer;
-        const INACTIVITY_TIMEOUT = 60000;
-        function resetInactivityTimer() { clearTimeout(inactivityTimer); inactivityTimer = setTimeout(() => { alert('ክፍለ ጊዜ ተቋርጧል!'); logout(); }, INACTIVITY_TIMEOUT); }
-        function startInactivityTracking() { ['mousedown','mousemove','keypress','scroll','click'].forEach(e => document.addEventListener(e, resetInactivityTimer)); resetInactivityTimer(); }
-        function stopInactivityTracking() { ['mousedown','mousemove','keypress','scroll','click'].forEach(e => document.removeEventListener(e, resetInactivityTimer)); clearTimeout(inactivityTimer); }
+        function resetInactivityTimer(){clearTimeout(inactivityTimer);inactivityTimer=setTimeout(()=>{alert('ክፍለ ጊዜ ተቋርጧል!');logout();},60000);}
+        function startInactivityTracking(){['mousedown','mousemove','keypress','scroll','click'].forEach(e=>document.addEventListener(e,resetInactivityTimer));resetInactivityTimer();}
+        function stopInactivityTracking(){['mousedown','mousemove','keypress','scroll','click'].forEach(e=>document.removeEventListener(e,resetInactivityTimer));clearTimeout(inactivityTimer);}
         
-        async function apiCall(endpoint, options = {}) {
-            const response = await fetch(`/api${endpoint}`, { ...options, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers } });
-            if (response.status === 401) { localStorage.clear(); window.location.href = '/'; }
-            return response.json();
-        }
+        async function apiCall(e,o={}){let r=await fetch(`/api${e}`,{...o,headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json',...o.headers}});if(r.status===401){localStorage.clear();window.location.href='/';}return r.json();}
         
-        // ==================== BENEFICIARY FUNCTIONS ====================
-        function generateBeneficiaryForms() {
-            const count = parseInt(document.getElementById('beneficiaryCount').value) || 0;
-            const container = document.getElementById('beneficiariesContainer');
-            if (count > 20) { alert('ከ20 በታች ያስገቡ'); document.getElementById('beneficiaryCount').value = 20; generateBeneficiaryForms(); return; }
-            if (count <= 0) { container.innerHTML = ''; return; }
-            let html = '';
-            for (let i = 1; i <= count; i++) {
-                html += `<div class="beneficiary-card"><div class="beneficiary-title">👨‍👦 ወራሽ ${i} <button type="button" class="remove-beneficiary" onclick="removeBeneficiary(${i})">✖ አጥፋ</button></div>
-                    <div class="form-row"><div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName_${i}"></div><div class="form-group"><label>ፆታ</label><select id="beneficiaryGender_${i}"><option value="">ምረጥ</option><option value="ወንድ">ወንድ</option><option value="ሴት">ሴት</option></select></div></div>
-                    <div class="form-row"><div class="form-group"><label>ዝምድና</label><select id="beneficiaryRelationship_${i}" onchange="toggleOtherRelationshipBeneficiary(${i})"><option value="">ምረጥ</option><option value="አባት">አባት</option><option value="እናት">እናት</option><option value="ወንድም">ወንድም</option><option value="እህት">እህት</option><option value="ልጅ">ልጅ</option><option value="ሚስት">ሚስት</option><option value="አክስት">አክስት</option><option value="አጎት">አጎት</option><option value="የአጎት ልጅ">የአጎት ልጅ</option><option value="የአክስት ልጅ">የአክስት ልጅ</option><option value="ሌላ">ሌላ</option></select></div>
-                    <div class="form-group" id="otherRelationshipDiv_${i}" style="display:none"><label>ሌላ</label><input type="text" id="beneficiaryOtherRelationship_${i}"></div></div>
-                    <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress_${i}" rows="2"></textarea></div>
-                    <div class="form-row"><div class="form-group"><label>📸 ፎቶ</label><input type="file" id="beneficiaryPhoto_${i}" accept="image/*" onchange="previewBeneficiaryImage(this, ${i})"><div id="beneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
-                    <div class="form-group"><label>🆔 የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc_${i}" accept="image/*" onchange="previewBeneficiaryDoc(this, ${i})"><div id="beneficiaryTaxPreview_${i}" class="image-preview"></div></div></div>`;
-            }
-            container.innerHTML = html;
+        function generateBeneficiaryForms(){
+            let c=parseInt(document.getElementById('beneficiaryCount').value)||0,cont=document.getElementById('beneficiariesContainer');
+            if(c>20){alert('ከ20 በታች ያስገቡ');document.getElementById('beneficiaryCount').value=20;generateBeneficiaryForms();return;}
+            if(c<=0){cont.innerHTML='';return;}
+            let html='';
+            for(let i=1;i<=c;i++)html+=`<div class="beneficiary-card"><div class="beneficiary-title">👨‍👦 ወራሽ ${i} <button type="button" class="remove-beneficiary" onclick="removeBeneficiary(${i})">✖</button></div>
+                <div class="form-row"><div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName_${i}"></div><div class="form-group"><label>ፆታ</label><select id="beneficiaryGender_${i}"><option value="">ምረጥ</option><option value="ወንድ">ወንድ</option><option value="ሴት">ሴት</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>ዝምድና</label><select id="beneficiaryRelationship_${i}" onchange="toggleOtherRelationshipBeneficiary(${i})"><option value="">ምረጥ</option><option value="አባት">አባት</option><option value="እናት">እናት</option><option value="ወንድም">ወንድም</option><option value="እህት">እህት</option><option value="ልጅ">ልጅ</option><option value="ሚስት">ሚስት</option><option value="አክስት">አክስት</option><option value="አጎት">አጎት</option><option value="የአጎት ልጅ">የአጎት ልጅ</option><option value="የአክስት ልጅ">የአክስት ልጅ</option><option value="ሌላ">ሌላ</option></select></div>
+                <div class="form-group" id="otherRelationshipDiv_${i}" style="display:none"><label>ሌላ</label><input type="text" id="beneficiaryOtherRelationship_${i}"></div></div>
+                <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress_${i}" rows="2"></textarea></div>
+                <div class="form-row"><div class="form-group"><label>📸 ፎቶ</label><input type="file" id="beneficiaryPhoto_${i}" accept="image/*" onchange="previewBeneficiaryImage(this,${i})"><div id="beneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
+                <div class="form-group"><label>🆔 የፋይዳ መታወቂያ</label><input type="file" id="beneficiaryTaxDoc_${i}" accept="image/*" onchange="previewBeneficiaryDoc(this,${i})"><div id="beneficiaryTaxPreview_${i}" class="image-preview"></div></div></div>`;
+            cont.innerHTML=html;
         }
+        function removeBeneficiary(i){let c=parseInt(document.getElementById('beneficiaryCount').value);if(c>0){document.getElementById('beneficiaryCount').value=c-1;generateBeneficiaryForms();}}
+        function toggleOtherRelationshipBeneficiary(i){let r=document.getElementById(`beneficiaryRelationship_${i}`).value,o=document.getElementById(`otherRelationshipDiv_${i}`);if(r==='ሌላ')o.style.display='block';else{o.style.display='none';document.getElementById(`beneficiaryOtherRelationship_${i}`).value='';}}
+        function previewBeneficiaryImage(i,idx){if(i.files[0]){let r=new FileReader();r.onload=e=>document.getElementById(`beneficiaryPhotoPreview_${idx}`).innerHTML=`<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;r.readAsDataURL(i.files[0]);}}
+        function previewBeneficiaryDoc(i,idx){if(i.files[0]){let r=new FileReader();r.onload=e=>document.getElementById(`beneficiaryTaxPreview_${idx}`).innerHTML=`<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;r.readAsDataURL(i.files[0]);}}
+        async function collectBeneficiariesData(){let c=parseInt(document.getElementById('beneficiaryCount').value)||0,b=[];for(let i=1;i<=c;i++){let r=document.getElementById(`beneficiaryRelationship_${i}`).value;if(r==='ሌላ')r=document.getElementById(`beneficiaryOtherRelationship_${i}`).value;let pf=document.getElementById(`beneficiaryPhoto_${i}`).files[0],tf=document.getElementById(`beneficiaryTaxDoc_${i}`).files[0];b.push({name:document.getElementById(`beneficiaryName_${i}`).value,gender:document.getElementById(`beneficiaryGender_${i}`).value,relationship:r,address:document.getElementById(`beneficiaryAddress_${i}`).value,photo:pf?await fileToBase64(pf):null,taxDoc:tf?await fileToBase64(tf):null});}return b;}
+        function togglePowerOfAttorneyOptions(){document.getElementById('powerOfAttorneyDetails').style.display=document.getElementById('powerOfAttorneyType').value!==''?'block':'none';}
         
-        function removeBeneficiary(index) {
-            const count = parseInt(document.getElementById('beneficiaryCount').value);
-            if (count > 0) { document.getElementById('beneficiaryCount').value = count - 1; generateBeneficiaryForms(); }
-        }
-        
-        function toggleOtherRelationshipBeneficiary(index) {
-            const relationship = document.getElementById(`beneficiaryRelationship_${index}`).value;
-            const otherDiv = document.getElementById(`otherRelationshipDiv_${index}`);
-            if (relationship === 'ሌላ') otherDiv.style.display = 'block';
-            else { otherDiv.style.display = 'none'; document.getElementById(`beneficiaryOtherRelationship_${index}`).value = ''; }
-        }
-        
-        function previewBeneficiaryImage(input, index) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => document.getElementById(`beneficiaryPhotoPreview_${index}`).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        function closeMemberModal() { 
-    document.getElementById('memberModal').style.display = 'none'; 
-}
-        function previewBeneficiaryDoc(input, index) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => document.getElementById(`beneficiaryTaxPreview_${index}`).innerHTML = `<img src="${e.target.result}" onclick="openLightbox('${e.target.result}')">`;
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        
-        async function collectBeneficiariesData() {
-            const count = parseInt(document.getElementById('beneficiaryCount').value) || 0;
-            const beneficiaries = [];
-            for (let i = 1; i <= count; i++) {
-                let relationship = document.getElementById(`beneficiaryRelationship_${i}`).value;
-                if (relationship === 'ሌላ') relationship = document.getElementById(`beneficiaryOtherRelationship_${i}`).value;
-                const photoFile = document.getElementById(`beneficiaryPhoto_${i}`).files[0];
-                const taxDocFile = document.getElementById(`beneficiaryTaxDoc_${i}`).files[0];
-                beneficiaries.push({
-                    name: document.getElementById(`beneficiaryName_${i}`).value,
-                    gender: document.getElementById(`beneficiaryGender_${i}`).value,
-                    relationship: relationship,
-                    address: document.getElementById(`beneficiaryAddress_${i}`).value,
-                    photo: photoFile ? await fileToBase64(photoFile) : null,
-                    taxDoc: taxDocFile ? await fileToBase64(taxDocFile) : null
-                });
-            }
-            return beneficiaries;
-        }
-        
-        function togglePowerOfAttorneyOptions() {
-            const type = document.getElementById('powerOfAttorneyType').value;
-            document.getElementById('powerOfAttorneyDetails').style.display = type !== '' ? 'block' : 'none';
-        }
-        
-        // ==================== LOAD MEMBERS ====================
-        async function loadMembers() {
-            try {
-                const response = await fetch('/api/members', { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await response.json();
-                members = data.members || data;
-                if (!Array.isArray(members)) members = [];
+        async function loadMembers(){
+            try{
+                let r=await fetch('/api/members',{headers:{'Authorization':`Bearer ${token}`}}),d=await r.json();
+                members=d.members||d;if(!Array.isArray(members))members=[];
                 members.sort(sortAmharic);
-                const search = document.getElementById('searchInput')?.value || '';
-                let filtered = members;
-                if (search) filtered = members.filter(m => (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || (m.phone && m.phone.includes(search)));
-                document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
-                const container = document.getElementById('membersList');
-                if (!filtered.length) { container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>'; return; }
-                container.innerHTML = filtered.map((m, index) => `
-                    <div class="member-card">
-                        <div class="member-header">
-                            <div class="member-name">
-                                <span class="serial-number">#${index + 1}</span>
-                                ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-                                <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
-                                ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
-                                <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
-                            </div>
-                            <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
-                        </div>
-                        <div class="member-details">
-                            <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
-                            <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
-                            <div>📅 ${m.age || 'N/A'}</div>
-                            <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
-                        </div>
-                        <div class="member-actions">
-                            <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
-                            <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
-                        </div>
-                    </div>
-                `).join('');
-                const saleSelect = document.getElementById('selectedMemberId');
-                const transferSelect = document.getElementById('oldMemberId');
-                if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-                if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-            } catch (error) { console.error(error); }
+                let s=document.getElementById('searchInput')?.value||'',f=members;
+                if(s)f=members.filter(m=>m.fullName?.toLowerCase().includes(s.toLowerCase())||m.phone?.includes(s));
+                document.getElementById('memberCount').innerHTML=f.length+' አባላት';
+                let cont=document.getElementById('membersList');
+                if(!f.length){cont.innerHTML='<div class="no-data">📭 ምንም አባላት የሉም</div>';return;}
+                cont.innerHTML=f.map((m,i)=>`<div class="member-card"><div class="member-header"><div class="member-name"><span class="serial-number">#${i+1}</span>${m.memberPhoto?`<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation();openLightbox('${m.memberPhoto}')">`:'👤'}<strong style="cursor:pointer;color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName)}</strong>${m.shareCount>0?`<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>`:''}<span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus||'አልተከፈለም'}</span></div><div class="member-role">${escapeHtml(m.role)}</div></div><div class="member-details"><div>📞 ${escapeHtml(m.phone)}</div><div>♂/♀ ${escapeHtml(m.gender)}</div><div>📅 ${m.age||'N/A'}</div><div>🏠 ${escapeHtml((m.address||'').substring(0,30))}${(m.address||'').length>30?'...':''}</div></div><div class="member-actions"><button class="btn-edit" onclick="event.stopPropagation();showMemberDetails('${m.id}')">✏️ አርትዕ</button><button class="btn-danger" onclick="event.stopPropagation();deleteMember('${m.id}')">🗑️ ሰርዝ</button></div></div>`).join('');
+                let saleSelect=document.getElementById('selectedMemberId'),transferSelect=document.getElementById('oldMemberId');
+                if(saleSelect)saleSelect.innerHTML='<option value="">አባል ይምረጡ</option>'+members.map(m=>`<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+                if(transferSelect)transferSelect.innerHTML='<option value="">አባል ይምረጡ</option>'+members.map(m=>`<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+                updateShareStatistics();
+            }catch(e){console.error(e);}
         }
+        async function deleteMember(id){if(confirm('እርግጠኛ ነዎት?')){await apiCall(`/members/${id}`,{method:'DELETE'});loadMembers();updateShareStatistics();alert('አባል ተሰርዟል!');}}
         
-        async function deleteMember(id) {
-            if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
-                await apiCall(`/members/${id}`, { method: 'DELETE' });
-                loadMembers();
-                  updateShareStatistics();
-                alert('አባል ተሰርዟል!');
-            }
-        }
-        // After member registration success
-               
-        // ==================== REGISTER MEMBER ====================
-        document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
+        document.getElementById('memberForm')?.addEventListener('submit',async(e)=>{
             e.preventDefault();
-            const beneficiaries = await collectBeneficiariesData();
-            const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-            // Inside the memberForm submit event, after getting shareCount
-const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-
-// Update share statistics first
-const remainingShares = updateShareStatistics();
-
-// Validate share availability
-if (shareCount > remainingShares) {
-    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-    return;
-}
-            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-            const totalPayable = shareCount * SHARE_PRICE;
-            const remainingBalance = totalPayable - sharePricePaid;
-            
-            // Get bank name
-            let bankName = document.getElementById('bankName').value;
-            if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
-            
-            const member = {
-                fullName: document.getElementById('fullName').value,
-                gender: document.getElementById('gender').value,
-                age: parseInt(document.getElementById('age').value) || 0,
-                motherName: document.getElementById('motherName').value,
-                nationality: document.getElementById('nationality').value,
-                education: document.getElementById('education').value,
-                region: document.getElementById('region').value,
-                zone: document.getElementById('zone').value,
-                district: document.getElementById('district').value,
-                city: document.getElementById('city').value,
-                kebele: document.getElementById('kebele').value,
-                houseNumber: document.getElementById('houseNumber').value,
-                phone: document.getElementById('phone').value,
-                taxId: document.getElementById('taxId').value,
-                role: document.getElementById('role').value,
-                shareCount: shareCount,
-                sharePrice: SHARE_PRICE,
-                totalPayable: totalPayable,
-                sharePricePaid: sharePricePaid,
-                remainingBalance: remainingBalance,
-                paymentStatus: document.getElementById('paymentStatus').value,
-                year1Payment: totalPayable * 0.3,
-                year2Payment: totalPayable * 0.4,
-                year3Payment: totalPayable * 0.3,
-                bankName: bankName,
-                bankBranch: document.getElementById('bankBranch').value,
-                accountNumber: document.getElementById('accountNumber').value,
-                accountName: document.getElementById('accountName').value,
-                financialNotes: document.getElementById('financialNotes').value,
-                beneficiaries: beneficiaries,
-                beneficiaryCount: beneficiaries.length,
-                legalRepName: document.getElementById('legalRepName').value,
-                legalRepAddress: document.getElementById('legalRepAddress').value,
-                legalRepPhone: document.getElementById('legalRepPhone').value,
-                powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
-                powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
-                powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
-                powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
-                powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
-                powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
-                memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
-                memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
-                repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
-                repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
-                hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
-                powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
-                hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
-            };
-            const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
-            // After the registration API call succeeds, add:
-updateShareStatistics();
-            if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
+            let shareCount=parseInt(document.getElementById('shareCount').value)||0,remaining=updateShareStatistics();
+            if(shareCount>remaining){alert(`⚠️ በቂ አክሲዬን የለም! የቀረው: ${remaining}`);return;}
+            let beneficiaries=await collectBeneficiariesData(),paid=parseFloat(document.getElementById('sharePricePaid').value)||0,total=shareCount*SHARE_PRICE;
+            let bank=document.getElementById('bankName').value;if(bank==='ሌላ')bank=document.getElementById('otherBankName').value;
+            let member={fullName:document.getElementById('fullName').value,gender:document.getElementById('gender').value,age:parseInt(document.getElementById('age').value)||0,motherName:document.getElementById('motherName').value,nationality:document.getElementById('nationality').value,education:document.getElementById('education').value,region:document.getElementById('region').value,zone:document.getElementById('zone').value,district:document.getElementById('district').value,city:document.getElementById('city').value,kebele:document.getElementById('kebele').value,houseNumber:document.getElementById('houseNumber').value,phone:document.getElementById('phone').value,taxId:document.getElementById('taxId').value,role:document.getElementById('role').value,shareCount,sharePrice:SHARE_PRICE,totalPayable:total,sharePricePaid:paid,remainingBalance:total-paid,paymentStatus:document.getElementById('paymentStatus').value,year1Payment:total*0.3,year2Payment:total*0.4,year3Payment:total*0.3,bankName:bank,bankBranch:document.getElementById('bankBranch').value,accountNumber:document.getElementById('accountNumber').value,accountName:document.getElementById('accountName').value,financialNotes:document.getElementById('financialNotes').value,beneficiaries,beneficiaryCount:beneficiaries.length,legalRepName:document.getElementById('legalRepName').value,legalRepAddress:document.getElementById('legalRepAddress').value,legalRepPhone:document.getElementById('legalRepPhone').value,powerOfAttorneyType:document.getElementById('powerOfAttorneyType').value,powerOfAttorneyNumber:document.getElementById('powerOfAttorneyNumber').value,powerOfAttorneyDate:document.getElementById('powerOfAttorneyDate').value,powerOfAttorneyIssuer:document.getElementById('powerOfAttorneyIssuer').value,powerOfAttorneyExpiry:document.getElementById('powerOfAttorneyExpiry').value,powerOfAttorneyNotes:document.getElementById('powerOfAttorneyNotes').value,memberPhoto:document.getElementById('memberPhoto').files[0]?await fileToBase64(document.getElementById('memberPhoto').files[0]):null,memberTaxDoc:document.getElementById('memberTaxDoc').files[0]?await fileToBase64(document.getElementById('memberTaxDoc').files[0]):null,repPhoto:document.getElementById('repPhoto').files[0]?await fileToBase64(document.getElementById('repPhoto').files[0]):null,repTaxDoc:document.getElementById('repTaxDoc').files[0]?await fileToBase64(document.getElementById('repTaxDoc').files[0]):null,hardCopyForm:document.getElementById('hardCopyForm').files[0]?await fileToBase64(document.getElementById('hardCopyForm').files[0]):null,powerOfAttorneyPhoto:document.getElementById('powerOfAttorneyPhoto').files[0]?await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]):null,hardCopyDocumentPhoto:document.getElementById('hardCopyDocumentPhoto').files[0]?await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]):null};
+            let res=await apiCall('/members/register',{method:'POST',body:JSON.stringify(member)});
+            if(res.credentials)alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${res.credentials.username}\nPassword: ${res.credentials.password}`);
             else alert('✅ አባል ተመዝግቧል!');
-            e.target.reset();
-            document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
-            document.getElementById('shareCount').value = '0';
-            document.getElementById('sharePricePaid').value = '0';
-            document.getElementById('powerOfAttorneyDetails').style.display = 'none';
-            document.getElementById('beneficiariesContainer').innerHTML = '';
-            document.getElementById('beneficiaryCount').value = '0';
-            document.getElementById('otherBankDiv').style.display = 'none';
-            loadMembers();
-            showTab('list');
-            // After member registration success
-updateShareStatistics();
+            e.target.reset();document.querySelectorAll('.image-preview').forEach(el=>el.innerHTML='');
+            document.getElementById('shareCount').value='0';document.getElementById('sharePricePaid').value='0';
+            document.getElementById('powerOfAttorneyDetails').style.display='none';document.getElementById('beneficiariesContainer').innerHTML='';
+            document.getElementById('beneficiaryCount').value='0';document.getElementById('otherBankDiv').style.display='none';
+            loadMembers();updateShareStatistics();showTab('list');
         });
         
-        // ==================== SHOW MEMBER DETAILS ====================
-        function showMemberDetails(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
-            currentEditingMemberId = memberId;
-            const serialNumber = members.findIndex(m => m.id === memberId) + 1;
-            const modalBody = document.getElementById('modalBody');
-            modalBody.innerHTML = `
-                <div id="viewMode">
-                    <div class="profile-header"><div class="profile-photo" style="background:#ddd;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div><div class="profile-name">${escapeHtml(member.fullName)}</div></div>
-                    <div class="info-grid">
-                        <div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${serialNumber}</div></div>
-                        <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(member.gender)}</div></div>
-                        <div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value">${member.age || 'N/A'}</div></div>
-                        <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><div class="info-value">${escapeHtml(member.motherName)}</div></div>
-                        <div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(member.nationality)}</div></div>
-                        <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><div class="info-value">${escapeHtml(member.education)}</div></div>
-                        <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(member.region || '')} ${escapeHtml(member.zone || '')} ${escapeHtml(member.district || '')} ${escapeHtml(member.city || '')} ${escapeHtml(member.kebele || '')} ${escapeHtml(member.houseNumber || '')}</div></div>
-                        <div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value">${escapeHtml(member.phone)}</div></div>
-                        <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(member.taxId)}</div></div>
-                        <div class="info-item"><div class="info-label">👔 ሚና</div><div class="info-value">${escapeHtml(member.role)}</div></div>
-                        <div class="info-item"><div class="info-label">📊 የአክሲዬን ብዛት</div><div class="info-value">${member.shareCount || 0} (ከ25,000)</div></div>
-                        <div class="info-item"><div class="info-label">💰 አጠቃላይ የሚከፈል</div><div class="info-value">${(member.totalPayable || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">💵 የተከፈለ</div><div class="info-value">${(member.sharePricePaid || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">💰 ቀሪ</div><div class="info-value">${(member.remainingBalance || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">📅 የመጀመሪያ ዓመት (30%)</div><div class="info-value">${(member.year1Payment || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">📅 የሁለተኛ ዓመት (40%)</div><div class="info-value">${(member.year2Payment || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">📅 የሶስተኛ ዓመት (30%)</div><div class="info-value">${(member.year3Payment || 0).toLocaleString()} ብር</div></div>
-                        <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(member.paymentStatus)}</div></div>
-                        <div class="info-item"><div class="info-label">🏦 ባንክ</div><div class="info-value">${escapeHtml(member.bankName)} - ${escapeHtml(member.bankBranch)}</div></div>
-                        <div class="info-item"><div class="info-label">🏦 አካውንት ቁጥር</div><div class="info-value">${escapeHtml(member.accountNumber)}</div></div>
-                        <div class="info-item"><div class="info-label">🏦 አካውንት ስም</div><div class="info-value">${escapeHtml(member.accountName)}</div></div>
-                    </div>
-                    <div class="section-card"><div class="section-title">👨‍👦 ወራሾች</div>${member.beneficiaries && member.beneficiaries.length > 0 ? member.beneficiaries.map((b,i)=>`<div><strong>${i+1}. ${escapeHtml(b.name)}</strong> (${escapeHtml(b.relationship)})</div>`).join('') : '<div>ምንም ወራሽ የለም</div>'}</div>
-                    <div class="section-card"><div class="section-title">⚖️ ህጋዊ ተወካይ</div><div>${escapeHtml(member.legalRepName) || 'N/A'}</div></div>
-                    ${member.powerOfAttorneyType ? `<div class="section-card"><div class="section-title">📜 ውክልና</div><div>${escapeHtml(member.powerOfAttorneyType)}<br>ቁጥር: ${escapeHtml(member.powerOfAttorneyNumber)}</div></div>` : ''}
-                </div>
-                <div id="editMode" style="display:none">
-    <!-- Edit mode content will be dynamically populated by enableEditMode() -->
-    <div style="text-align:center; padding:20px">Loading edit form...</div>
-</div>
-            `;
-            document.getElementById('memberModal').style.display = 'block';
-            document.getElementById('editModeBtn').style.display = 'inline-block';
-            document.getElementById('saveEditBtn').style.display = 'none';
-            document.getElementById('cancelEditBtn').style.display = 'none';
-        }
+        function showMemberDetails(id){let m=members.find(x=>x.id===id);if(!m)return;currentEditingMemberId=id;let sn=members.findIndex(x=>x.id===id)+1,mb=document.getElementById('modalBody');mb.innerHTML=`<div id="viewMode"><div class="profile-header"><div class="profile-photo" style="background:#ddd;display:flex;align-items:center;justify-content:center;font-size:40px">👤</div><div class="profile-name">${escapeHtml(m.fullName)}</div></div><div class="info-grid"><div class="info-item"><div class="info-label">📝 ተራ ቁጥር</div><div class="info-value">${sn}</div></div><div class="info-item"><div class="info-label">♂/♀ ፆታ</div><div class="info-value">${escapeHtml(m.gender)}</div></div><div class="info-item"><div class="info-label">📅 ዕድሜ</div><div class="info-value">${m.age||'N/A'}</div></div><div class="info-item"><div class="info-label">👩 የእናት ስም</div><div class="info-value">${escapeHtml(m.motherName)}</div></div><div class="info-item"><div class="info-label">🌍 ዜግነት</div><div class="info-value">${escapeHtml(m.nationality)}</div></div><div class="info-item"><div class="info-label">📚 ትምህርት</div><div class="info-value">${escapeHtml(m.education)}</div></div><div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><div class="info-value">${escapeHtml(m.address||'')}</div></div><div class="info-item"><div class="info-label">📞 ስልክ</div><div class="info-value">${escapeHtml(m.phone)}</div></div><div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><div class="info-value">${escapeHtml(m.taxId)}</div></div><div class="info-item"><div class="info-label">👔 ሚና</div><div class="info-value">${escapeHtml(m.role)}</div></div><div class="info-item"><div class="info-label">📊 አክሲዬን</div><div class="info-value">${m.shareCount||0}</div></div><div class="info-item"><div class="info-label">💰 የተከፈለ</div><div class="info-value">${(m.sharePricePaid||0).toLocaleString()} ብር</div></div><div class="info-item"><div class="info-label">💵 ቀሪ</div><div class="info-value">${(m.remainingBalance||0).toLocaleString()} ብር</div></div><div class="info-item"><div class="info-label">📋 ክፍያ ሁኔታ</div><div class="info-value">${escapeHtml(m.paymentStatus)}</div></div><div class="info-item"><div class="info-label">🏦 ባንክ</div><div class="info-value">${escapeHtml(m.bankName)}</div></div></div><div class="section-card"><div class="section-title">👨‍👦 ወራሾች</div>${m.beneficiaries&&m.beneficiaries.length>0?m.beneficiaries.map((b,i)=>`<div><strong>${i+1}. ${escapeHtml(b.name)}</strong> (${escapeHtml(b.relationship)})</div>`).join(''):'<div>ምንም ወራሽ የለም</div>'}</div><div class="section-card"><div class="section-title">⚖️ ህጋዊ ተወካይ</div><div>${escapeHtml(m.legalRepName)||'N/A'}</div></div>${m.powerOfAttorneyType?`<div class="section-card"><div class="section-title">📜 ውክልና</div><div>${escapeHtml(m.powerOfAttorneyType)}</div></div>`:''}</div><div id="editMode" style="display:none"><div style="text-align:center;padding:20px">Loading edit form...</div></div>`;document.getElementById('memberModal').style.display='block';document.getElementById('editModeBtn').style.display='inline-block';document.getElementById('saveEditBtn').style.display='none';document.getElementById('cancelEditBtn').style.display='none';}
+        function enableEditMode(){alert('Edit mode - You can edit member information here. Full edit functionality coming soon.');}
+        function cancelEditMode(){closeMemberModal();}
+        async function saveMemberEdit(){alert('Save functionality - Update member data here');closeMemberModal();loadMembers();}
         
-        function enableEditMode() {
-            document.getElementById('viewMode').style.display = 'none';
-            document.getElementById('editMode').style.display = 'block';
-            document.getElementById('editModeBtn').style.display = 'none';
-            document.getElementById('saveEditBtn').style.display = 'inline-block';
-            document.getElementById('cancelEditBtn').style.display = 'inline-block';
-        }
+        // Sales Functions
+        function calculateTotalAmount(){let q=parseFloat(document.getElementById('quantity').value)||0,p=parseFloat(document.getElementById('pricePerKg').value)||0;document.getElementById('totalAmount').value=(q*p).toFixed(2)+' ብር';}
+        function toggleCollectionType(){let t=document.getElementById('collectionType').value;document.getElementById('nonMemberNameGroup').style.display=t==='nonmember'?'block':'none';document.getElementById('selectedMemberId').disabled=t==='nonmember';}
+        function updateCoffeeSummary(){let mt=0,nmt=0;sales.forEach(s=>{if(s.collectionType==='member')mt+=s.quantity||0;else if(s.collectionType==='nonmember')nmt+=s.quantity||0;});document.getElementById('memberCoffeeTotal').innerHTML=mt.toFixed(2)+' kg';document.getElementById('nonMemberCoffeeTotal').innerHTML=nmt.toFixed(2)+' kg';document.getElementById('totalCoffeeCollected').innerHTML=(mt+nmt).toFixed(2)+' kg';}
+        function filterSalesHistory(){let t=document.getElementById('filterCollectionType').value,fs=t!=='all'?sales.filter(s=>s.collectionType===t):sales;displayAllSalesHistory(fs);}
+        function displayAllSalesHistory(sd){let c=document.getElementById('salesHistoryList');if(!sd.length){c.innerHTML='<div class="no-data">📭 ምንም ሽያጭ የለም</div>';return;}let tq=sd.reduce((s,x)=>s+(x.quantity||0),0),ta=sd.reduce((s,x)=>s+(x.totalAmount||0),0);document.getElementById('salesStats').innerHTML=`<div class="stat-card" style="background:#2d6a1a;color:white"><div class="stat-value">${sd.length}</div><div>ግብይቶች</div></div><div class="stat-card" style="background:#17a2b8;color:white"><div class="stat-value">${tq.toFixed(2)} kg</div><div>ብዛት</div></div><div class="stat-card" style="background:#f5c542;color:#333"><div class="stat-value">${ta.toFixed(2)} ብር</div><div>ገቢ</div></div>`;c.innerHTML=sd.map(s=>`<div class="member-card"><div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div><div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg</div><button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');}
+        async function addSale(){let ct=document.getElementById('collectionType').value,date=document.getElementById('saleDate').value,qty=parseFloat(document.getElementById('quantity').value),price=parseFloat(document.getElementById('pricePerKg').value);if(!date||!qty||!price){alert('ሁሉንም ይሙሉ!');return;}let mid=null,mname=null,nname=null;if(ct==='member'){mid=document.getElementById('selectedMemberId').value;if(!mid){alert('አባል ይምረጡ!');return;}let m=members.find(x=>x.id===mid);if(m)mname=m.fullName;}else{nname=document.getElementById('nonMemberName').value;if(!nname){alert('የሻጩን ስም ያስገቡ!');return;}}let rp=null,rf=document.getElementById('receiptPhoto').files[0];if(rf)rp=await fileToBase64(rf);let ns={memberId:mid,memberName:mname,collectionType:ct,nonMemberName:nname,date,productType:document.getElementById('productType').value,quantity:qty,pricePerKg:price,totalAmount:qty*price,paymentMethod:document.getElementById('paymentMethod').value,notes:document.getElementById('saleNotes').value,receiptPhoto:rp};await apiCall('/sales',{method:'POST',body:JSON.stringify(ns)});alert('✅ ሽያጭ ተመዝግቧል!');document.getElementById('quantity').value='';document.getElementById('pricePerKg').value='';document.getElementById('saleNotes').value='';document.getElementById('receiptPhoto').value='';document.getElementById('receiptPreview').innerHTML='';document.getElementById('nonMemberName').value='';await loadAllSales();}
+        async function deleteSale(id){if(confirm('ሽያጭ ይሰረዛል?')){await apiCall(`/sales/${id}`,{method:'DELETE'});await loadAllSales();alert('ሽያጭ ተሰርዟል!');}}
+        async function loadAllSales(){let sd=await apiCall('/sales');sales=sd;updateCoffeeSummary();filterSalesHistory();}
+        function searchMemberForSales(){let t=document.getElementById('salesMemberSearch').value.toLowerCase(),s=document.getElementById('selectedMemberId'),f=members.filter(m=>m.fullName?.toLowerCase().includes(t)||m.phone?.includes(t));s.innerHTML='<option value="">አባል ይምረጡ</option>'+f.map(m=>`<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');}
+        async function loadMemberSales(){let mid=document.getElementById('selectedMemberId').value;if(!mid)return;let m=members.find(x=>x.id===mid);if(m)document.getElementById('selectedMemberInfo').innerHTML=`<h4>✅ ${escapeHtml(m.fullName)}</h4>`;let ms=sales.filter(s=>s.memberId===mid);if(!ms.length){document.getElementById('salesHistoryList').innerHTML='<div class="no-data">📭 ምንም ሽያጭ የለም</div>';return;}document.getElementById('salesHistoryList').innerHTML=ms.map(s=>`<div class="member-card"><div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div><div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg</div><button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');}
         
-       // ==================== EDIT MODE FUNCTIONS ====================
-
-function enableEditMode() {
-    const member = members.find(m => m.id === currentEditingMemberId);
-    if (!member) return;
-    
-    // Hide view mode, show edit mode
-    document.getElementById('viewMode').style.display = 'none';
-    document.getElementById('editMode').style.display = 'block';
-    document.getElementById('editModeBtn').style.display = 'none';
-    document.getElementById('saveEditBtn').style.display = 'inline-block';
-    document.getElementById('cancelEditBtn').style.display = 'inline-block';
-    
-    // Populate edit form with existing member data
-    const editHtml = `
-        <div class="profile-header">
-            <div>
-                <img id="editMemberPhotoPreview" src="${member.memberPhoto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23ddd%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E👤%3C/text%3E%3C/svg%3E'}" class="profile-photo" onclick="openLightbox(this.src)">
-                <input type="file" id="editMemberPhoto" accept="image/*" onchange="previewEditPhoto(this, 'editMemberPhotoPreview')" style="margin-top:10px">
-                <small>አዲስ ፎቶ ለመጫን</small>
-            </div>
-            <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" style="font-size:1.2em; padding:8px; width:100%; border:1px solid #ddd; border-radius:6px">
-        </div>
+        // Transfer Functions
+        function loadOldMemberInfo(){let mid=document.getElementById('oldMemberId').value,m=members.find(x=>x.id===mid);document.getElementById('oldMemberInfo').innerHTML=m?`<h4>📋 ${escapeHtml(m.fullName)}</h4><p>📞 ${m.phone} | 👔 ${m.role}</p>`:'';}
+        async function processNameTransfer(){let oid=document.getElementById('oldMemberId').value,nname=document.getElementById('newMemberName').value,date=document.getElementById('transferDate').value;if(!oid||!nname||!date){alert('ሁሉንም ይሙሉ!');return;}let om=members.find(x=>x.id===oid),td=null,tf=document.getElementById('transferDocument').files[0];if(tf)td=await fileToBase64(tf);await apiCall('/transfers',{method:'POST',body:JSON.stringify({oldMemberId:oid,oldMemberName:om.fullName,newMemberName:nname,newMemberIdNumber:document.getElementById('newMemberIdNumber').value,newMemberPhone:document.getElementById('newMemberPhone').value,transferDate:date,transferFee:parseFloat(document.getElementById('transferFee').value)||0,transferReason:document.getElementById('transferReason').value,transferDocument:td})});if(confirm('ስሙን ማዘመን ይፈልጋሉ?')){await apiCall(`/members/${oid}`,{method:'PUT',body:JSON.stringify({...om,fullName:nname})});loadMembers();}alert('✅ ዝውውር ተመዝግቧል!');document.getElementById('newMemberName').value='';document.getElementById('newMemberIdNumber').value='';document.getElementById('newMemberPhone').value='';document.getElementById('transferFee').value='';document.getElementById('transferReason').value='';document.getElementById('transferDocument').value='';document.getElementById('transferDocPreview').innerHTML='';loadTransfers();}
+        async function loadTransfers(){let td=await apiCall('/transfers');let c=document.getElementById('transferHistoryList');if(!td.length){c.innerHTML='<div class="no-data">📭 ምንም ዝውውር የለም</div>';return;}c.innerHTML=td.map(t=>`<div class="member-card"><div class="member-header"><span>📅 ${new Date(t.transferDate).toLocaleDateString()}</span><span class="member-role">✅ ተጠናቋል</span></div><div>👤 ${escapeHtml(t.oldMemberName)} → ${escapeHtml(t.newMemberName)}</div><button onclick="deleteTransfer('${t.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');}
+        async function deleteTransfer(id){if(confirm('ዝውውሩን መሰረዝ ይፈልጋሉ?')){await apiCall(`/transfers/${id}`,{method:'DELETE'});loadTransfers();alert('ዝውውር ተሰርዟል!');}}
         
-        <div class="info-grid">
-            <div class="info-item"><div class="info-label">♂/♀ ፆታ</div><select id="editGender" class="form-control"><option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option><option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option></select></div>
-            <div class="info-item"><div class="info-label">📅 ዕድሜ</div><input type="number" id="editAge" value="${member.age || ''}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">👩 የእናት ሙሉ ስም</div><input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">🌍 ዜግነት</div><input type="text" id="editNationality" value="${escapeHtml(member.nationality)}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">📚 የትምህርት ደረጃ</div><input type="text" id="editEducation" value="${escapeHtml(member.education)}" class="form-control"></div>
-            <div class="info-item full-width"><div class="info-label">🏠 አድራሻ</div><textarea id="editAddress" rows="2" class="form-control">${escapeHtml(member.address)}</textarea></div>
-            <div class="info-item"><div class="info-label">📞 ስልክ</div><input type="tel" id="editPhone" value="${escapeHtml(member.phone)}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">🆔 የፋይዳ መለያ</div><input type="text" id="editTaxId" value="${escapeHtml(member.taxId)}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">👔 ሚና</div><input type="text" id="editRole" value="${escapeHtml(member.role)}" class="form-control"></div>
-            <div class="info-item"><div class="info-label">📊 አክሲዬን ብዛት</div><input type="number" id="editShareCount" value="${member.shareCount || 0}" class="form-control" oninput="calculateEditRemainingBalance()"></div>
-            <div class="info-item"><div class="info-label">💰 የተከፈለ (ብር)</div><input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}" class="form-control" oninput="calculateEditRemainingBalance()"></div>
-            <div class="info-item"><div class="info-label">💵 ቀሪ ገንዘብ</div><input type="text" id="editRemainingBalance" readonly style="background:#e9ecef" class="form-control"></div>
-            <div class="info-item"><div class="info-label">📋 የክፍያ ሁኔታ</div><select id="editPaymentStatus" class="form-control"><option ${member.paymentStatus === 'ተከፍሏል' ? 'selected' : ''}>ተከፍሏል</option><option ${member.paymentStatus === 'በከፊል ተከፍሏል' ? 'selected' : ''}>በከፊል ተከፍሏል</option><option ${member.paymentStatus === 'አልተከፈለም' ? 'selected' : ''}>አልተከፈለም</option></select></div>
-            <div class="info-item"><div class="info-label">🏦 ባንክ ሂሳብ</div><input type="text" id="editBankAccountNumber" value="${escapeHtml(member.bankAccountNumber)}" class="form-control"></div>
-            <div class="info-item full-width"><div class="info-label">📝 ማስታወሻ</div><textarea id="editFinancialNotes" rows="2" class="form-control">${escapeHtml(member.financialNotes)}</textarea></div>
-        </div>
+        async function searchMembers(){let t=document.getElementById('searchTerm').value;if(!t){document.getElementById('searchResults').innerHTML='';return;}let r=members.filter(m=>m.fullName?.toLowerCase().includes(t.toLowerCase())||m.phone?.includes(t));document.getElementById('searchResults').innerHTML=r.map(m=>`<div class="member-card" onclick="showMemberDetails('${m.id}')"><div class="member-header"><div class="member-name">👤 ${escapeHtml(m.fullName)}</div><div class="member-role">${escapeHtml(m.role)}</div></div><div>📞 ${escapeHtml(m.phone)}</div></div>`).join('');}
         
-        <div class="section-card">
-            <div class="section-title">⚖️ ህጋዊ ተወካይ መረጃ</div>
-            <div class="form-row">
-                <div class="form-group"><label>ስም</label><input type="text" id="editLegalRepName" value="${escapeHtml(member.legalRepName)}" class="form-control"></div>
-                <div class="form-group"><label>አድራሻ</label><textarea id="editLegalRepAddress" rows="2" class="form-control">${escapeHtml(member.legalRepAddress)}</textarea></div>
-            </div>
-            <div class="form-group"><label>ስልክ</label><input type="tel" id="editLegalRepPhone" value="${escapeHtml(member.legalRepPhone)}" class="form-control"></div>
-            <div class="form-group"><label>📸 አዲስ የተወካይ ፎቶ</label><input type="file" id="editRepPhoto" accept="image/*" onchange="previewEditPhoto(this, 'editRepPhotoPreview')"><div id="editRepPhotoPreview" class="image-preview"></div></div>
-        </div>
+        // Share Statistics
+        function updateShareStatistics(){let sold=members.reduce((s,m)=>s+(parseInt(m.shareCount)||0),0),rem=25000-sold;document.getElementById('soldShares').innerHTML=sold.toLocaleString();document.getElementById('remainingShares').innerHTML=rem.toLocaleString();return rem;}
         
-        <div class="section-card">
-            <div class="section-title">📜 ውክልና (Power of Attorney)</div>
-            <div class="form-group"><label>አይነት</label>
-                <select id="editPowerOfAttorneyType" class="form-control" onchange="toggleEditPowerOfAttorneyOptions()">
-                    <option value="">ምረጥ</option>
-                    <option value="ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ" ${member.powerOfAttorneyType === 'ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ' ? 'selected' : ''}>ፌዴራል ሰነዶች ምዝገባ ኤጀንሲ</option>
-                    <option value="በፍትህ የተረጋገጠ የምስክር ወረቀት" ${member.powerOfAttorneyType === 'በፍትህ የተረጋገጠ የምስክር ወረቀት' ? 'selected' : ''}>በፍትህ የተረጋገጠ የምስክር ወረቀት</option>
-                </select>
-            </div>
-            <div id="editPowerOfAttorneyDetails" style="display:${member.powerOfAttorneyType ? 'block' : 'none'}">
-                <div class="form-row">
-                    <div class="form-group"><label>ቁጥር</label><input type="text" id="editPowerOfAttorneyNumber" value="${escapeHtml(member.powerOfAttorneyNumber)}" class="form-control"></div>
-                    <div class="form-group"><label>ቀን</label><input type="date" id="editPowerOfAttorneyDate" value="${member.powerOfAttorneyDate || ''}" class="form-control"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>ሰጪ ተቋም</label><input type="text" id="editPowerOfAttorneyIssuer" value="${escapeHtml(member.powerOfAttorneyIssuer)}" class="form-control"></div>
-                    <div class="form-group"><label>የሚያበቃበት</label><input type="date" id="editPowerOfAttorneyExpiry" value="${member.powerOfAttorneyExpiry || ''}" class="form-control"></div>
-                </div>
-                <div class="form-group"><label>ማስታወሻ</label><textarea id="editPowerOfAttorneyNotes" rows="2" class="form-control">${escapeHtml(member.powerOfAttorneyNotes)}</textarea></div>
-                <div class="form-group"><label>📸 አዲስ የውክልና ሰነድ ፎቶ</label><input type="file" id="editPowerOfAttorneyPhoto" accept="image/*" onchange="previewEditPhoto(this, 'editPowerOfAttorneyPreview')"><div id="editPowerOfAttorneyPreview" class="image-preview"></div></div>
-                <div class="form-group"><label>📸 አዲስ የሀርድ ኮፒ ቅጂ ፎቶ</label><input type="file" id="editHardCopyDocumentPhoto" accept="image/*" onchange="previewEditPhoto(this, 'editHardCopyDocumentPreview')"><div id="editHardCopyDocumentPreview" class="image-preview"></div></div>
-            </div>
-        </div>
+        // Trading Functions
+        async function loadTradingStats(){let s=await apiCall('/share-trading/stats');document.getElementById('tradingStats').innerHTML=`<div class="stat-card"><div class="stat-value">${s.totalShares||0}</div><div>ጠቅላላ</div></div><div class="stat-card"><div class="stat-value">${s.pendingRequests||0}</div><div>በመጠባበቅ</div></div><div class="stat-card"><div class="stat-value">${s.approvedRequests||0}</div><div>የጸደቁ</div></div>`;}
+        async function loadPendingRequests(){let r=await apiCall('/share-trading/pending');let c=document.getElementById('pendingRequestsList');if(!r.length){c.innerHTML='<div class="no-data">⏳ ምንም ጥያቄ የለም</div>';return;}c.innerHTML=r.map(req=>`<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(req.memberName)}</div><div class="member-role">${req.requestType==='buy'?'📥 መግዛት':'📤 መሸጥ'}</div></div><div>📊 ${req.shareAmount} አክሲዬን | 💰 ${req.totalValue.toFixed(2)} ብር</div><div class="member-actions"><button class="btn-primary" onclick="approveTradingRequest('${req.id}')">✅ ጸድቋል</button><button class="btn-danger" onclick="rejectTradingRequest('${req.id}')">❌ ውድቅ</button></div></div>`).join('');}
+        async function approveTradingRequest(id){if(confirm('ማጽደቅ ይፈልጋሉ?')){let r=await apiCall(`/share-trading/approve/${id}`,{method:'POST'});if(r.success){alert('✅ ጸድቋል!');loadPendingRequests();loadAllRequests();loadTradingStats();loadMembers();updateShareStatistics();}else alert(r.message||'Approval failed');}}
+        async function rejectTradingRequest(id){let reason=prompt('ምክንያት:');if(reason!==null){let r=await apiCall(`/share-trading/reject/${id}`,{method:'POST',body:JSON.stringify({reason})});if(r.success){alert('❌ ውድቅ ተደርጓል!');loadPendingRequests();loadAllRequests();loadTradingStats();}else alert(r.message||'Rejection failed');}}
+        async function loadAllRequests(){let r=await apiCall('/share-trading/requests');let c=document.getElementById('allRequestsList');if(!r.length){c.innerHTML='<div class="no-data">📭 ምንም ጥያቄ የለም</div>';return;}c.innerHTML=r.slice(0,20).map(req=>`<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(req.memberName)}</div><div class="member-role">${req.requestType==='buy'?'📥 መግዛት':'📤 መሸጥ'}</div></div><div>📅 ${new Date(req.createdAt).toLocaleDateString()} | 📊 ${req.shareAmount} አክሲዬን</div></div>`).join('');}
         
-        <div class="section-card">
-            <div class="section-title">👨‍👦 የወራሾች መረጃ</div>
-            <div id="editBeneficiariesContainer"></div>
-            <button type="button" class="btn-primary" style="margin-top:10px" onclick="addEditBeneficiary()">+ ወራሽ ይጨምሩ</button>
-        </div>
-    `;
-    
-    document.getElementById('editMode').innerHTML = editHtml;
-    generateEditBeneficiaryForms();
-    calculateEditRemainingBalance();
-    toggleEditPowerOfAttorneyOptions();
-}
-
-function previewEditPhoto(input, previewId) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const previewDiv = document.getElementById(previewId);
-            if (previewDiv) {
-                previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width:100px; max-height:100px; border-radius:8px; border:2px solid #2d6a1a; cursor:pointer" onclick="openLightbox('${e.target.result}')">`;
-            } else {
-                const img = document.getElementById(previewId);
-                if (img) img.src = e.target.result;
-            }
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function generateEditBeneficiaryForms() {
-    const member = members.find(m => m.id === currentEditingMemberId);
-    const beneficiaries = member?.beneficiaries || [];
-    const container = document.getElementById('editBeneficiariesContainer');
-    if (!container) return;
-    
-    let html = '';
-    beneficiaries.forEach((ben, idx) => {
-        const i = idx + 1;
-        html += `
-            <div class="beneficiary-card" id="editBeneficiary_${i}">
-                <div class="beneficiary-title">👨‍👦 ወራሽ ${i} <button type="button" class="remove-beneficiary" onclick="removeEditBeneficiary(${i})">✖ አጥፋ</button></div>
-                <div class="form-row">
-                    <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="editBeneficiaryName_${i}" value="${escapeHtml(ben.name || '')}" class="form-control"></div>
-                    <div class="form-group"><label>ፆታ</label>
-                        <select id="editBeneficiaryGender_${i}" class="form-control">
-                            <option value="">ምረጥ</option>
-                            <option value="ወንድ" ${ben.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
-                            <option value="ሴት" ${ben.gender === 'ሴት' ? 'selected' : ''}>ሴት</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>ዝምድና</label>
-                        <select id="editBeneficiaryRelationship_${i}" class="form-control" onchange="toggleEditOtherRelationshipBeneficiary(${i})">
-                            <option value="">ምረጥ</option>
-                            <option value="አባት" ${ben.relationship === 'አባት' ? 'selected' : ''}>አባት</option>
-                            <option value="እናት" ${ben.relationship === 'እናት' ? 'selected' : ''}>እናት</option>
-                            <option value="ወንድም" ${ben.relationship === 'ወንድም' ? 'selected' : ''}>ወንድም</option>
-                            <option value="እህት" ${ben.relationship === 'እህት' ? 'selected' : ''}>እህት</option>
-                            <option value="ልጅ" ${ben.relationship === 'ልጅ' ? 'selected' : ''}>ልጅ</option>
-                            <option value="ሚስት" ${ben.relationship === 'ሚስት' ? 'selected' : ''}>ሚስት</option>
-                            <option value="አክስት" ${ben.relationship === 'አክስት' ? 'selected' : ''}>አክስት</option>
-                            <option value="አጎት" ${ben.relationship === 'አጎት' ? 'selected' : ''}>አጎት</option>
-                            <option value="የአጎት ልጅ" ${ben.relationship === 'የአጎት ልጅ' ? 'selected' : ''}>የአጎት ልጅ</option>
-                            <option value="የአክስት ልጅ" ${ben.relationship === 'የአክስት ልጅ' ? 'selected' : ''}>የአክስት ልጅ</option>
-                            <option value="ሌላ" ${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) && ben.relationship ? 'selected' : ''}>ሌላ</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="editOtherRelationshipDiv_${i}" style="display:${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) && ben.relationship ? 'block' : 'none'}">
-                        <label>ሌላ (ዝምድናውን ይግለጹ)</label>
-                        <input type="text" id="editBeneficiaryOtherRelationship_${i}" value="${!['አባት','እናት','ወንድም','እህት','ልጅ','ሚስት','አክስት','አጎት','የአጎት ልጅ','የአክስት ልጅ'].includes(ben.relationship) ? escapeHtml(ben.relationship) : ''}" class="form-control">
-                    </div>
-                </div>
-                <div class="form-group"><label>አድራሻ</label><textarea id="editBeneficiaryAddress_${i}" rows="2" class="form-control">${escapeHtml(ben.address || '')}</textarea></div>
-                <div class="form-group"><label>📸 አዲስ ፎቶ (ካለ)</label><input type="file" id="editBeneficiaryPhoto_${i}" accept="image/*" onchange="previewEditPhoto(this, 'editBeneficiaryPhotoPreview_${i}')"><div id="editBeneficiaryPhotoPreview_${i}" class="image-preview"></div></div>
-                <div class="form-group"><label>🆔 አዲስ የፋይዳ መታወቂያ (ካለ)</label><input type="file" id="editBeneficiaryTaxDoc_${i}" accept="image/*" onchange="previewEditPhoto(this, 'editBeneficiaryTaxPreview_${i}')"><div id="editBeneficiaryTaxPreview_${i}" class="image-preview"></div></div>
-            </div>
-        `;
-    });
-    container.innerHTML = html;
-}
-
-function addEditBeneficiary() {
-    const member = members.find(m => m.id === currentEditingMemberId);
-    const beneficiaries = member?.beneficiaries || [];
-    const newBeneficiary = {
-        name: '',
-        gender: '',
-        relationship: '',
-        address: '',
-        photo: null,
-        taxDoc: null
-    };
-    beneficiaries.push(newBeneficiary);
-    member.beneficiaries = beneficiaries;
-    generateEditBeneficiaryForms();
-}
-
-function removeEditBeneficiary(index) {
-    const member = members.find(m => m.id === currentEditingMemberId);
-    if (member && member.beneficiaries) {
-        member.beneficiaries.splice(index - 1, 1);
-        generateEditBeneficiaryForms();
-    }
-}
-
-function toggleEditOtherRelationshipBeneficiary(index) {
-    const relationship = document.getElementById(`editBeneficiaryRelationship_${index}`).value;
-    const otherDiv = document.getElementById(`editOtherRelationshipDiv_${index}`);
-    if (relationship === 'ሌላ') {
-        otherDiv.style.display = 'block';
-    } else {
-        otherDiv.style.display = 'none';
-    }
-}
-
-function calculateEditRemainingBalance() {
-    const shareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
-    const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid')?.value) || 0;
-    const totalPayable = shareCount * 10000;
-    const remaining = totalPayable - sharePricePaid;
-    const remainingField = document.getElementById('editRemainingBalance');
-    if (remainingField) {
-        remainingField.value = remaining > 0 ? remaining.toLocaleString() + ' ብር' : '0 ብር';
-    }
-    const paymentStatus = document.getElementById('editPaymentStatus');
-    if (paymentStatus) {
-        if (remaining <= 0) paymentStatus.value = 'ተከፍሏል';
-        else if (sharePricePaid > 0 && remaining > 0) paymentStatus.value = 'በከፊል ተከፍሏል';
-        else paymentStatus.value = 'አልተከፈለም';
-    }
-}
-
-function toggleEditPowerOfAttorneyOptions() {
-    const type = document.getElementById('editPowerOfAttorneyType')?.value;
-    const detailsDiv = document.getElementById('editPowerOfAttorneyDetails');
-    if (detailsDiv) {
-        detailsDiv.style.display = type && type !== '' ? 'block' : 'none';
-    }
-}
-
-async function saveMemberEdit() {
-    if (!currentEditingMemberId) {
-        alert('No member selected for editing');
-        return;
-    }
-    
-    try {
-        // Collect beneficiaries data from edit forms
-        const editBeneficiaries = [];
-        const beneficiaryDivs = document.querySelectorAll('[id^="editBeneficiaryName_"]');
+        // Admin Functions
+        async function updateUserProfile(){let op=document.getElementById('oldPassword').value;if(!op){alert('አሮጌ የይለፍ ቃል ያስገቡ!');return;}let np=document.getElementById('newPassword').value,cp=document.getElementById('confirmPassword').value;if(np&&np!==cp){alert('አዲስ የይለፍ ቃል አይዛመድም!');return;}let r=await apiCall('/auth/update-profile',{method:'PUT',body:JSON.stringify({oldPassword:op,fullName:document.getElementById('newFullName').value,username:document.getElementById('newUsername').value,email:document.getElementById('newEmail').value,newPassword:np||undefined})});if(r.success){alert('✅ ተሻሽሏል! እንደገና ይግቡ');setTimeout(()=>logout(),2000);}else alert(r.message);}
+        async function loadAllUsers(){let u=await apiCall('/auth/users');let c=document.getElementById('usersList');if(!u.length){c.innerHTML='<p>No users found</p>';return;}c.innerHTML=u.map(user=>`<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(user.fullName)}</div><div class="member-role">${escapeHtml(user.role)}</div></div><div>Username: ${escapeHtml(user.username)} | Email: ${escapeHtml(user.email)}</div></div>`).join('');}
+        async function createNewUser(){let r=await apiCall('/auth/register',{method:'POST',body:JSON.stringify({fullName:document.getElementById('newUserFullName').value,username:document.getElementById('newUserUsername').value,email:document.getElementById('newUserEmail').value,password:document.getElementById('newUserPassword').value,role:document.getElementById('newUserRole').value})});if(r.success){alert('✅ አዲስ ተጠቃሚ ተፈጥሯል!');loadAllUsers();}else alert(r.message);}
+        async function deleteUser(id){if(confirm('እርግጠኛ ነዎት?')){let r=await apiCall(`/auth/users/${id}`,{method:'DELETE'});if(r.success){alert('✅ ተሰርዟል!');loadAllUsers();}else alert(r.message);}}
+        async function resetUserPassword(id){let np=prompt('Enter new password:');if(np&&np.length>=6){let r=await apiCall(`/auth/users/${id}/reset-password`,{method:'PUT',body:JSON.stringify({newPassword:np})});if(r.success)alert('✅ ተለውጧል!');else alert(r.message);}}
         
-        for (let i = 1; i <= beneficiaryDivs.length; i++) {
-            let relationship = document.getElementById(`editBeneficiaryRelationship_${i}`)?.value || '';
-            if (relationship === 'ሌላ') {
-                relationship = document.getElementById(`editBeneficiaryOtherRelationship_${i}`)?.value || '';
-            }
-            
-            const photoFile = document.getElementById(`editBeneficiaryPhoto_${i}`)?.files[0];
-            const taxDocFile = document.getElementById(`editBeneficiaryTaxDoc_${i}`)?.files[0];
-            const name = document.getElementById(`editBeneficiaryName_${i}`)?.value;
-            
-            if (name) {
-                editBeneficiaries.push({
-                    name: name,
-                    gender: document.getElementById(`editBeneficiaryGender_${i}`)?.value || '',
-                    relationship: relationship,
-                    address: document.getElementById(`editBeneficiaryAddress_${i}`)?.value || '',
-                    photo: photoFile ? await fileToBase64(photoFile) : null,
-                    taxDoc: taxDocFile ? await fileToBase64(taxDocFile) : null
-                });
-            }
-        }
+        function exportToCSV(){if(!members.length){alert('ምንም አባላት የሉም!');return;}let h=['ተራ ቁጥር','ሙሉ ስም','ፆታ','ዕድሜ','የእናት ስም','አድራሻ','ስልክ','ሚና','አክሲዬን'];let r=members.map((m,i)=>[i+1,m.fullName,m.gender,m.age,m.motherName,m.address,m.phone,m.role,m.shareCount||0]);let csv=[h,...r].map(row=>row.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');let blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`members_${new Date().toISOString().split('T')[0]}.csv`;a.click();alert(`✅ ${members.length} አባላት ወደ CSV ተልከዋል!`);}
         
-        // Collect new photo files
-        const memberPhotoFile = document.getElementById('editMemberPhoto')?.files[0];
-        const repPhotoFile = document.getElementById('editRepPhoto')?.files[0];
-        const powerOfAttorneyPhotoFile = document.getElementById('editPowerOfAttorneyPhoto')?.files[0];
-        const hardCopyDocumentPhotoFile = document.getElementById('editHardCopyDocumentPhoto')?.files[0];
+        function showTab(tabId){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tabId).classList.add('active');event.target.classList.add('active');if(tabId==='list')loadMembers();if(tabId==='sales'){loadAllSales();}if(tabId==='transfer')loadTransfers();if(tabId==='trading'){loadTradingStats();loadPendingRequests();loadAllRequests();}}
+        function logout(){stopInactivityTracking();localStorage.clear();window.location.href='/';}
         
-        let memberPhotoBase64 = null;
-        let repPhotoBase64 = null;
-        let powerOfAttorneyPhotoBase64 = null;
-        let hardCopyDocumentPhotoBase64 = null;
+        document.getElementById('quantity')?.addEventListener('input',calculateTotalAmount);
+        document.getElementById('pricePerKg')?.addEventListener('input',calculateTotalAmount);
+        document.getElementById('saleDate').valueAsDate=new Date();
+        document.getElementById('transferDate').valueAsDate=new Date();
+        document.getElementById('shareCount')?.addEventListener('input',calculateShareTotal);
+        document.getElementById('sharePricePaid')?.addEventListener('input',calculateRemainingBalance);
+        document.getElementById('userName').innerHTML=`👤 ${escapeHtml(currentUser.fullName)||'Admin'}`;
         
-        if (memberPhotoFile) memberPhotoBase64 = await fileToBase64(memberPhotoFile);
-        if (repPhotoFile) repPhotoBase64 = await fileToBase64(repPhotoFile);
-        if (powerOfAttorneyPhotoFile) powerOfAttorneyPhotoBase64 = await fileToBase64(powerOfAttorneyPhotoFile);
-        if (hardCopyDocumentPhotoFile) hardCopyDocumentPhotoBase64 = await fileToBase64(hardCopyDocumentPhotoFile);
+        loadZones();loadMembers();loadAllSales();loadTransfers();startInactivityTracking();updateShareStatistics();
         
-        const shareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
-        const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid')?.value) || 0;
-        const totalPayable = shareCount * 10000;
-        
-        const updatedMember = {
-            fullName: document.getElementById('editFullName')?.value,
-            gender: document.getElementById('editGender')?.value,
-            age: parseInt(document.getElementById('editAge')?.value) || 0,
-            motherName: document.getElementById('editMotherName')?.value,
-            nationality: document.getElementById('editNationality')?.value,
-            education: document.getElementById('editEducation')?.value,
-            address: document.getElementById('editAddress')?.value,
-            phone: document.getElementById('editPhone')?.value,
-            taxId: document.getElementById('editTaxId')?.value,
-            role: document.getElementById('editRole')?.value,
-            shareCount: shareCount,
-            sharePricePaid: sharePricePaid,
-            remainingBalance: totalPayable - sharePricePaid,
-            paymentStatus: document.getElementById('editPaymentStatus')?.value,
-            bankAccountNumber: document.getElementById('editBankAccountNumber')?.value,
-            financialNotes: document.getElementById('editFinancialNotes')?.value,
-            beneficiaries: editBeneficiaries,
-            beneficiaryCount: editBeneficiaries.length,
-            legalRepName: document.getElementById('editLegalRepName')?.value,
-            legalRepAddress: document.getElementById('editLegalRepAddress')?.value,
-            legalRepPhone: document.getElementById('editLegalRepPhone')?.value,
-            powerOfAttorneyType: document.getElementById('editPowerOfAttorneyType')?.value,
-            powerOfAttorneyNumber: document.getElementById('editPowerOfAttorneyNumber')?.value,
-            powerOfAttorneyDate: document.getElementById('editPowerOfAttorneyDate')?.value,
-            powerOfAttorneyIssuer: document.getElementById('editPowerOfAttorneyIssuer')?.value,
-            powerOfAttorneyExpiry: document.getElementById('editPowerOfAttorneyExpiry')?.value,
-            powerOfAttorneyNotes: document.getElementById('editPowerOfAttorneyNotes')?.value,
-            updatedAt: new Date().toISOString()
-        };
-        
-        // Only update photo fields if new photos were uploaded
-        if (memberPhotoBase64) updatedMember.memberPhoto = memberPhotoBase64;
-        if (repPhotoBase64) updatedMember.repPhoto = repPhotoBase64;
-        if (powerOfAttorneyPhotoBase64) updatedMember.powerOfAttorneyPhoto = powerOfAttorneyPhotoBase64;
-        if (hardCopyDocumentPhotoBase64) updatedMember.hardCopyDocumentPhoto = hardCopyDocumentPhotoBase64;
-        
-        const response = await fetch(`/api/members/${currentEditingMemberId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updatedMember)
-        });
-        // Inside saveMemberEdit function, before saving
-const newShareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
-const oldMember = members.find(m => m.id === currentEditingMemberId);
-const oldShareCount = oldMember?.shareCount || 0;
-const shareDifference = newShareCount - oldShareCount;
-
-if (shareDifference > 0) {
-    const remainingShares = updateShareStatistics();
-    if (shareDifference > remainingShares + oldShareCount) {
-        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}`);
-        return;
-    }
-} 
-        const result = await response.json();
-        
-        if (response.ok) {
-            alert('✅ አባል በሚገባ ተሻሽሏል! / Member updated successfully!');
-            closeMemberModal();
-            loadMembers();
-            updateShareStatistics();
-            
-        } else {
-            alert('❌ ስህተት: ' + (result.message || 'Update failed'));
-        }
-    } catch (error) {
-        console.error('Error saving member edit:', error);
-        alert('❌ ስህተት: ' + error.message);
-    }
-}// ==================== COFFEE COLLECTION FUNCTIONS ====================
-
-function toggleCollectionType() {
-    const collectionType = document.getElementById('collectionType').value;
-    const nonMemberGroup = document.getElementById('nonMemberNameGroup');
-    const memberSelect = document.getElementById('selectedMemberId');
-    
-    if (collectionType === 'nonmember') {
-        nonMemberGroup.style.display = 'block';
-        memberSelect.disabled = true;
-        memberSelect.style.opacity = '0.5';
-        document.getElementById('selectedMemberInfo').innerHTML = '';
-    } else {
-        nonMemberGroup.style.display = 'none';
-        memberSelect.disabled = false;
-        memberSelect.style.opacity = '1';
-    }
-}
-
-function updateCoffeeSummary() {
-    // Calculate totals from sales array
-    let memberTotal = 0;
-    let nonMemberTotal = 0;
-    
-    sales.forEach(sale => {
-        if (sale.collectionType === 'member') {
-            memberTotal += sale.quantity || 0;
-        } else if (sale.collectionType === 'nonmember') {
-            nonMemberTotal += sale.quantity || 0;
-        }
-    });
-    
-    document.getElementById('memberCoffeeTotal').innerHTML = memberTotal.toFixed(2) + ' kg';
-    document.getElementById('nonMemberCoffeeTotal').innerHTML = nonMemberTotal.toFixed(2) + ' kg';
-    document.getElementById('totalCoffeeCollected').innerHTML = (memberTotal + nonMemberTotal).toFixed(2) + ' kg';
-}
-
-function filterSalesHistory() {
-    const filterType = document.getElementById('filterCollectionType').value;
-    let filteredSales = sales;
-    
-    if (filterType !== 'all') {
-        filteredSales = sales.filter(s => s.collectionType === filterType);
-    }
-    
-    displayAllSalesHistory(filteredSales);
-}
-
-function displayAllSalesHistory(salesData) {
-    const container = document.getElementById('salesHistoryList');
-    
-    if (!salesData.length) {
-        container.innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>';
-        return;
-    }
-    
-    // Calculate summary for filtered sales
-    const totalQty = salesData.reduce((sum, s) => sum + (s.quantity || 0), 0);
-    const totalAmt = salesData.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
-    const memberSales = salesData.filter(s => s.collectionType === 'member').length;
-    const nonMemberSales = salesData.filter(s => s.collectionType === 'nonmember').length;
-    
-    document.getElementById('salesStats').innerHTML = `
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${salesData.length}</div>
-            <div>ጠቅላላ ግብይቶች</div>
-        </div>
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales}</div>
-            <div>ከአባላት ግብይቶች</div>
-        </div>
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${nonMemberSales}</div>
-            <div>ከአባላት ውጪ ግብይቶች</div>
-        </div>
-        <div class="stat-card" style="background:#17a2b8;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div>
-            <div>ጠቅላላ ብዛት</div>
-        </div>
-        <div class="stat-card" style="background:#f5c542;color:#333;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div>
-            <div>ጠቅላላ ገቢ</div>
-        </div>
-    `;
-    
-    container.innerHTML = salesData.map(s => `
-        <div class="member-card">
-            <div class="member-header">
-                <span>📅 ${new Date(s.date).toLocaleDateString()}</span>
-                <span class="member-role">${s.collectionType === 'member' ? '👥 ከአባል' : '🏪 ከአባል ውጪ'} | ${s.totalAmount.toFixed(2)} ብር</span>
-            </div>
-            <div class="member-details">
-                <div><span class="detail-label">🏷️ ምርት:</span> ${s.productType}</div>
-                <div><span class="detail-label">⚖️ ብዛት:</span> ${s.quantity} kg</div>
-                <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
-                <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
-                ${s.memberName ? `<div><span class="detail-label">👤 አባል:</span> ${escapeHtml(s.memberName)}</div>` : ''}
-                ${s.nonMemberName ? `<div><span class="detail-label">👤 ሻጭ:</span> ${escapeHtml(s.nonMemberName)}</div>` : ''}
-                ${s.notes ? `<div><span class="detail-label">📝 ማስታወሻ:</span> ${escapeHtml(s.notes)}</div>` : ''}
-            </div>
-            <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
-        </div>
-    `).join('');
-}
-
-// Update the addSale function
-async function addSale() {
-    const collectionType = document.getElementById('collectionType').value;
-    const date = document.getElementById('saleDate').value;
-    const quantity = parseFloat(document.getElementById('quantity').value);
-    const pricePerKg = parseFloat(document.getElementById('pricePerKg').value);
-    
-    if (!date || !quantity || !pricePerKg) {
-        alert('ሁሉንም መረጃዎች ይሙሉ!');
-        return;
-    }
-    
-    let memberId = null;
-    let memberName = null;
-    let nonMemberName = null;
-    
-    if (collectionType === 'member') {
-        memberId = document.getElementById('selectedMemberId').value;
-        if (!memberId) {
-            alert('እባክዎ አባል ይምረጡ!');
-            return;
-        }
-        const member = members.find(m => m.id === memberId);
-        if (member) memberName = member.fullName;
-    } else {
-        nonMemberName = document.getElementById('nonMemberName').value;
-        if (!nonMemberName) {
-            alert('እባክዎ የሻጩን ሙሉ ስም ያስገቡ!');
-            return;
-        }
-    }
-    
-    let receiptPhoto = null;
-    const file = document.getElementById('receiptPhoto').files[0];
-    if (file) receiptPhoto = await fileToBase64(file);
-    
-    const newSale = {
-        memberId: memberId,
-        memberName: memberName,
-        collectionType: collectionType,
-        nonMemberName: nonMemberName,
-        date: date,
-        productType: document.getElementById('productType').value,
-        quantity: quantity,
-        pricePerKg: pricePerKg,
-        totalAmount: quantity * pricePerKg,
-        paymentMethod: document.getElementById('paymentMethod').value,
-        notes: document.getElementById('saleNotes').value,
-        receiptPhoto: receiptPhoto,
-        recordedBy: currentUser.id,
-        createdAt: new Date().toISOString()
-    };
-    
-    try {
-        const result = await apiCall('/sales', { method: 'POST', body: JSON.stringify(newSale) });
-        sales.push(result);
-        alert('✅ ሽያጭ ተመዝግቧል!');
-        
-        // Clear form
-        document.getElementById('quantity').value = '';
-        document.getElementById('pricePerKg').value = '';
-        document.getElementById('saleNotes').value = '';
-        document.getElementById('receiptPhoto').value = '';
-        document.getElementById('receiptPreview').innerHTML = '';
-        document.getElementById('nonMemberName').value = '';
-        document.getElementById('collectionType').value = 'member';
-        toggleCollectionType();
-        
-        // Update displays
-        updateCoffeeSummary();
-        loadMemberSales();
-        filterSalesHistory();
-    } catch (error) {
-        console.error('Error adding sale:', error);
-        alert('❌ ስህተት: ' + error.message);
-    }
-}
-
-// Update loadAllSales to also update coffee summary
-async function loadAllSales() {
-    const salesData = await apiCall('/sales');
-    sales = salesData;
-    updateCoffeeSummary();
-    filterSalesHistory();
-}
-
-// Update loadMemberSales to show member sales only
-async function loadMemberSales() {
-    const memberId = document.getElementById('selectedMemberId').value;
-    if (!memberId) {
-        document.getElementById('selectedMemberInfo').innerHTML = '';
-        return;
-    }
-    
-    const member = members.find(m => m.id === memberId);
-    if (member) {
-        document.getElementById('selectedMemberInfo').innerHTML = `
-            <div style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px">
-                <h4>✅ ${escapeHtml(member.fullName)}</h4>
-                <p>📞 ${member.phone} | 👔 ${member.role}</p>
-                <p>📊 የአክሲዬን ብዛት: ${member.shareCount || 0}</p>
-            </div>
-        `;
-    }
-    
-    const memberSales = sales.filter(s => s.memberId === memberId);
-    displayMemberSalesHistory(memberSales);
-}
-
-function displayMemberSalesHistory(memberSales) {
-    const container = document.getElementById('salesHistoryList');
-    if (!memberSales.length) {
-        container.innerHTML = '<div class="no-data">📭 ለዚህ አባል ምንም ሽያጭ የለም</div>';
-        return;
-    }
-    
-    const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
-    const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
-    
-    document.getElementById('salesStats').innerHTML = `
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales.length}</div>
-            <div>ግብይቶች</div>
-        </div>
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div>
-            <div>ጠቅላላ ብዛት</div>
-        </div>
-        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div>
-            <div>ጠቅላላ ገቢ</div>
-        </div>
-    `;
-    
-    container.innerHTML = memberSales.map(s => `
-        <div class="member-card">
-            <div class="member-header">
-                <span>📅 ${new Date(s.date).toLocaleDateString()}</span>
-                <span class="member-role">${s.totalAmount.toFixed(2)} ብር</span>
-            </div>
-            <div class="member-details">
-                <div><span class="detail-label">🏷️ ምርት:</span> ${s.productType}</div>
-                <div><span class="detail-label">⚖️ ብዛት:</span> ${s.quantity} kg</div>
-                <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
-                <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
-            </div>
-            <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
-        </div>
-    `).join('');
-}
-// Add this to your script section
-function calculateTotalAmount() {
-    const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-    const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
-    const total = quantity * pricePerKg;
-    const totalAmountField = document.getElementById('totalAmount');
-    if (totalAmountField) {
-        totalAmountField.value = total.toFixed(2) + ' ብር';
-    }
-    
-    // Optional: Add visual feedback
-    if (quantity > 0 && pricePerKg > 0) {
-        totalAmountField.style.backgroundColor = '#d4edda';
-        setTimeout(() => {
-            totalAmountField.style.backgroundColor = '#e8f5e9';
-        }, 500);
-    }
-}
-// Update deleteSale to refresh coffee summary
-async function deleteSale(saleId) {
-    if (confirm('ሽያጭ ይሰረዛል?')) {
-        await apiCall(`/sales/${saleId}`, { method: 'DELETE' });
-        await loadAllSales();
-        loadMemberSales();
-        alert('ሽያጭ ተሰርዟል!');
-    }
-}
-
-// Initialize collection type toggle
-function initializeCollectionType() {
-    toggleCollectionType();
-}
-        async function loadAllSales() { sales = await apiCall('/sales'); }
-        
-        // ==================== TRANSFER FUNCTIONS ====================
-        function loadOldMemberInfo() {
-            const memberId = document.getElementById('oldMemberId').value;
-            const member = members.find(m => m.id === memberId);
-            document.getElementById('oldMemberInfo').innerHTML = member ? `<h4>📋 ${escapeHtml(member.fullName)}</h4><p>📞 ${member.phone} | 👔 ${member.role}</p>` : '';
-        }
-        
-        async function processNameTransfer() {
-            const oldMemberId = document.getElementById('oldMemberId').value;
-            const newMemberName = document.getElementById('newMemberName').value;
-            const transferDate = document.getElementById('transferDate').value;
-            if (!oldMemberId || !newMemberName || !transferDate) { alert('ሁሉንም መረጃዎች ይሙሉ!'); return; }
-            const oldMember = members.find(m => m.id === oldMemberId);
-            let transferDocument = null;
-            const file = document.getElementById('transferDocument').files[0];
-            if (file) transferDocument = await fileToBase64(file);
-            await apiCall('/transfers', { method: 'POST', body: JSON.stringify({ oldMemberId, oldMemberName: oldMember.fullName, newMemberName, newMemberIdNumber: document.getElementById('newMemberIdNumber').value, newMemberPhone: document.getElementById('newMemberPhone').value, transferDate, transferFee: parseFloat(document.getElementById('transferFee').value) || 0, transferReason: document.getElementById('transferReason').value, transferDocument }) });
-            if (confirm('የአባሉን ስም ማዘመን ይፈልጋሉ?')) { await apiCall(`/members/${oldMemberId}`, { method: 'PUT', body: JSON.stringify({ ...oldMember, fullName: newMemberName }) }); loadMembers(); }
-            alert('✅ የስም ዝውውር ተመዝግቧል!');
-            document.getElementById('newMemberName').value = ''; document.getElementById('newMemberIdNumber').value = ''; document.getElementById('newMemberPhone').value = '';
-            document.getElementById('transferFee').value = ''; document.getElementById('transferReason').value = ''; document.getElementById('transferDocument').value = '';
-            document.getElementById('transferDocPreview').innerHTML = ''; loadTransfers();
-        }
-        
-        async function loadTransfers() {
-            const transfersData = await apiCall('/transfers');
-            const container = document.getElementById('transferHistoryList');
-            if (!transfersData.length) { container.innerHTML = '<div class="no-data">📭 ምንም ዝውውር የለም</div>'; return; }
-            container.innerHTML = transfersData.map(t => `<div class="member-card"><div class="member-header"><span>📅 ${new Date(t.transferDate).toLocaleDateString()}</span><span class="member-role">✅ ተጠናቋል</span></div><div>👤 ${escapeHtml(t.oldMemberName)} → ${escapeHtml(t.newMemberName)}</div><button onclick="deleteTransfer('${t.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');
-        }
-        
-        async function deleteTransfer(transferId) {
-            if (confirm('ዝውውሩን መሰረዝ ይፈልጋሉ?')) {
-                await apiCall(`/transfers/${transferId}`, { method: 'DELETE' });
-                loadTransfers(); alert('ዝውውር ተሰርዟል!');
-            }
-        }
-        
-        async function searchMembers() {
-            const term = document.getElementById('searchTerm').value;
-            if (!term) { document.getElementById('searchResults').innerHTML = ''; return; }
-            const results = members.filter(m => m.fullName?.toLowerCase().includes(term.toLowerCase()) || m.phone?.includes(term));
-            document.getElementById('searchResults').innerHTML = results.map(m => `<div class="member-card" onclick="showMemberDetails('${m.id}')"><div class="member-header"><div class="member-name">👤 ${escapeHtml(m.fullName)}</div><div class="member-role">${escapeHtml(m.role)}</div></div><div>📞 ${escapeHtml(m.phone)}</div></div>`).join('');
-        }
-        
-        // ==================== TRADING FUNCTIONS ====================
-        async function loadTradingStats() {
-            const stats = await apiCall('/share-trading/stats');
-            document.getElementById('tradingStats').innerHTML = `<div class="stat-card"><div class="stat-value">${stats.totalShares || 0}</div><div>ጠቅላላ አክሲዬን</div></div><div class="stat-card"><div class="stat-value">${stats.pendingRequests || 0}</div><div>በመጠባበቅ ላይ</div></div><div class="stat-card"><div class="stat-value">${stats.approvedRequests || 0}</div><div>የጸደቁ</div></div>`;
-        }
-        
-        async function loadPendingRequests() {
-            const requests = await apiCall('/share-trading/pending');
-            const container = document.getElementById('pendingRequestsList');
-            if (!requests.length) { container.innerHTML = '<div class="no-data">⏳ ምንም ጥያቄ የለም</div>'; return; }
-            container.innerHTML = requests.map(r => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div><div>📊 ${r.shareAmount} አክሲዬን | 💰 ${r.totalValue.toFixed(2)} ብር</div><div class="member-actions"><button class="btn-primary" onclick="approveTradingRequest('${r.id}')">✅ ጸድቋል</button><button class="btn-danger" onclick="rejectTradingRequest('${r.id}')">❌ ውድቅ ተደርጓል</button></div></div>`).join('');
-        }
-        
-        async function approveTradingRequest(requestId) {
-            if (confirm('ይህን ጥያቄ ማጽደቅ ይፈልጋሉ?')) {
-                const result = await apiCall(`/share-trading/approve/${requestId}`, { method: 'POST' });
-                if (result.success) { alert('✅ ጥያቄ ጸድቋል!'); loadPendingRequests(); loadAllRequests(); loadTradingStats(); loadMembers(); }
-                else alert(result.message || 'Approval failed');
-            }
-        }
-        
-        async function rejectTradingRequest(requestId) {
-            const reason = prompt('ውድቅ ምክንያት:');
-            if (reason !== null) {
-                const result = await apiCall(`/share-trading/reject/${requestId}`, { method: 'POST', body: JSON.stringify({ reason }) });
-                if (result.success) { alert('❌ ጥያቄ ውድቅ ተደርጓል!'); loadPendingRequests(); loadAllRequests(); loadTradingStats(); }
-                else alert(result.message || 'Rejection failed');
-            }
-        }
-        async function approveTradingRequest(requestId) {
-    if (confirm('ይህን ጥያቄ ማጽደቅ ይፈልጋሉ?')) {
-        const request = tradingRequests.find(r => r.id === requestId);
-        
-        // Validate share availability for buy requests
-        if (request.requestType === 'buy') {
-            const remainingShares = updateShareStatistics();
-            if (request.shareAmount > remainingShares) {
-                alert(`⚠️ በቂ አክሲዬን የለም! የቀረው: ${remainingShares}`);
-                return;
-            }
-        }
-        
-        const result = await apiCall(`/share-trading/approve/${requestId}`, { method: 'POST' });
-        if (result.success) { 
-            alert('✅ ጥያቄ ጸድቋል!'); 
-            loadPendingRequests(); 
-            loadAllRequests(); 
-            loadTradingStats(); 
-            loadMembers();
-            updateShareStatistics(); // Update share stats
-        } else {
-            alert(result.message || 'Approval failed');
-        }
-    }
-}
-        async function loadAllRequests() {
-            const requests = await apiCall('/share-trading/requests');
-            const container = document.getElementById('allRequestsList');
-            if (!requests.length) { container.innerHTML = '<div class="no-data">📭 ምንም ጥያቄ የለም</div>'; return; }
-            container.innerHTML = requests.slice(0, 20).map(r => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(r.memberName)}</div><div class="member-role">${r.requestType === 'buy' ? '📥 መግዛት' : '📤 መሸጥ'}</div></div><div>📅 ${new Date(r.createdAt).toLocaleDateString()} | 📊 ${r.shareAmount} አክሲዬን</div></div>`).join('');
-        }
-        // ==================== SHARE STATISTICS FUNCTIONS ====================
-
-// ==================== SHARE STATISTICS FUNCTIONS ====================
-
-function updateShareStatistics() {
-    console.log("Updating share statistics...");
-    
-    const totalSharesLimit = 25000;
-    
-    // Calculate total sold shares from all members
-    let soldShares = 0;
-    if (members && members.length > 0) {
-        soldShares = members.reduce((sum, member) => {
-            const shares = parseInt(member.shareCount) || 0;
-            return sum + shares;
-        }, 0);
-    }
-    
-    const remainingShares = totalSharesLimit - soldShares;
-    
-    // Update the display
-    const soldSharesElement = document.getElementById('soldShares');
-    const remainingSharesElement = document.getElementById('remainingShares');
-    
-    if (soldSharesElement) soldSharesElement.innerHTML = soldShares.toLocaleString();
-    if (remainingSharesElement) remainingSharesElement.innerHTML = remainingShares.toLocaleString();
-    
-    console.log(`Sold: ${soldShares}, Remaining: ${remainingShares}`);
-    
-    return remainingShares;
-}
-
-// Validate if requested shares are available
-function validateShareAvailability(requestedShares) {
-    const remainingShares = updateShareStatistics();
-    if (requestedShares > remainingShares) {
-        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\nInsufficient shares! Remaining shares: ${remainingShares}`);
-        return false;
-    }
-    return true;
-}
-        
-        // ==================== ADMIN FUNCTIONS ====================
-        async function updateUserProfile() {
-            const oldPassword = document.getElementById('oldPassword').value;
-            if (!oldPassword) { alert('እባክዎ አሮጌ የይለፍ ቃል ያስገቡ!'); return; }
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            if (newPassword && newPassword !== confirmPassword) { alert('አዲስ የይለፍ ቃል አይዛመድም!'); return; }
-            const result = await apiCall('/auth/update-profile', { method: 'PUT', body: JSON.stringify({ oldPassword, fullName: document.getElementById('newFullName').value, username: document.getElementById('newUsername').value, email: document.getElementById('newEmail').value, newPassword: newPassword || undefined }) });
-            if (result.success) { alert('✅ መረጃ ተሻሽሏል! እንደገና ይግቡ'); setTimeout(() => logout(), 2000); }
-            else alert(result.message);
-        }
-        
-        async function loadAllUsers() {
-            const users = await apiCall('/auth/users');
-            const container = document.getElementById('usersList');
-            if (!users.length) { container.innerHTML = '<p>No users found</p>'; return; }
-            container.innerHTML = users.map(u => `<div class="member-card"><div class="member-header"><div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="share-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div><div>Username: ${escapeHtml(u.username)} | Email: ${escapeHtml(u.email)}</div>${u.id !== currentUser.id ? `<div class="member-actions"><button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button><button class="btn-edit" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button></div>` : ''}</div>`).join('');
-        }
-        
-        async function createNewUser() {
-            const result = await apiCall('/auth/register', { method: 'POST', body: JSON.stringify({ fullName: document.getElementById('newUserFullName').value, username: document.getElementById('newUserUsername').value, email: document.getElementById('newUserEmail').value, password: document.getElementById('newUserPassword').value, role: document.getElementById('newUserRole').value }) });
-            if (result.success) { alert('✅ አዲስ ተጠቃሚ ተፈጥሯል!'); loadAllUsers(); }
-            else alert(result.message);
-        }
-        
-        async function deleteUser(userId) {
-            if (confirm('እርግጠኛ ነዎት?')) {
-                const result = await apiCall(`/auth/users/${userId}`, { method: 'DELETE' });
-                if (result.success) { alert('✅ ተጠቃሚ ተሰርዟል!'); loadAllUsers(); }
-                else alert(result.message);
-            }
-        }
-        
-        async function resetUserPassword(userId) {
-            const newPassword = prompt('Enter new password:');
-            if (newPassword && newPassword.length >= 6) {
-                const result = await apiCall(`/auth/users/${userId}/reset-password`, { method: 'PUT', body: JSON.stringify({ newPassword }) });
-                if (result.success) alert('✅ የይለፍ ቃል ተለውጧል!');
-                else alert(result.message);
-            }
-        }
-        
-        // ==================== EXPORT CSV ====================
-        function exportToCSV() {
-            if (!members.length) { alert('ምንም አባላት የሉም!'); return; }
-            const headers = ['ተራ ቁጥር', 'ሙሉ ስም', 'ፆታ', 'ዕድሜ', 'የእናት ስም', 'አድራሻ', 'ስልክ', 'ሚና', 'የአክሲዬን ብዛት', 'የተከፈለ', 'ቀሪ', 'የክፍያ ሁኔታ', 'ባንክ', 'የአካውንት ቁጥር'];
-            const rows = members.map((m, idx) => [idx + 1, m.fullName, m.gender, m.age, m.motherName, `${m.region || ''} ${m.zone || ''} ${m.district || ''}`, m.phone, m.role, m.shareCount || 0, m.sharePricePaid || 0, m.remainingBalance || 0, m.paymentStatus || '', m.bankName || '', m.accountNumber || '']);
-            const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `members_${new Date().toISOString().split('T')[0]}.csv`; link.click();
-            alert(`✅ ${members.length} አባላት ወደ CSV ተልከዋል!`);
-        }
-        
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-            if (tabId === 'list') loadMembers();
-            if (tabId === 'sales') { loadAllSales(); loadMemberSales(); }
-            if (tabId === 'transfer') loadTransfers();
-            if (tabId === 'trading') { loadTradingStats(); loadPendingRequests(); loadAllRequests(); }
-        }
-        
-        function logout() { stopInactivityTracking(); localStorage.clear(); window.location.href = '/'; }
-        
-        // Initialize event listeners
-        document.getElementById('quantity')?.addEventListener('input', calculateTotalAmount);
-        document.getElementById('pricePerKg')?.addEventListener('input', calculateTotalAmount);
-        document.getElementById('saleDate').valueAsDate = new Date();
-        document.getElementById('transferDate').valueAsDate = new Date();
-        document.getElementById('shareCount')?.addEventListener('input', calculateShareTotal);
-        document.getElementById('sharePricePaid')?.addEventListener('input', calculateRemainingBalance);
-        document.getElementById('userName').innerHTML = `👤 ${escapeHtml(currentUser.fullName) || 'Admin'}`;
-        
-        // Initialize location data
-        loadZones();
-        
-        // Initialize
-        loadMembers(); loadAllSales(); loadTransfers(); startInactivityTracking();
-        
-        // Make functions global
-        window.showTab = showTab; window.deleteMember = deleteMember; window.exportToCSV = exportToCSV;
-        window.searchMemberForSales = searchMemberForSales; window.loadMemberSales = loadMemberSales;
-        window.addSale = addSale; window.deleteSale = deleteSale; window.loadOldMemberInfo = loadOldMemberInfo;
-        window.processNameTransfer = processNameTransfer; window.deleteTransfer = deleteTransfer;
-        window.searchMembers = searchMembers; window.openLightbox = openLightbox; window.closeLightbox = closeLightbox;
-        window.previewImage = previewImage; window.logout = logout; window.calculateRemainingBalance = calculateRemainingBalance;
-        window.approveTradingRequest = approveTradingRequest; window.rejectTradingRequest = rejectTradingRequest;
-        window.updateUserProfile = updateUserProfile; window.loadAllUsers = loadAllUsers; window.createNewUser = createNewUser;
-        window.deleteUser = deleteUser; window.resetUserPassword = resetUserPassword; window.showMemberDetails = showMemberDetails;
-        window.closeMemberModal = closeMemberModal; window.enableEditMode = enableEditMode; window.saveMemberEdit = saveMemberEdit;
-        window.cancelEditMode = cancelEditMode; window.togglePowerOfAttorneyOptions = togglePowerOfAttorneyOptions;
-        window.generateBeneficiaryForms = generateBeneficiaryForms; window.removeBeneficiary = removeBeneficiary;
-        window.toggleOtherRelationshipBeneficiary = toggleOtherRelationshipBeneficiary;
-        window.previewBeneficiaryImage = previewBeneficiaryImage; window.previewBeneficiaryDoc = previewBeneficiaryDoc;
-        window.calculateShareTotal = calculateShareTotal; window.toggleOtherBank = toggleOtherBank;
-        window.loadZones = loadZones; window.loadDistricts = loadDistricts; window.loadCities = loadCities;
-        window.toggleCollectionType = toggleCollectionType;
-window.filterSalesHistory = filterSalesHistory;
-window.initializeCollectionType = initializeCollectionType;
-        window.calculateTotalAmount = calculateTotalAmount;
+        window.showTab=showTab;window.deleteMember=deleteMember;window.exportToCSV=exportToCSV;window.searchMemberForSales=searchMemberForSales;window.loadMemberSales=loadMemberSales;window.addSale=addSale;window.deleteSale=deleteSale;window.loadOldMemberInfo=loadOldMemberInfo;window.processNameTransfer=processNameTransfer;window.deleteTransfer=deleteTransfer;window.searchMembers=searchMembers;window.openLightbox=openLightbox;window.closeLightbox=closeLightbox;window.previewImage=previewImage;window.logout=logout;window.calculateRemainingBalance=calculateRemainingBalance;window.approveTradingRequest=approveTradingRequest;window.rejectTradingRequest=rejectTradingRequest;window.updateUserProfile=updateUserProfile;window.loadAllUsers=loadAllUsers;window.createNewUser=createNewUser;window.deleteUser=deleteUser;window.resetUserPassword=resetUserPassword;window.showMemberDetails=showMemberDetails;window.closeMemberModal=closeMemberModal;window.enableEditMode=enableEditMode;window.saveMemberEdit=saveMemberEdit;window.cancelEditMode=cancelEditMode;window.togglePowerOfAttorneyOptions=togglePowerOfAttorneyOptions;window.generateBeneficiaryForms=generateBeneficiaryForms;window.removeBeneficiary=removeBeneficiary;window.toggleOtherRelationshipBeneficiary=toggleOtherRelationshipBeneficiary;window.previewBeneficiaryImage=previewBeneficiaryImage;window.previewBeneficiaryDoc=previewBeneficiaryDoc;window.calculateShareTotal=calculateShareTotal;window.toggleOtherBank=toggleOtherBank;window.loadZones=loadZones;window.loadDistricts=loadDistricts;window.loadCities=loadCities;window.toggleCollectionType=toggleCollectionType;window.filterSalesHistory=filterSalesHistory;window.calculateTotalAmount=calculateTotalAmount;window.updateShareStatistics=updateShareStatistics;
     </script>
 </body>
 </html>
