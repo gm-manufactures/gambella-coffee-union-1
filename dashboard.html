@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
     <style>
+        .stat-card {
+    transition: transform 0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+.stat-label {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
         .navbar{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
@@ -310,19 +321,130 @@
         </div>
         
         <!-- Sales Tab -->
-        <div id="sales" class="tab-content"><h2>💰 የሽያጭ ታሪክ</h2>
-            <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px"><h4>🔍 አባል ይፈልጉ</h4><div class="form-row"><input type="text" id="salesMemberSearch" placeholder="በስም ይፈልጉ..." onkeyup="searchMemberForSales()"><select id="selectedMemberId" onchange="loadMemberSales()"><option value="">አባል ይምረጡ</option></select></div></div>
-            <div id="selectedMemberInfo"></div>
-            <div class="form-section"><h3>➕ አዲስ ሽያጭ</h3>
-                <div class="form-row"><div class="form-group"><label>📅 ቀን</label><input type="date" id="saleDate" required></div><div class="form-group"><label>🏷️ ምርት</label><select id="productType"><option>የጫካ ቡና</option><option>የአትክልት ቡና</option></select></div></div>
-                <div class="form-row"><div class="form-group"><label>⚖️ ብዛት (ኪሎ)</label><input type="number" id="quantity" step="0.01" required></div><div class="form-group"><label>💰 ዋጋ በአንድ ኪሎ</label><input type="number" id="pricePerKg" step="0.01" required></div></div>
-                <div class="form-row"><div class="form-group"><label>💵 ጠቅላላ</label><input type="text" id="totalAmount" readonly></div><div class="form-group"><label>💳 ክፍያ</label><select id="paymentMethod"><option>ጥሬ ገንዘብ</option><option>ባንክ ዝውውር</option></select></div></div>
-                <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="saleNotes" rows="2"></textarea></div>
-                <div class="form-group"><label>🧾 ደረሰኝ</label><input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this,'receiptPreview')"><div id="receiptPreview" class="image-preview"></div></div>
-                <button onclick="addSale()" class="btn-primary">💾 ያስመዝግቡ</button>
-            </div>
-            <div class="form-section"><h3>📜 ታሪክ</h3><div id="salesStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px"></div><div id="salesHistoryList"></div></div>
+<div id="sales" class="tab-content">
+    <h2>💰 የቡና ሽያጭ እና ክትትል</h2>
+    
+    <!-- Coffee Collection Summary Cards -->
+    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
+        <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">👥 ከአባላት የተሰበሰበ</div>
+            <div class="stat-value" id="memberCoffeeTotal" style="font-size:1.8em; font-weight:bold">0 kg</div>
         </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">🏪 ከአባላት ውጪ የተሰበሰበ</div>
+            <div class="stat-value" id="nonMemberCoffeeTotal" style="font-size:1.8em; font-weight:bold">0 kg</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
+            <div class="stat-label">📊 አጠቃላይ የተሰበሰበ</div>
+            <div class="stat-value" id="totalCoffeeCollected" style="font-size:1.8em; font-weight:bold">0 kg</div>
+        </div>
+    </div>
+    
+    <!-- Member Selection for Coffee Collection -->
+    <div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:20px">
+        <h4>🔍 አባል ይምረጡ (ለአባላት ቡና ምዝገባ)</h4>
+        <div class="form-row">
+            <input type="text" id="salesMemberSearch" placeholder="በስም ወይም በስልክ ይፈልጉ..." onkeyup="searchMemberForSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
+            <select id="selectedMemberId" onchange="loadMemberSales()" style="padding:10px;border:1px solid #ddd;border-radius:6px">
+                <option value="">አባል ይምረጡ</option>
+            </select>
+        </div>
+    </div>
+    
+    <div id="selectedMemberInfo"></div>
+    
+    <!-- Coffee Collection Form -->
+    <div class="form-section">
+        <h3>📥 የቡና ሰብሳቢ መዝገብ</h3>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>📅 ቀን</label>
+                <input type="date" id="saleDate" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label>🏷️ የቡና አይነት</label>
+                <select id="productType" class="form-control">
+                    <option value="የጫካ ቡና">የጫካ ቡና (Forest Coffee)</option>
+                    <option value="የአትክልት ቡና">የአትክልት ቡና (Garden Coffee)</option>
+                    <option value="ኦርጋኒክ ቡና">ኦርጋኒክ ቡና (Organic Coffee)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>📊 የሰብሳቢነት አይነት</label>
+                <select id="collectionType" class="form-control" onchange="toggleCollectionType()">
+                    <option value="member">ከአባላት የተሰበሰበ (From Members)</option>
+                    <option value="nonmember">ከአባላት ውጪ የተሰበሰበ (From Non-Members)</option>
+                </select>
+            </div>
+            <div class="form-group" id="nonMemberNameGroup" style="display:none">
+                <label>👤 የሻጩ ሙሉ ስም (ከአባል ውጪ ከሆነ)</label>
+                <input type="text" id="nonMemberName" placeholder="የሻጩ ሙሉ ስም" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>⚖️ ብዛት (ኪሎ ግራም)</label>
+                <input type="number" id="quantity" step="0.01" required class="form-control" oninput="calculateTotalAmount()">
+            </div>
+            <div class="form-group">
+                <label>💰 ዋጋ በአንድ ኪሎ (ብር)</label>
+                <input type="number" id="pricePerKg" step="0.01" required class="form-control" oninput="calculateTotalAmount()">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>💵 ጠቅላላ ዋጋ (ብር)</label>
+                <input type="text" id="totalAmount" readonly style="background:#e9ecef" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>💳 የክፍያ ዘዴ</label>
+                <select id="paymentMethod" class="form-control">
+                    <option value="ጥሬ ገንዘብ">ጥሬ ገንዘብ (Cash)</option>
+                    <option value="ባንክ ዝውውር">ባንክ ዝውውር (Bank Transfer)</option>
+                    <option value="ቼክ">ቼክ (Check)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>📝 ማስታወሻ</label>
+            <textarea id="saleNotes" rows="2" class="form-control" placeholder="ተጨማሪ መረጃ..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>🧾 ደረሰኝ ፎቶ (ካለ)</label>
+            <input type="file" id="receiptPhoto" accept="image/*" onchange="previewImage(this,'receiptPreview')">
+            <div id="receiptPreview" class="image-preview"></div>
+        </div>
+        
+        <button onclick="addSale()" class="btn-primary">💾 ሽያጭ ያስመዝግቡ</button>
+    </div>
+    
+    <!-- Sales History by Type -->
+    <div class="form-section">
+        <h3>📜 የተመዘገቡ ሽያጮች ታሪክ</h3>
+        
+        <div class="form-row" style="margin-bottom:15px">
+            <div class="form-group">
+                <label>🔍 በሰብሳቢነት አይነት አጣራ</label>
+                <select id="filterCollectionType" onchange="filterSalesHistory()" class="form-control">
+                    <option value="all">ሁሉም (All)</option>
+                    <option value="member">ከአባላት (From Members)</option>
+                    <option value="nonmember">ከአባላት ውጪ (From Non-Members)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="salesStats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px"></div>
+        <div id="salesHistoryList" style="max-height:400px; overflow-y:auto"></div>
+    </div>
+</div>
         
         <!-- Transfer Tab -->
         <div id="transfer" class="tab-content"><h2>🔄 የስም ዝውውር</h2>
@@ -1213,67 +1335,276 @@ async function saveMemberEdit() {
         console.error('Error saving member edit:', error);
         alert('❌ ስህተት: ' + error.message);
     }
+}// ==================== COFFEE COLLECTION FUNCTIONS ====================
+
+function toggleCollectionType() {
+    const collectionType = document.getElementById('collectionType').value;
+    const nonMemberGroup = document.getElementById('nonMemberNameGroup');
+    const memberSelect = document.getElementById('selectedMemberId');
+    
+    if (collectionType === 'nonmember') {
+        nonMemberGroup.style.display = 'block';
+        memberSelect.disabled = true;
+        memberSelect.style.opacity = '0.5';
+        document.getElementById('selectedMemberInfo').innerHTML = '';
+    } else {
+        nonMemberGroup.style.display = 'none';
+        memberSelect.disabled = false;
+        memberSelect.style.opacity = '1';
+    }
 }
-        // ==================== SALES FUNCTIONS ====================
-        function searchMemberForSales() {
-            const term = document.getElementById('salesMemberSearch').value.toLowerCase();
-            const select = document.getElementById('selectedMemberId');
-            const filtered = members.filter(m => m.fullName?.toLowerCase().includes(term) || m.phone?.includes(term));
-            select.innerHTML = '<option value="">አባል ይምረጡ</option>' + filtered.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+
+function updateCoffeeSummary() {
+    // Calculate totals from sales array
+    let memberTotal = 0;
+    let nonMemberTotal = 0;
+    
+    sales.forEach(sale => {
+        if (sale.collectionType === 'member') {
+            memberTotal += sale.quantity || 0;
+        } else if (sale.collectionType === 'nonmember') {
+            nonMemberTotal += sale.quantity || 0;
         }
-        
-        async function loadMemberSales() {
-            const memberId = document.getElementById('selectedMemberId').value;
-            if (!memberId) return;
-            const member = members.find(m => m.id === memberId);
-            if (member) document.getElementById('selectedMemberInfo').innerHTML = `<h4>✅ ${escapeHtml(member.fullName)}</h4>`;
-            const memberSales = sales.filter(s => s.memberId === memberId);
-            displaySalesHistory(memberSales);
-            displaySalesStats(memberSales);
+    });
+    
+    document.getElementById('memberCoffeeTotal').innerHTML = memberTotal.toFixed(2) + ' kg';
+    document.getElementById('nonMemberCoffeeTotal').innerHTML = nonMemberTotal.toFixed(2) + ' kg';
+    document.getElementById('totalCoffeeCollected').innerHTML = (memberTotal + nonMemberTotal).toFixed(2) + ' kg';
+}
+
+function filterSalesHistory() {
+    const filterType = document.getElementById('filterCollectionType').value;
+    let filteredSales = sales;
+    
+    if (filterType !== 'all') {
+        filteredSales = sales.filter(s => s.collectionType === filterType);
+    }
+    
+    displayAllSalesHistory(filteredSales);
+}
+
+function displayAllSalesHistory(salesData) {
+    const container = document.getElementById('salesHistoryList');
+    
+    if (!salesData.length) {
+        container.innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>';
+        return;
+    }
+    
+    // Calculate summary for filtered sales
+    const totalQty = salesData.reduce((sum, s) => sum + (s.quantity || 0), 0);
+    const totalAmt = salesData.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
+    const memberSales = salesData.filter(s => s.collectionType === 'member').length;
+    const nonMemberSales = salesData.filter(s => s.collectionType === 'nonmember').length;
+    
+    document.getElementById('salesStats').innerHTML = `
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${salesData.length}</div>
+            <div>ጠቅላላ ግብይቶች</div>
+        </div>
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales}</div>
+            <div>ከአባላት ግብይቶች</div>
+        </div>
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${nonMemberSales}</div>
+            <div>ከአባላት ውጪ ግብይቶች</div>
+        </div>
+        <div class="stat-card" style="background:#17a2b8;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div>
+            <div>ጠቅላላ ብዛት</div>
+        </div>
+        <div class="stat-card" style="background:#f5c542;color:#333;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div>
+            <div>ጠቅላላ ገቢ</div>
+        </div>
+    `;
+    
+    container.innerHTML = salesData.map(s => `
+        <div class="member-card">
+            <div class="member-header">
+                <span>📅 ${new Date(s.date).toLocaleDateString()}</span>
+                <span class="member-role">${s.collectionType === 'member' ? '👥 ከአባል' : '🏪 ከአባል ውጪ'} | ${s.totalAmount.toFixed(2)} ብር</span>
+            </div>
+            <div class="member-details">
+                <div><span class="detail-label">🏷️ ምርት:</span> ${s.productType}</div>
+                <div><span class="detail-label">⚖️ ብዛት:</span> ${s.quantity} kg</div>
+                <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
+                <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
+                ${s.memberName ? `<div><span class="detail-label">👤 አባል:</span> ${escapeHtml(s.memberName)}</div>` : ''}
+                ${s.nonMemberName ? `<div><span class="detail-label">👤 ሻጭ:</span> ${escapeHtml(s.nonMemberName)}</div>` : ''}
+                ${s.notes ? `<div><span class="detail-label">📝 ማስታወሻ:</span> ${escapeHtml(s.notes)}</div>` : ''}
+            </div>
+            <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
+        </div>
+    `).join('');
+}
+
+// Update the addSale function
+async function addSale() {
+    const collectionType = document.getElementById('collectionType').value;
+    const date = document.getElementById('saleDate').value;
+    const quantity = parseFloat(document.getElementById('quantity').value);
+    const pricePerKg = parseFloat(document.getElementById('pricePerKg').value);
+    
+    if (!date || !quantity || !pricePerKg) {
+        alert('ሁሉንም መረጃዎች ይሙሉ!');
+        return;
+    }
+    
+    let memberId = null;
+    let memberName = null;
+    let nonMemberName = null;
+    
+    if (collectionType === 'member') {
+        memberId = document.getElementById('selectedMemberId').value;
+        if (!memberId) {
+            alert('እባክዎ አባል ይምረጡ!');
+            return;
         }
-        
-        function displaySalesStats(memberSales) {
-            const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
-            const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
-            document.getElementById('salesStats').innerHTML = `<div class="stat-card"><div class="stat-value">${memberSales.length}</div><div>ግብይቶች</div></div><div class="stat-card"><div class="stat-value">${totalQty.toFixed(2)} kg</div><div>ብዛት</div></div><div class="stat-card"><div class="stat-value">${totalAmt.toFixed(2)} ብር</div><div>ገቢ</div></div>`;
+        const member = members.find(m => m.id === memberId);
+        if (member) memberName = member.fullName;
+    } else {
+        nonMemberName = document.getElementById('nonMemberName').value;
+        if (!nonMemberName) {
+            alert('እባክዎ የሻጩን ሙሉ ስም ያስገቡ!');
+            return;
         }
+    }
+    
+    let receiptPhoto = null;
+    const file = document.getElementById('receiptPhoto').files[0];
+    if (file) receiptPhoto = await fileToBase64(file);
+    
+    const newSale = {
+        memberId: memberId,
+        memberName: memberName,
+        collectionType: collectionType,
+        nonMemberName: nonMemberName,
+        date: date,
+        productType: document.getElementById('productType').value,
+        quantity: quantity,
+        pricePerKg: pricePerKg,
+        totalAmount: quantity * pricePerKg,
+        paymentMethod: document.getElementById('paymentMethod').value,
+        notes: document.getElementById('saleNotes').value,
+        receiptPhoto: receiptPhoto,
+        recordedBy: currentUser.id,
+        createdAt: new Date().toISOString()
+    };
+    
+    try {
+        const result = await apiCall('/sales', { method: 'POST', body: JSON.stringify(newSale) });
+        sales.push(result);
+        alert('✅ ሽያጭ ተመዝግቧል!');
         
-        function displaySalesHistory(memberSales) {
-            if (!memberSales.length) { document.getElementById('salesHistoryList').innerHTML = '<div class="no-data">📭 ምንም ሽያጭ የለም</div>'; return; }
-            document.getElementById('salesHistoryList').innerHTML = memberSales.map(s => `<div class="member-card"><div class="member-header"><span>📅 ${new Date(s.date).toLocaleDateString()}</span><span class="member-role">${s.totalAmount.toFixed(2)} ብር</span></div><div>🏷️ ${s.productType} | ⚖️ ${s.quantity} kg</div><button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button></div>`).join('');
-        }
+        // Clear form
+        document.getElementById('quantity').value = '';
+        document.getElementById('pricePerKg').value = '';
+        document.getElementById('saleNotes').value = '';
+        document.getElementById('receiptPhoto').value = '';
+        document.getElementById('receiptPreview').innerHTML = '';
+        document.getElementById('nonMemberName').value = '';
+        document.getElementById('collectionType').value = 'member';
+        toggleCollectionType();
         
-        function calculateTotalAmount() {
-            const qty = parseFloat(document.getElementById('quantity').value) || 0;
-            const price = parseFloat(document.getElementById('pricePerKg').value) || 0;
-            document.getElementById('totalAmount').value = (qty * price).toFixed(2) + ' ብር';
-        }
-        
-        async function addSale() {
-            const memberId = document.getElementById('selectedMemberId').value;
-            if (!memberId) { alert('እባክዎ አባል ይምረጡ!'); return; }
-            const date = document.getElementById('saleDate').value;
-            const quantity = parseFloat(document.getElementById('quantity').value);
-            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value);
-            if (!date || !quantity || !pricePerKg) { alert('ሁሉንም መረጃዎች ይሙሉ!'); return; }
-            let receiptPhoto = null;
-            const file = document.getElementById('receiptPhoto').files[0];
-            if (file) receiptPhoto = await fileToBase64(file);
-            await apiCall('/sales', { method: 'POST', body: JSON.stringify({ memberId, date, productType: document.getElementById('productType').value, quantity, pricePerKg, totalAmount: quantity * pricePerKg, paymentMethod: document.getElementById('paymentMethod').value, notes: document.getElementById('saleNotes').value, receiptPhoto }) });
-            alert('✅ ሽያጭ ተመዝግቧል!');
-            document.getElementById('quantity').value = ''; document.getElementById('pricePerKg').value = ''; document.getElementById('saleNotes').value = '';
-            document.getElementById('receiptPhoto').value = ''; document.getElementById('receiptPreview').innerHTML = '';
-            await loadAllSales(); loadMemberSales();
-        }
-        
-        async function deleteSale(saleId) {
-            if (confirm('ሽያጭ ይሰረዛል?')) {
-                await apiCall(`/sales/${saleId}`, { method: 'DELETE' });
-                await loadAllSales(); loadMemberSales();
-                alert('ሽያጭ ተሰርዟል!');
-            }
-        }
-        
+        // Update displays
+        updateCoffeeSummary();
+        loadMemberSales();
+        filterSalesHistory();
+    } catch (error) {
+        console.error('Error adding sale:', error);
+        alert('❌ ስህተት: ' + error.message);
+    }
+}
+
+// Update loadAllSales to also update coffee summary
+async function loadAllSales() {
+    const salesData = await apiCall('/sales');
+    sales = salesData;
+    updateCoffeeSummary();
+    filterSalesHistory();
+}
+
+// Update loadMemberSales to show member sales only
+async function loadMemberSales() {
+    const memberId = document.getElementById('selectedMemberId').value;
+    if (!memberId) {
+        document.getElementById('selectedMemberInfo').innerHTML = '';
+        return;
+    }
+    
+    const member = members.find(m => m.id === memberId);
+    if (member) {
+        document.getElementById('selectedMemberInfo').innerHTML = `
+            <div style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px">
+                <h4>✅ ${escapeHtml(member.fullName)}</h4>
+                <p>📞 ${member.phone} | 👔 ${member.role}</p>
+                <p>📊 የአክሲዬን ብዛት: ${member.shareCount || 0}</p>
+            </div>
+        `;
+    }
+    
+    const memberSales = sales.filter(s => s.memberId === memberId);
+    displayMemberSalesHistory(memberSales);
+}
+
+function displayMemberSalesHistory(memberSales) {
+    const container = document.getElementById('salesHistoryList');
+    if (!memberSales.length) {
+        container.innerHTML = '<div class="no-data">📭 ለዚህ አባል ምንም ሽያጭ የለም</div>';
+        return;
+    }
+    
+    const totalQty = memberSales.reduce((s, sale) => s + (sale.quantity || 0), 0);
+    const totalAmt = memberSales.reduce((s, sale) => s + (sale.totalAmount || 0), 0);
+    
+    document.getElementById('salesStats').innerHTML = `
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${memberSales.length}</div>
+            <div>ግብይቶች</div>
+        </div>
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalQty.toFixed(2)} kg</div>
+            <div>ጠቅላላ ብዛት</div>
+        </div>
+        <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
+            <div class="stat-value" style="font-size:1.5em;font-weight:bold">${totalAmt.toFixed(2)} ብር</div>
+            <div>ጠቅላላ ገቢ</div>
+        </div>
+    `;
+    
+    container.innerHTML = memberSales.map(s => `
+        <div class="member-card">
+            <div class="member-header">
+                <span>📅 ${new Date(s.date).toLocaleDateString()}</span>
+                <span class="member-role">${s.totalAmount.toFixed(2)} ብር</span>
+            </div>
+            <div class="member-details">
+                <div><span class="detail-label">🏷️ ምርት:</span> ${s.productType}</div>
+                <div><span class="detail-label">⚖️ ብዛት:</span> ${s.quantity} kg</div>
+                <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
+                <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
+            </div>
+            <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
+        </div>
+    `).join('');
+}
+
+// Update deleteSale to refresh coffee summary
+async function deleteSale(saleId) {
+    if (confirm('ሽያጭ ይሰረዛል?')) {
+        await apiCall(`/sales/${saleId}`, { method: 'DELETE' });
+        await loadAllSales();
+        loadMemberSales();
+        alert('ሽያጭ ተሰርዟል!');
+    }
+}
+
+// Initialize collection type toggle
+function initializeCollectionType() {
+    toggleCollectionType();
+}
         async function loadAllSales() { sales = await apiCall('/sales'); }
         
         // ==================== TRANSFER FUNCTIONS ====================
@@ -1456,6 +1787,9 @@ async function saveMemberEdit() {
         window.previewBeneficiaryImage = previewBeneficiaryImage; window.previewBeneficiaryDoc = previewBeneficiaryDoc;
         window.calculateShareTotal = calculateShareTotal; window.toggleOtherBank = toggleOtherBank;
         window.loadZones = loadZones; window.loadDistricts = loadDistricts; window.loadCities = loadCities;
+        window.toggleCollectionType = toggleCollectionType;
+window.filterSalesHistory = filterSalesHistory;
+window.initializeCollectionType = initializeCollectionType;
     </script>
 </body>
 </html>
