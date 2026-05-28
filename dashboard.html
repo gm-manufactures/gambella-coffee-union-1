@@ -1590,7 +1590,7 @@ function displayMemberSalesHistory(memberSales) {
         </div>
     `).join('');
 }
-// ==================== CALCULATE TOTAL AMOUNT ====================
+// Add this to your script section
 function calculateTotalAmount() {
     const quantity = parseFloat(document.getElementById('quantity').value) || 0;
     const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
@@ -1598,6 +1598,14 @@ function calculateTotalAmount() {
     const totalAmountField = document.getElementById('totalAmount');
     if (totalAmountField) {
         totalAmountField.value = total.toFixed(2) + ' ብር';
+    }
+    
+    // Optional: Add visual feedback
+    if (quantity > 0 && pricePerKg > 0) {
+        totalAmountField.style.backgroundColor = '#d4edda';
+        setTimeout(() => {
+            totalAmountField.style.backgroundColor = '#e8f5e9';
+        }, 500);
     }
 }
 // Update deleteSale to refresh coffee summary
