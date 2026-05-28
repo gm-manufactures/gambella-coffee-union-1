@@ -701,8 +701,7 @@
             else if (paid > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
             else document.getElementById('paymentStatus').value = 'አልተከፈለም';
         }
-        // Inside the memberForm submit event, after getting shareCount
-const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+     
 
 // Validate share availability
 const remainingShares = updateShareStatistics();
@@ -912,9 +911,6 @@ if (shareCount > remainingShares) {
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
             const totalPayable = shareCount * SHARE_PRICE;
             const remainingBalance = totalPayable - sharePricePaid;
-               // Inside the memberForm submit event, after getting shareCount
-const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-
 // Update share statistics first
 const remainingShares = updateShareStatistics();
 
@@ -1913,6 +1909,7 @@ function validateShareAvailability(requestedShares) {
         loadMembers(); loadAllSales(); loadTransfers(); startInactivityTracking();
         
         // Make functions global
+        window.cancelEditMode = cancelEditMode;
         window.showTab = showTab; window.deleteMember = deleteMember; window.exportToCSV = exportToCSV;
         window.searchMemberForSales = searchMemberForSales; window.loadMemberSales = loadMemberSales;
         window.addSale = addSale; window.deleteSale = deleteSale; window.loadOldMemberInfo = loadOldMemberInfo;
@@ -1931,6 +1928,8 @@ function validateShareAvailability(requestedShares) {
         window.loadZones = loadZones; window.loadDistricts = loadDistricts; window.loadCities = loadCities;
         window.toggleCollectionType = toggleCollectionType;
 window.filterSalesHistory = filterSalesHistory;
+        window.saveMemberEdit = saveMemberEdit;
+        window.closeMemberModal = closeMemberModal;
 window.initializeCollectionType = initializeCollectionType;
         window.calculateTotalAmount = calculateTotalAmount;
     </script>
