@@ -461,27 +461,26 @@
             <div class="form-section"><h3>📜 ታሪክ</h3><div id="transferHistoryList"></div></div>
         </div>
         
-       <!-- Trading Tab -->
+  <!-- Trading Tab -->
 <div id="trading" class="tab-content">
     <h2>📊 የአክሲዬን ግብይት</h2>
     
     <!-- Share Statistics Cards -->
-    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
-        <div class="stat-card" style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">📊 ጠቅላላ አክሲዬን (Total Shares)</div>
-            <div class="stat-value" id="totalSharesLimit" style="font-size:1.8em; font-weight:bold">25,000</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px">
+        <div style="background:linear-gradient(135deg,#2d6a1a,#1a4a0e); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div style="font-size:0.9em; opacity:0.9">📊 ጠቅላላ አክሲዬን</div>
+            <div id="totalSharesLimit" style="font-size:1.8em; font-weight:bold">25,000</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">✅ የተሸጠ አክሲዬን (Sold Shares)</div>
-            <div class="stat-value" id="soldShares" style="font-size:1.8em; font-weight:bold">0</div>
+        <div style="background:linear-gradient(135deg,#17a2b8,#0d6e7a); color:white; padding:20px; border-radius:10px; text-align:center">
+            <div style="font-size:0.9em; opacity:0.9">✅ የተሸጠ አክሲዬን</div>
+            <div id="soldShares" style="font-size:1.8em; font-weight:bold">0</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
-            <div class="stat-label">📈 የቀረ አክሲዬን (Remaining Shares)</div>
-            <div class="stat-value" id="remainingShares" style="font-size:1.8em; font-weight:bold">25,000</div>
+        <div style="background:linear-gradient(135deg,#f5c542,#e6a800); color:#333; padding:20px; border-radius:10px; text-align:center">
+            <div style="font-size:0.9em; opacity:0.9">📈 የቀረ አክሲዬን</div>
+            <div id="remainingShares" style="font-size:1.8em; font-weight:bold">25,000</div>
         </div>
     </div>
     
-    <!-- Existing trading content below -->
     <div id="tradingStats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:20px"></div>
     <div class="form-section"><h3>⏳ በመጠባበቅ ላይ</h3><div id="pendingRequestsList"></div></div>
     <div class="form-section"><h3>📜 ታሪክ</h3><div id="allRequestsList"></div></div>
@@ -898,16 +897,28 @@ if (shareCount > remainingShares) {
             if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
                 await apiCall(`/members/${id}`, { method: 'DELETE' });
                 loadMembers();
+                  updateShareStatistics();
                 alert('አባል ተሰርዟል!');
             }
         }
         // After member registration success
-                 updateShareStatistics();
+               
         // ==================== REGISTER MEMBER ====================
         document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const beneficiaries = await collectBeneficiariesData();
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+            // Inside the memberForm submit event, after getting shareCount
+const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+
+// Update share statistics first
+const remainingShares = updateShareStatistics();
+
+// Validate share availability
+if (shareCount > remainingShares) {
+    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
+    return;
+}
             const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
             const totalPayable = shareCount * SHARE_PRICE;
             const remainingBalance = totalPayable - sharePricePaid;
@@ -966,6 +977,8 @@ if (shareCount > remainingShares) {
                 hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
             };
             const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
+            // After the registration API call succeeds, add:
+updateShareStatistics();
             if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
             else alert('✅ አባል ተመዝግቧል!');
             e.target.reset();
@@ -1365,17 +1378,14 @@ if (shareDifference > 0) {
         alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}`);
         return;
     }
-}
-
-// After successful update
-updateShareStatistics();
-        
+} 
         const result = await response.json();
         
         if (response.ok) {
             alert('✅ አባል በሚገባ ተሻሽሏል! / Member updated successfully!');
             closeMemberModal();
             loadMembers();
+            updateShareStatistics();
             
         } else {
             alert('❌ ስህተት: ' + (result.message || 'Update failed'));
@@ -1781,32 +1791,32 @@ function initializeCollectionType() {
         }
         // ==================== SHARE STATISTICS FUNCTIONS ====================
 
+// ==================== SHARE STATISTICS FUNCTIONS ====================
+
 function updateShareStatistics() {
+    console.log("Updating share statistics...");
+    
     const totalSharesLimit = 25000;
-    const soldShares = members.reduce((sum, member) => sum + (member.shareCount || 0), 0);
+    
+    // Calculate total sold shares from all members
+    let soldShares = 0;
+    if (members && members.length > 0) {
+        soldShares = members.reduce((sum, member) => {
+            const shares = parseInt(member.shareCount) || 0;
+            return sum + shares;
+        }, 0);
+    }
+    
     const remainingShares = totalSharesLimit - soldShares;
     
-    document.getElementById('soldShares').innerHTML = soldShares.toLocaleString();
-    document.getElementById('remainingShares').innerHTML = remainingShares.toLocaleString();
+    // Update the display
+    const soldSharesElement = document.getElementById('soldShares');
+    const remainingSharesElement = document.getElementById('remainingShares');
     
-    // Also update the trading stats
-    const tradingStatsDiv = document.getElementById('tradingStats');
-    if (tradingStatsDiv) {
-        tradingStatsDiv.innerHTML = `
-            <div class="stat-card" style="background:#2d6a1a;color:white;padding:15px;border-radius:10px;text-align:center">
-                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${soldShares}</div>
-                <div>የተሸጠ አክሲዬን</div>
-            </div>
-            <div class="stat-card" style="background:#f5c542;color:#333;padding:15px;border-radius:10px;text-align:center">
-                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${remainingShares}</div>
-                <div>የቀረ አክሲዬን</div>
-            </div>
-            <div class="stat-card" style="background:#17a2b8;color:white;padding:15px;border-radius:10px;text-align:center">
-                <div class="stat-value" style="font-size:1.5em;font-weight:bold">${members.length}</div>
-                <div>ተመዝጋቢ አባላት</div>
-            </div>
-        `;
-    }
+    if (soldSharesElement) soldSharesElement.innerHTML = soldShares.toLocaleString();
+    if (remainingSharesElement) remainingSharesElement.innerHTML = remainingShares.toLocaleString();
+    
+    console.log(`Sold: ${soldShares}, Remaining: ${remainingShares}`);
     
     return remainingShares;
 }
