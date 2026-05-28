@@ -908,7 +908,11 @@ if (shareCount > remainingShares) {
             e.preventDefault();
             const beneficiaries = await collectBeneficiariesData();
             const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-            // Inside the memberForm submit event, after getting shareCount
+         
+            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+            const totalPayable = shareCount * SHARE_PRICE;
+            const remainingBalance = totalPayable - sharePricePaid;
+               // Inside the memberForm submit event, after getting shareCount
 const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
 
 // Update share statistics first
@@ -919,10 +923,6 @@ if (shareCount > remainingShares) {
     alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
     return;
 }
-            const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-            const totalPayable = shareCount * SHARE_PRICE;
-            const remainingBalance = totalPayable - sharePricePaid;
-            
             // Get bank name
             let bankName = document.getElementById('bankName').value;
             if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
