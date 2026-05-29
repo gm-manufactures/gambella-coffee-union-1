@@ -14,27 +14,18 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static(__dirname));
 
 // JWT Secret
-const JWT_SECRET = 'gambella-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'gambella-secret-key-2024';
 
-// ==================== MONGODB CONNECTION ====================
-
-const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) {
-    console.error('❌ MONGODB_URI not set!');
-    process.exit(1);
-}
-
-console.log('🔄 Connecting to MongoDB...');
-
-// ==================== SCHEMAS ====================
+// ==================== MONGODB SCHEMAS ====================
 
 // User Schema
 const UserSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     fullName: { type: String, required: true },
-    role: { type: String, default: 'staff' },
+    role: { type: String, enum: ['admin', 'manager', 'staff', 'member'], default: 'staff' },
     memberId: { type: String, default: null },
     isActive: { type: Boolean, default: true },
     lastLogin: { type: Date },
@@ -55,6 +46,7 @@ const User = mongoose.model('User', UserSchema);
 
 // Member Schema
 const MemberSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     fullName: { type: String, required: true },
     gender: { type: String, required: true },
     age: { type: Number, required: true },
@@ -62,15 +54,29 @@ const MemberSchema = new mongoose.Schema({
     nationality: { type: String, default: 'Ethiopian' },
     education: { type: String },
     address: { type: String, required: true },
+    region: { type: String },
+    zone: { type: String },
+    district: { type: String },
+    city: { type: String },
+    kebele: { type: String },
+    houseNumber: { type: String },
     phone: { type: String, required: true, unique: true },
     taxId: { type: String },
     role: { type: String, required: true },
     shareCount: { type: Number, default: 0 },
     sharePercentage: { type: Number, default: 0 },
+    sharePrice: { type: Number, default: 10000 },
+    totalPayable: { type: Number, default: 0 },
     sharePricePaid: { type: Number, default: 0 },
     remainingBalance: { type: Number, default: 0 },
     paymentStatus: { type: String, default: 'አልተከፈለም' },
-    bankAccountNumber: { type: String },
+    year1Payment: { type: Number, default: 0 },
+    year2Payment: { type: Number, default: 0 },
+    year3Payment: { type: Number, default: 0 },
+    bankName: { type: String },
+    bankBranch: { type: String },
+    accountNumber: { type: String },
+    accountName: { type: String },
     financialNotes: { type: String },
     beneficiaries: { type: Array, default: [] },
     beneficiaryCount: { type: Number, default: 0 },
@@ -85,11 +91,14 @@ const MemberSchema = new mongoose.Schema({
     powerOfAttorneyNotes: { type: String },
     memberPhoto: { type: String },
     memberTaxDoc: { type: String },
+    beneficiaryPhoto: { type: String },
+    beneficiaryTaxDoc: { type: String },
     repPhoto: { type: String },
     repTaxDoc: { type: String },
     hardCopyForm: { type: String },
     powerOfAttorneyPhoto: { type: String },
     hardCopyDocumentPhoto: { type: String },
+    createdBy: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -98,7 +107,11 @@ const Member = mongoose.model('Member', MemberSchema);
 
 // Sale Schema
 const SaleSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     memberId: { type: String, required: true },
+    memberName: { type: String },
+    collectionType: { type: String, default: 'member' },
+    nonMemberName: { type: String },
     date: { type: Date, required: true },
     productType: { type: String, required: true },
     quantity: { type: Number, required: true },
@@ -113,7 +126,50 @@ const SaleSchema = new mongoose.Schema({
 
 const Sale = mongoose.model('Sale', SaleSchema);
 
+// Transfer Schema
+const TransferSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
+    oldMemberId: { type: String, required: true },
+    oldMemberName: { type: String, required: true },
+    newMemberName: { type: String, required: true },
+    newMemberIdNumber: { type: String },
+    newMemberPhone: { type: String },
+    transferDate: { type: Date, required: true },
+    transferFee: { type: Number, default: 0 },
+    transferReason: { type: String },
+    transferDocument: { type: String },
+    status: { type: String, default: 'completed' },
+    processedBy: { type: String },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const Transfer = mongoose.model('Transfer', TransferSchema);
+
+// Trading Request Schema
+const TradingRequestSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
+    memberId: { type: String, required: true },
+    memberName: { type: String, required: true },
+    memberPhone: { type: String },
+    requestType: { type: String, enum: ['buy', 'sell'], required: true },
+    shareAmount: { type: Number, required: true },
+    pricePerShare: { type: Number, default: 10000 },
+    totalValue: { type: Number, required: true },
+    status: { type: String, default: 'pending' },
+    notes: { type: String },
+    rejectionReason: { type: String },
+    processedBy: { type: String },
+    processedAt: { type: Date },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
+
 // ==================== HELPER FUNCTIONS ====================
+
+function generateId() {
+    return Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
 function generateUsername(fullName, phone) {
     let base = fullName.toLowerCase().replace(/[^a-z]/g, '').substring(0, 6);
@@ -132,15 +188,13 @@ function generateRandomPassword() {
 
 const authMiddleware = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        return res.status(401).json({ message: 'No token, authorization denied' });
-    }
+    if (!token) return res.status(401).json({ message: 'No token' });
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();
-    } catch (error) {
-        res.status(401).json({ message: 'Token is not valid' });
+    } catch { 
+        res.status(401).json({ message: 'Invalid token' }); 
     }
 };
 
@@ -151,54 +205,116 @@ app.post('/api/auth/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         const user = await User.findOne({ username, role: 'admin' });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+        if (!await user.comparePassword(password)) return res.status(401).json({ message: 'Invalid credentials' });
         
         user.lastLogin = new Date();
         await user.save();
         
-        const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        );
-        
-        res.json({
-            success: true,
-            token,
-            user: {
-                id: user._id,
-                username: user.username,
-                fullName: user.fullName,
-                role: user.role
-            }
-        });
+        const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
+        res.json({ success: true, token, user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role } });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
+app.post('/api/auth/member-login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username, role: 'member' });
+        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+        if (!await user.comparePassword(password)) return res.status(401).json({ message: 'Invalid credentials' });
+        
+        const token = jwt.sign({ id: user._id, username: user.username, role: user.role, memberId: user.memberId }, JWT_SECRET, { expiresIn: '30d' });
+        res.json({ success: true, token, user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role, memberId: user.memberId } });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
+    try {
+        const { oldPassword, fullName, username, email, newPassword } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) return res.status(401).json({ message: 'Current password is incorrect' });
+        
+        if (fullName) user.fullName = fullName;
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (newPassword && newPassword.length >= 6) {
+            user.password = newPassword;
+        }
+        await user.save();
+        res.json({ success: true, message: 'Profile updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/auth/users', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+    const users = await User.find({}, '-password');
+    res.json(users);
+});
+
+app.post('/api/auth/register', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+    const { username, email, password, fullName, role } = req.body;
+    
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+    
+    const newUser = new User({
+        id: generateId(),
+        username,
+        email,
+        password,
+        fullName,
+        role: role || 'staff'
+    });
+    await newUser.save();
+    res.json({ success: true, user: { id: newUser._id, username, email, fullName, role } });
+});
+
+app.delete('/api/auth/users/:id', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+    if (req.params.id === req.user.id) return res.status(400).json({ message: 'Cannot delete your own account' });
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+});
+
+app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.password = newPassword;
+    await user.save();
+    res.json({ success: true });
+});
+
 // ==================== MEMBER ROUTES ====================
 
 app.post('/api/members/register', async (req, res) => {
-    console.log("=".repeat(50));
-    console.log("📝 Registration request received");
-    console.log("Name:", req.body.fullName);
-    console.log("Phone:", req.body.phone);
-    console.log("=".repeat(50));
+    console.log("📝 Registration request received for:", req.body.fullName);
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
     
     try {
-        // Validate required fields
-        if (!req.body.fullName || !req.body.phone || !req.body.address) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
-        
         // Check if phone already exists
         const existingMember = await Member.findOne({ phone: req.body.phone });
         if (existingMember) {
@@ -208,55 +324,33 @@ app.post('/api/members/register', async (req, res) => {
         
         // Create new member
         const newMember = new Member({
-            fullName: req.body.fullName,
-            gender: req.body.gender || 'ወንድ',
-            age: parseInt(req.body.age) || 0,
-            motherName: req.body.motherName || '',
-            nationality: req.body.nationality || 'ኢትዮጵያዊ',
-            education: req.body.education || '',
-            address: req.body.address,
-            phone: req.body.phone,
-            taxId: req.body.taxId || '',
-            role: req.body.role || 'Member',
-            shareCount: parseInt(req.body.shareCount) || 0,
-            sharePercentage: parseFloat(req.body.sharePercentage) || 0,
-            sharePricePaid: parseFloat(req.body.sharePricePaid) || 0,
-            remainingBalance: (parseInt(req.body.shareCount) || 0) * 10000 - (parseFloat(req.body.sharePricePaid) || 0),
-            paymentStatus: req.body.paymentStatus || 'አልተከፈለም',
-            bankAccountNumber: req.body.bankAccountNumber || '',
-            financialNotes: req.body.financialNotes || '',
-            beneficiaries: req.body.beneficiaries || [],
-            legalRepName: req.body.legalRepName || '',
-            legalRepAddress: req.body.legalRepAddress || '',
-            legalRepPhone: req.body.legalRepPhone || '',
+            id: generateId(),
+            ...req.body,
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        
         await newMember.save();
-        console.log("✅ Member saved to MongoDB!");
-        console.log("   ID:", newMember._id);
-        console.log("   Name:", newMember.fullName);
+        console.log("✅ Member saved to MongoDB:", newMember.fullName);
         
-        // Generate credentials for member portal
+        // Generate credentials
         const username = generateUsername(newMember.fullName, newMember.phone);
         const plainPassword = generateRandomPassword();
         
-        // Create user account for member
+        // Check if user already exists
         const existingUser = await User.findOne({ username });
         if (!existingUser) {
             const newUser = new User({
+                id: generateId(),
                 username: username,
                 email: newMember.phone + '@member.gambella.com',
                 password: plainPassword,
                 fullName: newMember.fullName,
                 role: 'member',
-                memberId: newMember._id.toString(),
+                memberId: newMember.id,
                 isActive: true
             });
             await newUser.save();
             console.log("✅ User account created:", username);
-            console.log("   Password:", plainPassword);
         }
         
         res.status(201).json({
@@ -278,9 +372,11 @@ app.post('/api/members/register', async (req, res) => {
 app.get('/api/members', authMiddleware, async (req, res) => {
     try {
         const members = await Member.find().sort({ createdAt: -1 });
+        if (req.user.role === 'member') {
+            return res.json({ count: members.length, members: [] });
+        }
         res.json(members);
     } catch (error) {
-        console.error("Error fetching members:", error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -294,15 +390,41 @@ app.get('/api/members/count', authMiddleware, async (req, res) => {
     }
 });
 
+app.get('/api/members/:id', authMiddleware, async (req, res) => {
+    try {
+        const member = await Member.findOne({ id: req.params.id });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
     try {
         if (req.user.role !== 'member' || !req.user.memberId) {
             return res.status(403).json({ message: 'Access denied' });
         }
-        const member = await Member.findById(req.user.memberId);
-        if (!member) {
-            return res.status(404).json({ message: 'Member not found' });
-        }
+        const member = await Member.findOne({ id: req.user.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.put('/api/members/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const member = await Member.findOneAndUpdate(
+            { id: req.params.id },
+            { ...req.body, updatedAt: new Date() },
+            { new: true }
+        );
+        if (!member) return res.status(404).json({ message: 'Member not found' });
         res.json(member);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -311,10 +433,8 @@ app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
 
 app.delete('/api/members/:id', authMiddleware, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        await Member.findByIdAndDelete(req.params.id);
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Member.findOneAndDelete({ id: req.params.id });
         await User.findOneAndDelete({ memberId: req.params.id });
         res.json({ message: 'Member deleted successfully' });
     } catch (error) {
@@ -322,14 +442,54 @@ app.delete('/api/members/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// ==================== SALES ROUTES ====================
+app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const q = req.params.query;
+        const members = await Member.find({
+            $or: [
+                { fullName: { $regex: q, $options: 'i' } },
+                { phone: { $regex: q, $options: 'i' } }
+            ]
+        });
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== SALE ROUTES ====================
+
+app.get('/api/sales', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const sales = await Sale.find().sort({ date: -1 });
+        res.json(sales);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role === 'member' && req.user.memberId !== req.params.memberId) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
+        res.json(sales);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
 app.post('/api/sales', authMiddleware, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        const sale = new Sale(req.body);
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const sale = new Sale({
+            id: generateId(),
+            ...req.body,
+            createdAt: new Date()
+        });
         await sale.save();
         res.status(201).json(sale);
     } catch (error) {
@@ -337,13 +497,182 @@ app.post('/api/sales', authMiddleware, async (req, res) => {
     }
 });
 
-app.get('/api/sales', authMiddleware, async (req, res) => {
+app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Sale.findOneAndDelete({ id: req.params.id });
+        res.json({ message: 'Sale deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== TRANSFER ROUTES ====================
+
+app.get('/api/transfers', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const transfers = await Transfer.find().sort({ createdAt: -1 });
+        res.json(transfers);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.post('/api/transfers', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const transfer = new Transfer({
+            id: generateId(),
+            ...req.body,
+            createdAt: new Date()
+        });
+        await transfer.save();
+        res.status(201).json(transfer);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Transfer.findOneAndDelete({ id: req.params.id });
+        res.json({ message: 'Transfer deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== TRADING ROUTES ====================
+
+app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
+        const { requestType, shareAmount, pricePerShare = 10000, notes } = req.body;
+        if (!requestType || !shareAmount || shareAmount <= 0) {
+            return res.status(400).json({ message: 'Invalid request' });
         }
-        const sales = await Sale.find().sort({ date: -1 });
-        res.json(sales);
+        
+        const member = await Member.findOne({ id: req.user.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        
+        if (requestType === 'sell' && (member.shareCount || 0) < shareAmount) {
+            return res.status(400).json({ message: `Insufficient shares. You have only ${member.shareCount || 0} shares.` });
+        }
+        
+        const request = new TradingRequest({
+            id: generateId(),
+            memberId: req.user.memberId,
+            memberName: member.fullName,
+            memberPhone: member.phone,
+            requestType,
+            shareAmount,
+            pricePerShare,
+            totalValue: pricePerShare * shareAmount,
+            notes: notes || ''
+        });
+        await request.save();
+        res.status(201).json({ success: true, request });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/share-trading/my-requests', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
+        const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/share-trading/requests', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const requests = await TradingRequest.find().sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        
+        const request = await TradingRequest.findOne({ id: req.params.id });
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+        if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
+        
+        const member = await Member.findOne({ id: request.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        
+        if (request.requestType === 'buy') {
+            member.shareCount = (member.shareCount || 0) + request.shareAmount;
+        } else if (request.requestType === 'sell') {
+            if ((member.shareCount || 0) < request.shareAmount) {
+                return res.status(400).json({ message: 'Insufficient shares' });
+            }
+            member.shareCount = (member.shareCount || 0) - request.shareAmount;
+        }
+        
+        await member.save();
+        
+        request.status = 'approved';
+        request.processedBy = req.user.id;
+        request.processedAt = new Date();
+        await request.save();
+        
+        res.json({ success: true, message: 'Request approved successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        
+        const request = await TradingRequest.findOne({ id: req.params.id });
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+        if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
+        
+        request.status = 'rejected';
+        request.processedBy = req.user.id;
+        request.processedAt = new Date();
+        request.rejectionReason = req.body.reason || 'No reason provided';
+        await request.save();
+        
+        res.json({ success: true, message: 'Request rejected' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.get('/api/share-trading/stats', authMiddleware, async (req, res) => {
+    try {
+        const members = await Member.find();
+        const requests = await TradingRequest.find();
+        const totalShares = members.reduce((sum, m) => sum + (m.shareCount || 0), 0);
+        const pendingRequests = requests.filter(r => r.status === 'pending').length;
+        const approvedRequests = requests.filter(r => r.status === 'approved').length;
+        const totalBuyShares = requests.filter(r => r.requestType === 'buy').reduce((sum, r) => sum + r.shareAmount, 0);
+        const totalSellShares = requests.filter(r => r.requestType === 'sell').reduce((sum, r) => sum + r.shareAmount, 0);
+        
+        res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -356,6 +685,7 @@ const createDefaultAdmin = async () => {
         const adminExists = await User.findOne({ username: 'admin' });
         if (!adminExists) {
             const admin = new User({
+                id: generateId(),
                 username: 'admin',
                 email: 'admin@gambellacoffee.com',
                 password: 'Admin123!',
@@ -363,9 +693,7 @@ const createDefaultAdmin = async () => {
                 role: 'admin'
             });
             await admin.save();
-            console.log('✅ Default admin created!');
-            console.log('   Username: admin');
-            console.log('   Password: Admin123!');
+            console.log('✅ Default admin created! Username: admin, Password: Admin123!');
         } else {
             console.log('✅ Admin user already exists');
         }
@@ -388,6 +716,10 @@ app.get('/gmfc.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'gmfc.html'));
 });
 
+app.get('/member-portal.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'member-portal.html'));
+});
+
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -395,6 +727,12 @@ app.get('/health', (req, res) => {
 // ==================== START SERVER ====================
 
 const PORT = process.env.PORT || 10000;
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    console.error('❌ MONGODB_URI environment variable is not set!');
+    process.exit(1);
+}
 
 mongoose.connect(MONGODB_URI)
     .then(async () => {
@@ -402,8 +740,8 @@ mongoose.connect(MONGODB_URI)
         await createDefaultAdmin();
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`📱 URL: http://localhost:${PORT}`);
-            console.log(`👤 Admin Login: admin / Admin123!`);
+            console.log(`📱 Admin Login: http://localhost:${PORT}`);
+            console.log(`👤 Admin: admin / Admin123!`);
         });
     })
     .catch(err => {
