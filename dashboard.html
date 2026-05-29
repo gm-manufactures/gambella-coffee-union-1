@@ -764,7 +764,7 @@
         
         async function apiCall(endpoint, options = {}) {
             const response = await fetch(`/api${endpoint}`, { ...options, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers } });
-            if (response.status === 401) { localStorage.clear(); window.location.href = '/'; }
+            if (response.status === 404) { localStorage.clear(); window.location.href = '/'; }
             return response.json();
         }
         
