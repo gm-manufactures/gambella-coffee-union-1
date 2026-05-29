@@ -972,7 +972,7 @@
            
             if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
             else alert('✅ አባል ተመዝግቧል!');
-           
+            updateShareStatistics();
             e.target.reset();
             document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             document.getElementById('shareCount').value = '0';
@@ -982,7 +982,6 @@
             document.getElementById('beneficiaryCount').value = '0';
             document.getElementById('otherBankDiv').style.display = 'none';
             loadMembers();
-            updateShareStatistics();
             showTab('list');
            
         });
