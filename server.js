@@ -91,6 +91,8 @@ const MemberSchema = new mongoose.Schema({
     powerOfAttorneyNotes: { type: String },
     memberPhoto: { type: String },
     memberTaxDoc: { type: String },
+    beneficiaryPhoto: { type: String },
+    beneficiaryTaxDoc: { type: String },
     repPhoto: { type: String },
     repTaxDoc: { type: String },
     hardCopyForm: { type: String },
@@ -199,8 +201,9 @@ const authMiddleware = async (req, res, next) => {
 // ==================== AUTH ROUTES ====================
 
 app.post('/api/auth/login', async (req, res) => {
-    const { username, password } = req.body;
+    console.log("Login attempt:", req.body.username);
     try {
+        const { username, password } = req.body;
         const user = await User.findOne({ username, role: 'admin' });
         if (!user) return res.status(401).json({ message: 'Invalid credentials' });
         if (!await user.comparePassword(password)) return res.status(401).json({ message: 'Invalid credentials' });
@@ -211,13 +214,14 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
         res.json({ success: true, token, user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role } });
     } catch (error) {
+        console.error("Login error:", error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 app.post('/api/auth/member-login', async (req, res) => {
-    const { username, password } = req.body;
     try {
+        const { username, password } = req.body;
         const user = await User.findOne({ username, role: 'member' });
         if (!user) return res.status(401).json({ message: 'Invalid credentials' });
         if (!await user.comparePassword(password)) return res.status(401).json({ message: 'Invalid credentials' });
@@ -308,6 +312,7 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 
 app.post('/api/members/register', async (req, res) => {
     console.log("📝 Registration request received for:", req.body.fullName);
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
     
     try {
         // Check if phone already exists
@@ -365,247 +370,335 @@ app.post('/api/members/register', async (req, res) => {
 });
 
 app.get('/api/members', authMiddleware, async (req, res) => {
-    const members = await Member.find().sort({ createdAt: -1 });
-    if (req.user.role === 'member') {
-        return res.json({ count: members.length, members: [] });
+    try {
+        const members = await Member.find().sort({ createdAt: -1 });
+        if (req.user.role === 'member') {
+            return res.json({ count: members.length, members: [] });
+        }
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    res.json(members);
 });
 
 app.get('/api/members/count', authMiddleware, async (req, res) => {
-    const count = await Member.countDocuments();
-    res.json({ count });
+    try {
+        const count = await Member.countDocuments();
+        res.json({ count });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/members/:id', authMiddleware, async (req, res) => {
-    const member = await Member.findOne({ id: req.params.id });
-    if (!member) return res.status(404).json({ message: 'Member not found' });
-    if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
-        return res.status(403).json({ message: 'Access denied' });
+    try {
+        const member = await Member.findOne({ id: req.params.id });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    res.json(member);
 });
 
 app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'member' || !req.user.memberId) {
-        return res.status(403).json({ message: 'Access denied' });
+    try {
+        if (req.user.role !== 'member' || !req.user.memberId) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        const member = await Member.findOne({ id: req.user.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    const member = await Member.findOne({ id: req.user.memberId });
-    if (!member) return res.status(404).json({ message: 'Member not found' });
-    res.json(member);
 });
 
 app.put('/api/members/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const member = await Member.findOneAndUpdate(
-        { id: req.params.id },
-        { ...req.body, updatedAt: new Date() },
-        { new: true }
-    );
-    if (!member) return res.status(404).json({ message: 'Member not found' });
-    res.json(member);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const member = await Member.findOneAndUpdate(
+            { id: req.params.id },
+            { ...req.body, updatedAt: new Date() },
+            { new: true }
+        );
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.delete('/api/members/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Member.findOneAndDelete({ id: req.params.id });
-    await User.findOneAndDelete({ memberId: req.params.id });
-    res.json({ message: 'Member deleted successfully' });
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Member.findOneAndDelete({ id: req.params.id });
+        await User.findOneAndDelete({ memberId: req.params.id });
+        res.json({ message: 'Member deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const q = req.params.query;
-    const members = await Member.find({
-        $or: [
-            { fullName: { $regex: q, $options: 'i' } },
-            { phone: { $regex: q, $options: 'i' } }
-        ]
-    });
-    res.json(members);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const q = req.params.query;
+        const members = await Member.find({
+            $or: [
+                { fullName: { $regex: q, $options: 'i' } },
+                { phone: { $regex: q, $options: 'i' } }
+            ]
+        });
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ==================== SALE ROUTES ====================
 
 app.get('/api/sales', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const sales = await Sale.find().sort({ date: -1 });
-    res.json(sales);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const sales = await Sale.find().sort({ date: -1 });
+        res.json(sales);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
-    if (req.user.role === 'member' && req.user.memberId !== req.params.memberId) {
-        return res.status(403).json({ message: 'Access denied' });
+    try {
+        if (req.user.role === 'member' && req.user.memberId !== req.params.memberId) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
+        res.json(sales);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
-    res.json(sales);
 });
 
 app.post('/api/sales', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const sale = new Sale({
-        id: generateId(),
-        ...req.body,
-        createdAt: new Date()
-    });
-    await sale.save();
-    res.status(201).json(sale);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const sale = new Sale({
+            id: generateId(),
+            ...req.body,
+            createdAt: new Date()
+        });
+        await sale.save();
+        res.status(201).json(sale);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Sale.findOneAndDelete({ id: req.params.id });
-    res.json({ message: 'Sale deleted' });
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Sale.findOneAndDelete({ id: req.params.id });
+        res.json({ message: 'Sale deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ==================== TRANSFER ROUTES ====================
 
 app.get('/api/transfers', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const transfers = await Transfer.find().sort({ createdAt: -1 });
-    res.json(transfers);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const transfers = await Transfer.find().sort({ createdAt: -1 });
+        res.json(transfers);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.post('/api/transfers', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const transfer = new Transfer({
-        id: generateId(),
-        ...req.body,
-        createdAt: new Date()
-    });
-    await transfer.save();
-    res.status(201).json(transfer);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const transfer = new Transfer({
+            id: generateId(),
+            ...req.body,
+            createdAt: new Date()
+        });
+        await transfer.save();
+        res.status(201).json(transfer);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Transfer.findOneAndDelete({ id: req.params.id });
-    res.json({ message: 'Transfer deleted' });
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        await Transfer.findOneAndDelete({ id: req.params.id });
+        res.json({ message: 'Transfer deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ==================== TRADING ROUTES ====================
 
 app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
-    const { requestType, shareAmount, pricePerShare = 10000, notes } = req.body;
-    if (!requestType || !shareAmount || shareAmount <= 0) {
-        return res.status(400).json({ message: 'Invalid request' });
+    try {
+        if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
+        const { requestType, shareAmount, pricePerShare = 10000, notes } = req.body;
+        if (!requestType || !shareAmount || shareAmount <= 0) {
+            return res.status(400).json({ message: 'Invalid request' });
+        }
+        
+        const member = await Member.findOne({ id: req.user.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        
+        if (requestType === 'sell' && (member.shareCount || 0) < shareAmount) {
+            return res.status(400).json({ message: `Insufficient shares. You have only ${member.shareCount || 0} shares.` });
+        }
+        
+        const request = new TradingRequest({
+            id: generateId(),
+            memberId: req.user.memberId,
+            memberName: member.fullName,
+            memberPhone: member.phone,
+            requestType,
+            shareAmount,
+            pricePerShare,
+            totalValue: pricePerShare * shareAmount,
+            notes: notes || ''
+        });
+        await request.save();
+        res.status(201).json({ success: true, request });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    
-    const member = await Member.findOne({ id: req.user.memberId });
-    if (!member) return res.status(404).json({ message: 'Member not found' });
-    
-    if (requestType === 'sell' && (member.shareCount || 0) < shareAmount) {
-        return res.status(400).json({ message: `Insufficient shares. You have only ${member.shareCount || 0} shares.` });
-    }
-    
-    const request = new TradingRequest({
-        id: generateId(),
-        memberId: req.user.memberId,
-        memberName: member.fullName,
-        memberPhone: member.phone,
-        requestType,
-        shareAmount,
-        pricePerShare,
-        totalValue: pricePerShare * shareAmount,
-        notes: notes || ''
-    });
-    await request.save();
-    res.status(201).json({ success: true, request });
 });
 
 app.get('/api/share-trading/my-requests', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
-    const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
-    res.json(requests);
+    try {
+        if (req.user.role !== 'member') return res.status(403).json({ message: 'Members only' });
+        const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/share-trading/requests', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const requests = await TradingRequest.find().sort({ createdAt: -1 });
-    res.json(requests);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const requests = await TradingRequest.find().sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
-    res.json(requests);
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    
-    const request = await TradingRequest.findOne({ id: req.params.id });
-    if (!request) return res.status(404).json({ message: 'Request not found' });
-    if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
-    
-    const member = await Member.findOne({ id: request.memberId });
-    if (!member) return res.status(404).json({ message: 'Member not found' });
-    
-    if (request.requestType === 'buy') {
-        member.shareCount = (member.shareCount || 0) + request.shareAmount;
-    } else if (request.requestType === 'sell') {
-        if ((member.shareCount || 0) < request.shareAmount) {
-            return res.status(400).json({ message: 'Insufficient shares' });
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        
+        const request = await TradingRequest.findOne({ id: req.params.id });
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+        if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
+        
+        const member = await Member.findOne({ id: request.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        
+        if (request.requestType === 'buy') {
+            member.shareCount = (member.shareCount || 0) + request.shareAmount;
+        } else if (request.requestType === 'sell') {
+            if ((member.shareCount || 0) < request.shareAmount) {
+                return res.status(400).json({ message: 'Insufficient shares' });
+            }
+            member.shareCount = (member.shareCount || 0) - request.shareAmount;
         }
-        member.shareCount = (member.shareCount || 0) - request.shareAmount;
+        
+        await member.save();
+        
+        request.status = 'approved';
+        request.processedBy = req.user.id;
+        request.processedAt = new Date();
+        await request.save();
+        
+        res.json({ success: true, message: 'Request approved successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
-    
-    await member.save();
-    
-    request.status = 'approved';
-    request.processedBy = req.user.id;
-    request.processedAt = new Date();
-    await request.save();
-    
-    res.json({ success: true, message: 'Request approved successfully' });
 });
 
 app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    
-    const request = await TradingRequest.findOne({ id: req.params.id });
-    if (!request) return res.status(404).json({ message: 'Request not found' });
-    if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
-    
-    request.status = 'rejected';
-    request.processedBy = req.user.id;
-    request.processedAt = new Date();
-    request.rejectionReason = req.body.reason || 'No reason provided';
-    await request.save();
-    
-    res.json({ success: true, message: 'Request rejected' });
+    try {
+        if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
+        
+        const request = await TradingRequest.findOne({ id: req.params.id });
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+        if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
+        
+        request.status = 'rejected';
+        request.processedBy = req.user.id;
+        request.processedAt = new Date();
+        request.rejectionReason = req.body.reason || 'No reason provided';
+        await request.save();
+        
+        res.json({ success: true, message: 'Request rejected' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.get('/api/share-trading/stats', authMiddleware, async (req, res) => {
-    const members = await Member.find();
-    const requests = await TradingRequest.find();
-    const totalShares = members.reduce((sum, m) => sum + (m.shareCount || 0), 0);
-    const pendingRequests = requests.filter(r => r.status === 'pending').length;
-    const approvedRequests = requests.filter(r => r.status === 'approved').length;
-    const totalBuyShares = requests.filter(r => r.requestType === 'buy').reduce((sum, r) => sum + r.shareAmount, 0);
-    const totalSellShares = requests.filter(r => r.requestType === 'sell').reduce((sum, r) => sum + r.shareAmount, 0);
-    
-    res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
+    try {
+        const members = await Member.find();
+        const requests = await TradingRequest.find();
+        const totalShares = members.reduce((sum, m) => sum + (m.shareCount || 0), 0);
+        const pendingRequests = requests.filter(r => r.status === 'pending').length;
+        const approvedRequests = requests.filter(r => r.status === 'approved').length;
+        const totalBuyShares = requests.filter(r => r.requestType === 'buy').reduce((sum, r) => sum + r.shareAmount, 0);
+        const totalSellShares = requests.filter(r => r.requestType === 'sell').reduce((sum, r) => sum + r.shareAmount, 0);
+        
+        res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ==================== CREATE DEFAULT ADMIN ====================
 
 const createDefaultAdmin = async () => {
-    const adminExists = await User.findOne({ username: 'admin' });
-    if (!adminExists) {
-        const admin = new User({
-            id: generateId(),
-            username: 'admin',
-            email: 'admin@gambellacoffee.com',
-            password: 'Admin123!',
-            fullName: 'System Administrator',
-            role: 'admin'
-        });
-        await admin.save();
-        console.log('✅ Default admin created! Username: admin, Password: Admin123!');
-    } else {
-        console.log('✅ Admin user already exists');
+    try {
+        const adminExists = await User.findOne({ username: 'admin' });
+        if (!adminExists) {
+            const admin = new User({
+                id: generateId(),
+                username: 'admin',
+                email: 'admin@gambellacoffee.com',
+                password: 'Admin123!',
+                fullName: 'System Administrator',
+                role: 'admin'
+            });
+            await admin.save();
+            console.log('✅ Default admin created! Username: admin, Password: Admin123!');
+        } else {
+            console.log('✅ Admin user already exists');
+        }
+    } catch (error) {
+        console.error('Admin creation error:', error);
     }
 };
 
