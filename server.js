@@ -20,6 +20,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'gambella-secret-key-2024';
 
 // User Schema
 const UserSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -45,6 +46,7 @@ const User = mongoose.model('User', UserSchema);
 
 // Member Schema
 const MemberSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     fullName: { type: String, required: true },
     gender: { type: String, required: true },
     age: { type: Number, required: true },
@@ -103,6 +105,7 @@ const Member = mongoose.model('Member', MemberSchema);
 
 // Sale Schema
 const SaleSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     memberId: { type: String, required: true },
     memberName: { type: String },
     collectionType: { type: String, default: 'member' },
@@ -123,6 +126,7 @@ const Sale = mongoose.model('Sale', SaleSchema);
 
 // Transfer Schema
 const TransferSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     oldMemberId: { type: String, required: true },
     oldMemberName: { type: String, required: true },
     newMemberName: { type: String, required: true },
@@ -141,6 +145,7 @@ const Transfer = mongoose.model('Transfer', TransferSchema);
 
 // Trading Request Schema
 const TradingRequestSchema = new mongoose.Schema({
+    id: { type: String, unique: true },
     memberId: { type: String, required: true },
     memberName: { type: String, required: true },
     memberPhone: { type: String },
@@ -159,6 +164,10 @@ const TradingRequestSchema = new mongoose.Schema({
 const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
 
 // ==================== HELPER FUNCTIONS ====================
+
+function generateId() {
+    return Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
 function generateUsername(fullName, phone) {
     let base = fullName.toLowerCase().replace(/[^a-z]/g, '').substring(0, 6);
@@ -243,10 +252,8 @@ app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
         if (email) user.email = email;
         if (newPassword && newPassword.length >= 6) {
             user.password = newPassword;
-            await user.save();
-        } else {
-            await user.save();
         }
+        await user.save();
         res.json({ success: true, message: 'Profile updated successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -266,7 +273,14 @@ app.post('/api/auth/register', authMiddleware, async (req, res) => {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
     
-    const newUser = new User({ username, email, password, fullName, role: role || 'staff' });
+    const newUser = new User({
+        id: generateId(),
+        username,
+        email,
+        password,
+        fullName,
+        role: role || 'staff'
+    });
     await newUser.save();
     res.json({ success: true, user: { id: newUser._id, username, email, fullName, role } });
 });
@@ -293,43 +307,59 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 // ==================== MEMBER ROUTES ====================
 
 app.post('/api/members/register', async (req, res) => {
-    console.log("📝 Registration request:", req.body.fullName);
+    console.log("📝 Registration request received for:", req.body.fullName);
+    
     try {
+        // Check if phone already exists
         const existingMember = await Member.findOne({ phone: req.body.phone });
         if (existingMember) {
+            console.log("❌ Phone already exists:", req.body.phone);
             return res.status(400).json({ message: 'Phone number already registered' });
         }
         
+        // Create new member
         const newMember = new Member({
+            id: generateId(),
             ...req.body,
             createdAt: new Date(),
             updatedAt: new Date()
         });
         await newMember.save();
+        console.log("✅ Member saved to MongoDB:", newMember.fullName);
         
+        // Generate credentials
         const username = generateUsername(newMember.fullName, newMember.phone);
         const plainPassword = generateRandomPassword();
         
-        const newUser = new User({
-            username: username,
-            email: newMember.phone + '@member.gambella.com',
-            password: plainPassword,
-            fullName: newMember.fullName,
-            role: 'member',
-            memberId: newMember._id.toString(),
-            isActive: true
-        });
-        await newUser.save();
-        
-        console.log(`✅ Member registered: ${newMember.fullName} | Username: ${username}`);
+        // Check if user already exists
+        const existingUser = await User.findOne({ username });
+        if (!existingUser) {
+            const newUser = new User({
+                id: generateId(),
+                username: username,
+                email: newMember.phone + '@member.gambella.com',
+                password: plainPassword,
+                fullName: newMember.fullName,
+                role: 'member',
+                memberId: newMember.id,
+                isActive: true
+            });
+            await newUser.save();
+            console.log("✅ User account created:", username);
+        }
         
         res.status(201).json({
             success: true,
+            message: 'Member registered successfully',
             member: newMember,
-            credentials: { username, password: plainPassword }
+            credentials: {
+                username: username,
+                password: plainPassword
+            }
         });
+        
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error("❌ Registration error:", error);
         res.status(500).json({ message: 'Server error: ' + error.message });
     }
 });
@@ -348,7 +378,7 @@ app.get('/api/members/count', authMiddleware, async (req, res) => {
 });
 
 app.get('/api/members/:id', authMiddleware, async (req, res) => {
-    const member = await Member.findById(req.params.id);
+    const member = await Member.findOne({ id: req.params.id });
     if (!member) return res.status(404).json({ message: 'Member not found' });
     if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
         return res.status(403).json({ message: 'Access denied' });
@@ -360,15 +390,15 @@ app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
     if (req.user.role !== 'member' || !req.user.memberId) {
         return res.status(403).json({ message: 'Access denied' });
     }
-    const member = await Member.findById(req.user.memberId);
+    const member = await Member.findOne({ id: req.user.memberId });
     if (!member) return res.status(404).json({ message: 'Member not found' });
     res.json(member);
 });
 
 app.put('/api/members/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const member = await Member.findByIdAndUpdate(
-        req.params.id,
+    const member = await Member.findOneAndUpdate(
+        { id: req.params.id },
         { ...req.body, updatedAt: new Date() },
         { new: true }
     );
@@ -378,7 +408,7 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/members/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Member.findByIdAndDelete(req.params.id);
+    await Member.findOneAndDelete({ id: req.params.id });
     await User.findOneAndDelete({ memberId: req.params.id });
     res.json({ message: 'Member deleted successfully' });
 });
@@ -413,14 +443,18 @@ app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
 
 app.post('/api/sales', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const sale = new Sale(req.body);
+    const sale = new Sale({
+        id: generateId(),
+        ...req.body,
+        createdAt: new Date()
+    });
     await sale.save();
     res.status(201).json(sale);
 });
 
 app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Sale.findByIdAndDelete(req.params.id);
+    await Sale.findOneAndDelete({ id: req.params.id });
     res.json({ message: 'Sale deleted' });
 });
 
@@ -434,14 +468,18 @@ app.get('/api/transfers', authMiddleware, async (req, res) => {
 
 app.post('/api/transfers', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    const transfer = new Transfer(req.body);
+    const transfer = new Transfer({
+        id: generateId(),
+        ...req.body,
+        createdAt: new Date()
+    });
     await transfer.save();
     res.status(201).json(transfer);
 });
 
 app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
-    await Transfer.findByIdAndDelete(req.params.id);
+    await Transfer.findOneAndDelete({ id: req.params.id });
     res.json({ message: 'Transfer deleted' });
 });
 
@@ -454,7 +492,7 @@ app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
         return res.status(400).json({ message: 'Invalid request' });
     }
     
-    const member = await Member.findById(req.user.memberId);
+    const member = await Member.findOne({ id: req.user.memberId });
     if (!member) return res.status(404).json({ message: 'Member not found' });
     
     if (requestType === 'sell' && (member.shareCount || 0) < shareAmount) {
@@ -462,6 +500,7 @@ app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
     }
     
     const request = new TradingRequest({
+        id: generateId(),
         memberId: req.user.memberId,
         memberName: member.fullName,
         memberPhone: member.phone,
@@ -496,11 +535,11 @@ app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
 app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
     
-    const request = await TradingRequest.findById(req.params.id);
+    const request = await TradingRequest.findOne({ id: req.params.id });
     if (!request) return res.status(404).json({ message: 'Request not found' });
     if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
     
-    const member = await Member.findById(request.memberId);
+    const member = await Member.findOne({ id: request.memberId });
     if (!member) return res.status(404).json({ message: 'Member not found' });
     
     if (request.requestType === 'buy') {
@@ -525,7 +564,7 @@ app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
 app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
     
-    const request = await TradingRequest.findById(req.params.id);
+    const request = await TradingRequest.findOne({ id: req.params.id });
     if (!request) return res.status(404).json({ message: 'Request not found' });
     if (request.status !== 'pending') return res.status(400).json({ message: 'Request already processed' });
     
@@ -556,6 +595,7 @@ const createDefaultAdmin = async () => {
     const adminExists = await User.findOne({ username: 'admin' });
     if (!adminExists) {
         const admin = new User({
+            id: generateId(),
             username: 'admin',
             email: 'admin@gambellacoffee.com',
             password: 'Admin123!',
@@ -564,6 +604,8 @@ const createDefaultAdmin = async () => {
         });
         await admin.save();
         console.log('✅ Default admin created! Username: admin, Password: Admin123!');
+    } else {
+        console.log('✅ Admin user already exists');
     }
 };
 
@@ -592,7 +634,12 @@ app.get('/health', (req, res) => {
 // ==================== START SERVER ====================
 
 const PORT = process.env.PORT || 10000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    console.error('❌ MONGODB_URI environment variable is not set!');
+    process.exit(1);
+}
 
 mongoose.connect(MONGODB_URI)
     .then(async () => {
