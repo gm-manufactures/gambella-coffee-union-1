@@ -605,15 +605,54 @@ function toggleOtherBank() {
   otherDiv.style.display = bankSelect.value === 'ሌላ' ? 'block' : 'none';
 }
 
-const amharicOrder = ['ሀ', 'ለ', 'ሐ', 'መ', 'ሠ', 'ረ', 'ሰ', 'ሸ', 'ቀ', 'በ', 'ቨ', 'ተ', 'ቸ', 'ኀ', 'ነ', 'ኘ', 'አ', 'ከ', 'ኸ', 'ወ', 'ዐ', 'ዘ', 'ዠ', 'የ', 'ደ', 'ጀ', 'ገ', 'ጠ', 'ጨ', 'ጰ', 'ጸ', 'ፀ', 'ፈ', 'ፐ'];
+// ሙሉ የአማርኛ ፊደላት ቅደም ተከተል
+const amharicOrder = [
+  'ሀ', 'ሁ', 'ሂ', 'ሃ', 'ሄ', 'ህ', 'ሆ',
+  'ለ', 'ሉ', 'ሊ', 'ላ', 'ሌ', 'ል', 'ሎ', 'ሏ',
+  'ሐ', 'ሑ', 'ሒ', 'ሓ', 'ሔ', 'ሕ', 'ሖ', 'ሗ',
+  'መ', 'ሙ', 'ሚ', 'ማ', 'ሜ', 'ም', 'ሞ', 'ሟ',
+  'ሠ', 'ሡ', 'ሢ', 'ሣ', 'ሤ', 'ሥ', 'ሦ', 'ሧ',
+  'ረ', 'ሩ', 'ሪ', 'ራ', 'ሬ', 'ር', 'ሮ', 'ሯ',
+  'ሰ', 'ሱ', 'ሲ', 'ሳ', 'ሴ', 'ስ', 'ሶ', 'ሷ',
+  'ሸ', 'ሹ', 'ሺ', 'ሻ', 'ሼ', 'ሽ', 'ሾ', 'ሿ',
+  'ቀ', 'ቁ', 'ቂ', 'ቃ', 'ቄ', 'ቅ', 'ቆ', 'ቈ',
+  'በ', 'ቡ', 'ቢ', 'ባ', 'ቤ', 'ብ', 'ቦ', 'ቧ',
+  'ተ', 'ቱ', 'ቲ', 'ታ', 'ቴ', 'ት', 'ቶ', 'ቷ',
+  'ቸ', 'ቹ', 'ቺ', 'ቻ', 'ቼ', 'ች', 'ቾ', 'ቿ',
+  'ኀ', 'ኁ', 'ኂ', 'ኃ', 'ኄ', 'ኅ', 'ኆ', 'ኈ',
+  'ነ', 'ኑ', 'ኒ', 'ና', 'ኔ', 'ን', 'ኖ', 'ኗ',
+  'ኘ', 'ኙ', 'ኚ', 'ኛ', 'ኜ', 'ኝ', 'ኞ', 'ኟ',
+  'አ', 'ኡ', 'ኢ', 'ኣ', 'ኤ', 'እ', 'ኦ', 'ኧ',
+  'ከ', 'ኩ', 'ኪ', 'ካ', 'ኬ', 'ክ', 'ኮ', 'ኰ',
+  'ኸ', 'ኹ', 'ኺ', 'ኻ', 'ኼ', 'ኽ', 'ኾ', 'ዀ',
+  'ወ', 'ዉ', 'ዊ', 'ዋ', 'ዌ', 'ው', 'ዎ', 'ዏ',
+  'ዐ', 'ዑ', 'ዒ', 'ዓ', 'ዔ', 'ዕ', 'ዖ',
+  'ዘ', 'ዙ', 'ዚ', 'ዛ', 'ዜ', 'ዝ', 'ዞ', 'ዟ',
+  'ዠ', 'ዡ', 'ዢ', 'ዣ', 'ዤ', 'ዥ', 'ዦ', 'ዧ',
+  'የ', 'ዩ', 'ዪ', 'ያ', 'ዬ', 'ይ', 'ዮ', 'ዯ',
+  'ደ', 'ዱ', 'ዲ', 'ዳ', 'ዴ', 'ድ', 'ዶ', 'ዷ',
+  'ጀ', 'ጁ', 'ጂ', 'ጃ', 'ጄ', 'ጅ', 'ጆ', 'ጇ',
+  'ገ', 'ጉ', 'ጊ', 'ጋ', 'ጌ', 'ግ', 'ጎ', 'ጐ',
+  'ጠ', 'ጡ', 'ጢ', 'ጣ', 'ጤ', 'ጥ', 'ጦ', 'ጧ',
+  'ጨ', 'ጩ', 'ጪ', 'ጫ', 'ጬ', 'ጭ', 'ጮ', 'ጯ',
+  'ጰ', 'ጱ', 'ጲ', 'ጳ', 'ጴ', 'ጵ', 'ጶ', 'ጷ',
+  'ጸ', 'ጹ', 'ጺ', 'ጻ', 'ጼ', 'ጽ', 'ጾ', 'ጿ',
+  'ፀ', 'ፁ', 'ፂ', 'ፃ', 'ፄ', 'ፅ', 'ፆ',
+  'ፈ', 'ፉ', 'ፊ', 'ፋ', 'ፌ', 'ፍ', 'ፎ', 'ፏ',
+  'ፐ', 'ፑ', 'ፒ', 'ፓ', 'ፔ', 'ፕ', 'ፖ', 'ፗ'
+];
 
 function sortAmharic(a, b) {
   const nameA = a.fullName || '';
   const nameB = b.fullName || '';
+  
+  // የመጀመሪያውን ፊደል ይውሰዱ
   const firstA = nameA.charAt(0);
   const firstB = nameB.charAt(0);
+  
   const idxA = amharicOrder.indexOf(firstA);
   const idxB = amharicOrder.indexOf(firstB);
+  
   if (idxA === -1 && idxB === -1) return nameA.localeCompare(nameB);
   if (idxA === -1) return 1;
   if (idxB === -1) return -1;
@@ -731,6 +770,7 @@ function togglePowerOfAttorneyOptions() {
   document.getElementById('powerOfAttorneyDetails').style.display = type !== '' ? 'block' : 'none';
 }
 
+// የአባላት ዝርዝር ማሳያ - ከአማርኛ ደረደር ጋር
 async function loadMembers() {
   console.log("Loading members...");
   try {
@@ -738,28 +778,38 @@ async function loadMembers() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to load members');
+    
     const data = await response.json();
     members = data.members || data;
     if (!Array.isArray(members)) members = [];
+    
+    // በአማርኛ ደረደር
     members.sort(sortAmharic);
+    
     const search = document.getElementById('searchInput')?.value || '';
     let filtered = members;
     if (search) {
-      filtered = members.filter(m => (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || (m.phone && m.phone.includes(search)));
+      filtered = members.filter(m => 
+        (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
+        (m.phone && m.phone.includes(search))
+      );
     }
+    
     document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+    
     const container = document.getElementById('membersList');
     if (!filtered.length) {
       container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
       return;
     }
+    
     container.innerHTML = filtered.map((m, index) => `
       <div class="member-card">
         <div class="member-header">
           <div class="member-name">
             <span class="serial-number">#${index + 1}</span>
             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-            <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
+            <strong style="cursor:pointer; color:#2d6a1a; font-size:1.1em;" onclick="showMemberDetails('${m._id || m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
             <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
           </div>
@@ -772,15 +822,24 @@ async function loadMembers() {
           <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
         </div>
         <div class="member-actions">
-          <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
-          <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+          <button class="btn-edit" onclick="event.stopPropagation(); editMember('${m._id || m.id}')">✏️ አርትዕ</button>
+          <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m._id || m.id}')">🗑️ ሰርዝ</button>
         </div>
       </div>
     `).join('');
+    
+    // Update dropdowns
     const saleSelect = document.getElementById('selectedMemberId');
     const transferSelect = document.getElementById('oldMemberId');
-    if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
-    if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+    if (saleSelect) {
+      saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + 
+        members.map(m => `<option value="${m._id || m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+    }
+    if (transferSelect) {
+      transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + 
+        members.map(m => `<option value="${m._id || m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+    }
+    
   } catch (error) {
     console.error('Error loading members:', error);
     document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
@@ -788,12 +847,44 @@ async function loadMembers() {
   updateShareStatistics();
 }
 
+// አባል ለማርትዕ ተጨማሪ ቀላል ተግባር
+async function editMember(memberId) {
+  console.log("Editing member:", memberId);
+  const member = members.find(m => (m._id || m.id) === memberId);
+  if (!member) {
+    alert('አባል አልተገኘም!');
+    return;
+  }
+  currentEditingMemberId = memberId;
+  showMemberDetails(memberId);
+  
+  // በራስ-ሰር አርትዕ ሁነታ ይክፈት
+  setTimeout(() => {
+    enableEditMode();
+  }, 500);
+}
+
+// የተሻሻለ የአባል ሰርዝ ተግባር
 async function deleteMember(id) {
-  if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል!')) {
-    await apiCall(`/members/${id}`, { method: 'DELETE' });
-    loadMembers();
-    updateShareStatistics();
-    alert('አባል ተሰርዟል!');
+  if (confirm('እርግጠኛ ነዎት? ይህ አባል ይሰረዛል! ይህ ተግባር ሊቀለበስ አይችልም።')) {
+    try {
+      const response = await fetch(`/api/members/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('✅ አባል በሚገባ ተሰርዟል!');
+        await loadMembers();
+        updateShareStatistics();
+      } else {
+        const error = await response.json();
+        alert('❌ ሰርዝ አልተሳካም: ' + (error.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('❌ ስህተት: ' + error.message);
+    }
   }
 }
 
