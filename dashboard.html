@@ -799,135 +799,81 @@ async function deleteMember(id) {
 
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  
-  console.log("=== FORM SUBMISSION STARTED ===");
-  
-  try {
-    const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-    const remainingShares = updateShareStatistics();
-    
-    if (shareCount > remainingShares) {
-      alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}`);
-      return;
-    }
-    
-    const beneficiaries = await collectBeneficiariesData();
-    const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-    const totalPayable = shareCount * SHARE_PRICE;
-    const remainingBalance = totalPayable - sharePricePaid;
-    
-    let bankName = document.getElementById('bankName').value;
-    if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
-    
-    // Log all form values before sending
-    console.log("📝 Form Data being sent:");
-    console.log("fullName:", document.getElementById('fullName').value);
-    console.log("gender:", document.getElementById('gender').value);
-    console.log("age:", document.getElementById('age').value);
-    console.log("motherName:", document.getElementById('motherName').value);
-    console.log("phone:", document.getElementById('phone').value);
-    console.log("role:", document.getElementById('role').value);
-    console.log("shareCount:", shareCount);
-    
-    const member = {
-      fullName: document.getElementById('fullName').value,
-      gender: document.getElementById('gender').value,
-      age: parseInt(document.getElementById('age').value) || 0,
-      motherName: document.getElementById('motherName').value,
-      nationality: document.getElementById('nationality').value,
-      education: document.getElementById('education').value,
-      region: document.getElementById('region').value,
-      zone: document.getElementById('zone').value,
-      district: document.getElementById('district').value,
-      city: document.getElementById('city').value,
-      kebele: document.getElementById('kebele').value,
-      houseNumber: document.getElementById('houseNumber').value,
-      phone: document.getElementById('phone').value,
-      taxId: document.getElementById('taxId').value,
-      role: document.getElementById('role').value,
-      shareCount: shareCount,
-      sharePrice: SHARE_PRICE,
-      totalPayable: totalPayable,
-      sharePricePaid: sharePricePaid,
-      remainingBalance: remainingBalance,
-      paymentStatus: document.getElementById('paymentStatus').value,
-      year1Payment: totalPayable * 0.3,
-      year2Payment: totalPayable * 0.4,
-      year3Payment: totalPayable * 0.3,
-      bankName: bankName,
-      bankBranch: document.getElementById('bankBranch').value,
-      accountNumber: document.getElementById('accountNumber').value,
-      accountName: document.getElementById('accountName').value,
-      financialNotes: document.getElementById('financialNotes').value,
-      beneficiaries: beneficiaries,
-      legalRepName: document.getElementById('legalRepName').value,
-      legalRepAddress: document.getElementById('legalRepAddress').value,
-      legalRepPhone: document.getElementById('legalRepPhone').value,
-      powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
-      powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
-      powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
-      powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
-      powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
-      powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
-      memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
-      memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
-      repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
-      repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
-      hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
-      powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
-      hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
-    };
-    
-    console.log("🚀 Sending request to server...");
-    console.log("Request body:", JSON.stringify(member, null, 2));
-    
-    // Use fetch directly to see the full error response
-    const token = localStorage.getItem('token');
-    console.log("Using token:", token ? "Token exists" : "NO TOKEN FOUND!");
-    
-    const response = await fetch('/api/members/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(member)
-    });
-    
-    console.log("Response status:", response.status);
-    console.log("Response status text:", response.statusText);
-    
-    const result = await response.json();
-    console.log("Response data:", result);
-    
-    if (!response.ok) {
-      console.error("❌ Server error:", result);
-      alert(`Error: ${result.message || 'Unknown error'}\n\n${JSON.stringify(result, null, 2)}`);
-      return;
-    }
-    
-    if (result.credentials) {
-      alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
-    } else {
-      alert('✅ አባል ተመዝግቧል!');
-    }
-    
-    updateShareStatistics();
-    e.target.reset();
-    document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
-    document.getElementById('shareCount').value = '0';
-    document.getElementById('sharePricePaid').value = '0';
-    document.getElementById('powerOfAttorneyDetails').style.display = 'none';
-    document.getElementById('beneficiariesContainer').innerHTML = '';
-    document.getElementById('beneficiaryCount').value = '0';
-    document.getElementById('otherBankDiv').style.display = 'none';
-    loadMembers();
-    showTab('list');
-    
-  } catch (error) {
-    console.error("❌ Submission error:", error);
-    alert("An error occurred: " + error.message);
+  const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+  const remainingShares = updateShareStatistics();
+  if (shareCount > remainingShares) {
+    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
+    return;
   }
+  const beneficiaries = await collectBeneficiariesData();
+  const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+  const totalPayable = shareCount * SHARE_PRICE;
+  const remainingBalance = totalPayable - sharePricePaid;
+  let bankName = document.getElementById('bankName').value;
+  if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
+  const member = {
+    fullName: document.getElementById('fullName').value,
+    gender: document.getElementById('gender').value,
+    age: parseInt(document.getElementById('age').value) || 0,
+    motherName: document.getElementById('motherName').value,
+    nationality: document.getElementById('nationality').value,
+    education: document.getElementById('education').value,
+    region: document.getElementById('region').value,
+    zone: document.getElementById('zone').value,
+    district: document.getElementById('district').value,
+    city: document.getElementById('city').value,
+    kebele: document.getElementById('kebele').value,
+    houseNumber: document.getElementById('houseNumber').value,
+    phone: document.getElementById('phone').value,
+    taxId: document.getElementById('taxId').value,
+    role: document.getElementById('role').value,
+    shareCount: shareCount,
+    sharePrice: SHARE_PRICE,
+    totalPayable: totalPayable,
+    sharePricePaid: sharePricePaid,
+    remainingBalance: remainingBalance,
+    paymentStatus: document.getElementById('paymentStatus').value,
+    year1Payment: totalPayable * 0.3,
+    year2Payment: totalPayable * 0.4,
+    year3Payment: totalPayable * 0.3,
+    bankName: bankName,
+    bankBranch: document.getElementById('bankBranch').value,
+    accountNumber: document.getElementById('accountNumber').value,
+    accountName: document.getElementById('accountName').value,
+    financialNotes: document.getElementById('financialNotes').value,
+    beneficiaries: beneficiaries,
+    beneficiaryCount: beneficiaries.length,
+    legalRepName: document.getElementById('legalRepName').value,
+    legalRepAddress: document.getElementById('legalRepAddress').value,
+    legalRepPhone: document.getElementById('legalRepPhone').value,
+    powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
+    powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
+    powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
+    powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
+    powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
+    powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
+    memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
+    memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
+    repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
+    repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
+    hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
+    powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
+    hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
+  };
+  const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
+  if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
+  updateShareStatistics();
+  alert('✅ አባል ተመዝግቧል!');
+  e.target.reset();
+  document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
+  document.getElementById('shareCount').value = '0';
+  document.getElementById('sharePricePaid').value = '0';
+  document.getElementById('powerOfAttorneyDetails').style.display = 'none';
+  document.getElementById('beneficiariesContainer').innerHTML = '';
+  document.getElementById('beneficiaryCount').value = '0';
+  document.getElementById('otherBankDiv').style.display = 'none';
+  loadMembers();
+  showTab('list');
 });
 function showMemberDetails(memberId) {
   const member = members.find(m => m.id === memberId);
