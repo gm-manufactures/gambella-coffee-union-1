@@ -161,42 +161,47 @@ const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
 // ==================== FIXED HELPER FUNCTIONS ====================
 
 // Generate username from full name and phone number
-function generateUsername(fullName, phone) {
+// ==================== FIXED HELPER FUNCTIONS ====================
+
+// Generate UNIQUE username from full name and phone number
+function generateUsername(fullName, phone, existingUsernames = []) {
   console.log("🔑 Generating username for:", fullName);
   
-  // Convert Amharic name to transliterated form (simplified)
-  // This map covers common Amharic to English sounds
+  // Convert Amharic name to transliterated form
   const translitMap = {
     'ሀ': 'ha', 'ሁ': 'hu', 'ሂ': 'hi', 'ሃ': 'ha', 'ሄ': 'he', 'ህ': 'h', 'ሆ': 'ho',
-    'ለ': 'le', 'ሉ': 'lu', 'ሊ': 'li', 'ላ': 'la', 'ሌ': 'le', 'ል': 'l', 'ሎ': 'lo',
+    'ለ': 'le', 'ሉ': 'lu', 'ሊ': 'li', 'ላ': 'la', 'ሌ': 'le', 'ል': 'l', 'ሎ': 'lo', 'ሏ': 'la',
     'ሐ': 'ha', 'ሑ': 'hu', 'ሒ': 'hi', 'ሓ': 'ha', 'ሔ': 'he', 'ሕ': 'h', 'ሖ': 'ho',
-    'መ': 'me', 'ሙ': 'mu', 'ሚ': 'mi', 'ማ': 'ma', 'ሜ': 'me', 'ም': 'm', 'ሞ': 'mo',
+    'መ': 'me', 'ሙ': 'mu', 'ሚ': 'mi', 'ማ': 'ma', 'ሜ': 'me', 'ም': 'm', 'ሞ': 'mo', 'ሟ': 'ma',
     'ሠ': 'se', 'ሡ': 'su', 'ሢ': 'si', 'ሣ': 'sa', 'ሤ': 'se', 'ሥ': 's', 'ሦ': 'so',
-    'ረ': 're', 'ሩ': 'ru', 'ሪ': 'ri', 'ራ': 'ra', 'ሬ': 're', 'ር': 'r', 'ሮ': 'ro',
-    'ሰ': 'se', 'ሱ': 'su', 'ሲ': 'si', 'ሳ': 'sa', 'ሴ': 'se', 'ስ': 's', 'ሶ': 'so',
-    'ሸ': 'she', 'ሹ': 'shu', 'ሺ': 'shi', 'ሻ': 'sha', 'ሼ': 'she', 'ሽ': 'sh', 'ሾ': 'sho',
+    'ረ': 're', 'ሩ': 'ru', 'ሪ': 'ri', 'ራ': 'ra', 'ሬ': 're', 'ር': 'r', 'ሮ': 'ro', 'ሯ': 'ra',
+    'ሰ': 'se', 'ሱ': 'su', 'ሲ': 'si', 'ሳ': 'sa', 'ሴ': 'se', 'ስ': 's', 'ሶ': 'so', 'ሷ': 'sa',
+    'ሸ': 'she', 'ሹ': 'shu', 'ሺ': 'shi', 'ሻ': 'sha', 'ሼ': 'she', 'ሽ': 'sh', 'ሾ': 'sho', 'ሿ': 'sha',
     'ቀ': 'qe', 'ቁ': 'qu', 'ቂ': 'qi', 'ቃ': 'qa', 'ቄ': 'qe', 'ቅ': 'q', 'ቆ': 'qo',
-    'በ': 'be', 'ቡ': 'bu', 'ቢ': 'bi', 'ባ': 'ba', 'ቤ': 'be', 'ብ': 'b', 'ቦ': 'bo',
-    'ተ': 'te', 'ቱ': 'tu', 'ቲ': 'ti', 'ታ': 'ta', 'ቴ': 'te', 'ት': 't', 'ቶ': 'to',
-    'ቸ': 'che', 'ቹ': 'chu', 'ቺ': 'chi', 'ቻ': 'cha', 'ቼ': 'che', 'ች': 'ch', 'ቾ': 'cho',
-    'ነ': 'ne', 'ኑ': 'nu', 'ኒ': 'ni', 'ና': 'na', 'ኔ': 'ne', 'ን': 'n', 'ኖ': 'no',
-    'ኘ': 'nye', 'ኙ': 'nyu', 'ኚ': 'nyi', 'ኛ': 'nya', 'ኜ': 'nye', 'ኝ': 'ny', 'ኞ': 'nyo',
-    'አ': 'a', 'ኡ': 'u', 'ኢ': 'i', 'ኣ': 'a', 'ኤ': 'e', 'እ': 'e', 'ኦ': 'o',
-    'ከ': 'ke', 'ኩ': 'ku', 'ኪ': 'ki', 'ካ': 'ka', 'ኬ': 'ke', 'ክ': 'k', 'ኮ': 'ko',
-    'ወ': 'we', 'ዉ': 'wu', 'ዊ': 'wi', 'ዋ': 'wa', 'ዌ': 'we', 'ው': 'w', 'ዎ': 'wo',
-    'ዘ': 'ze', 'ዙ': 'zu', 'ዚ': 'zi', 'ዛ': 'za', 'ዜ': 'ze', 'ዝ': 'z', 'ዞ': 'zo',
+    'በ': 'be', 'ቡ': 'bu', 'ቢ': 'bi', 'ባ': 'ba', 'ቤ': 'be', 'ብ': 'b', 'ቦ': 'bo', 'ቧ': 'ba',
+    'ተ': 'te', 'ቱ': 'tu', 'ቲ': 'ti', 'ታ': 'ta', 'ቴ': 'te', 'ት': 't', 'ቶ': 'to', 'ቷ': 'ta',
+    'ቸ': 'che', 'ቹ': 'chu', 'ቺ': 'chi', 'ቻ': 'cha', 'ቼ': 'che', 'ች': 'ch', 'ቾ': 'cho', 'ቿ': 'cha',
+    'ኀ': 'he', 'ኁ': 'hu', 'ኂ': 'hi', 'ኃ': 'ha', 'ኄ': 'he', 'ኅ': 'h', 'ኆ': 'ho',
+    'ነ': 'ne', 'ኑ': 'nu', 'ኒ': 'ni', 'ና': 'na', 'ኔ': 'ne', 'ን': 'n', 'ኖ': 'no', 'ኗ': 'na',
+    'ኘ': 'nye', 'ኙ': 'nyu', 'ኚ': 'nyi', 'ኛ': 'nya', 'ኜ': 'nye', 'ኝ': 'ny', 'ኞ': 'nyo', 'ኟ': 'nya',
+    'አ': 'a', 'ኡ': 'u', 'ኢ': 'i', 'ኣ': 'a', 'ኤ': 'e', 'እ': 'e', 'ኦ': 'o', 'ኧ': 'a',
+    'ከ': 'ke', 'ኩ': 'ku', 'ኪ': 'ki', 'ካ': 'ka', 'ኬ': 'ke', 'ክ': 'k', 'ኮ': 'ko', 'ኰ': 'ke',
+    'ኸ': 'he', 'ኹ': 'hu', 'ኺ': 'hi', 'ኻ': 'ha', 'ኼ': 'he', 'ኽ': 'h', 'ኾ': 'ho',
+    'ወ': 'we', 'ዉ': 'wu', 'ዊ': 'wi', 'ዋ': 'wa', 'ዌ': 'we', 'ው': 'w', 'ዎ': 'wo', 'ዏ': 'wa',
+    'ዐ': 'a', 'ዑ': 'u', 'ዒ': 'i', 'ዓ': 'a', 'ዔ': 'e', 'ዕ': 'e', 'ዖ': 'o',
+    'ዘ': 'ze', 'ዙ': 'zu', 'ዚ': 'zi', 'ዛ': 'za', 'ዜ': 'ze', 'ዝ': 'z', 'ዞ': 'zo', 'ዟ': 'za',
     'ዠ': 'zhe', 'ዡ': 'zhu', 'ዢ': 'zhi', 'ዣ': 'zha', 'ዤ': 'zhe', 'ዥ': 'zh', 'ዦ': 'zho',
-    'የ': 'ye', 'ዩ': 'yu', 'ዪ': 'yi', 'ያ': 'ya', 'ዬ': 'ye', 'ይ': 'y', 'ዮ': 'yo',
-    'ደ': 'de', 'ዱ': 'du', 'ዲ': 'di', 'ዳ': 'da', 'ዴ': 'de', 'ድ': 'd', 'ዶ': 'do',
-    'ጀ': 'je', 'ጁ': 'ju', 'ጂ': 'ji', 'ጃ': 'ja', 'ጄ': 'je', 'ጅ': 'j', 'ጆ': 'jo',
-    'ገ': 'ge', 'ጉ': 'gu', 'ጊ': 'gi', 'ጋ': 'ga', 'ጌ': 'ge', 'ግ': 'g', 'ጎ': 'go',
-    'ጠ': 'te', 'ጡ': 'tu', 'ጢ': 'ti', 'ጣ': 'ta', 'ጤ': 'te', 'ጥ': 't', 'ጦ': 'to',
-    'ጨ': 'che', 'ጩ': 'chu', 'ጪ': 'chi', 'ጫ': 'cha', 'ጬ': 'che', 'ጭ': 'ch', 'ጮ': 'cho',
+    'የ': 'ye', 'ዩ': 'yu', 'ዪ': 'yi', 'ያ': 'ya', 'ዬ': 'ye', 'ይ': 'y', 'ዮ': 'yo', 'ዯ': 'ya',
+    'ደ': 'de', 'ዱ': 'du', 'ዲ': 'di', 'ዳ': 'da', 'ዴ': 'de', 'ድ': 'd', 'ዶ': 'do', 'ዷ': 'da',
+    'ጀ': 'je', 'ጁ': 'ju', 'ጂ': 'ji', 'ጃ': 'ja', 'ጄ': 'je', 'ጅ': 'j', 'ጆ': 'jo', 'ጇ': 'ja',
+    'ገ': 'ge', 'ጉ': 'gu', 'ጊ': 'gi', 'ጋ': 'ga', 'ጌ': 'ge', 'ግ': 'g', 'ጎ': 'go', 'ጐ': 'ge',
+    'ጠ': 'te', 'ጡ': 'tu', 'ጢ': 'ti', 'ጣ': 'ta', 'ጤ': 'te', 'ጥ': 't', 'ጦ': 'to', 'ጧ': 'ta',
+    'ጨ': 'che', 'ጩ': 'chu', 'ጪ': 'chi', 'ጫ': 'cha', 'ጬ': 'che', 'ጭ': 'ch', 'ጮ': 'cho', 'ጯ': 'cha',
     'ጰ': 'pe', 'ጱ': 'pu', 'ጲ': 'pi', 'ጳ': 'pa', 'ጴ': 'pe', 'ጵ': 'p', 'ጶ': 'po',
-    'ጸ': 'tse', 'ጹ': 'tsu', 'ጺ': 'tsi', 'ጻ': 'tsa', 'ጼ': 'tse', 'ጽ': 'ts', 'ጾ': 'tso',
+    'ጸ': 'tse', 'ጹ': 'tsu', 'ጺ': 'tsi', 'ጻ': 'tsa', 'ጼ': 'tse', 'ጽ': 'ts', 'ጾ': 'tso', 'ጿ': 'tsa',
     'ፀ': 'tse', 'ፁ': 'tsu', 'ፂ': 'tsi', 'ፃ': 'tsa', 'ፄ': 'tse', 'ፅ': 'ts', 'ፆ': 'tso',
-    'ፈ': 'fe', 'ፉ': 'fu', 'ፊ': 'fi', 'ፋ': 'fa', 'ፌ': 'fe', 'ፍ': 'f', 'ፎ': 'fo',
-    'ፐ': 'pe', 'ፑ': 'pu', 'ፒ': 'pi', 'ፓ': 'pa', 'ፔ': 'pe', 'ፕ': 'p', 'ፖ': 'po'
+    'ፈ': 'fe', 'ፉ': 'fu', 'ፊ': 'fi', 'ፋ': 'fa', 'ፌ': 'fe', 'ፍ': 'f', 'ፎ': 'fo', 'ፏ': 'fa',
+    'ፐ': 'pe', 'ፑ': 'pu', 'ፒ': 'pi', 'ፓ': 'pa', 'ፔ': 'pe', 'ፕ': 'p', 'ፖ': 'po', 'ፗ': 'pa'
   };
   
   // Get first part of name (first word)
@@ -226,14 +231,23 @@ function generateUsername(fullName, phone) {
   // Get last 4 digits of phone
   const phoneSuffix = phone.slice(-4);
   
-  // Create username
+  // Create base username
   let username = `${base}${phoneSuffix}`;
   
   // Clean up - only allow alphanumeric
   username = username.replace(/[^a-z0-9]/g, '');
   
-  console.log(`✅ Generated username: ${username}`);
-  return username;
+  // Check if username already exists and make it unique
+  let finalUsername = username;
+  let counter = 1;
+  
+  while (existingUsernames.includes(finalUsername)) {
+    finalUsername = `${username}${counter}`;
+    counter++;
+  }
+  
+  console.log(`✅ Generated username: ${finalUsername}`);
+  return finalUsername;
 }
 
 // Generate random secure password
@@ -266,7 +280,6 @@ function generateRandomPassword() {
   console.log(`✅ Generated password: ${password}`);
   return password;
 }
-
 // ==================== AUTH MIDDLEWARE ====================
 
 const authMiddleware = async (req, res, next) => {
@@ -427,19 +440,12 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 
 // ==================== FIXED MEMBER REGISTRATION ROUTE ====================
 
+// ==================== FIXED MEMBER REGISTRATION ROUTE ====================
+
 app.post('/api/members/register', async (req, res) => {
   console.log("=".repeat(60));
   console.log("📝 NEW MEMBER REGISTRATION REQUEST");
   console.log("=".repeat(60));
-  console.log("Received data:", JSON.stringify({
-    fullName: req.body.fullName,
-    phone: req.body.phone,
-    gender: req.body.gender,
-    age: req.body.age,
-    motherName: req.body.motherName,
-    role: req.body.role,
-    shareCount: req.body.shareCount
-  }, null, 2));
   
   try {
     // Remove any id fields from request
@@ -450,7 +456,6 @@ app.post('/api/members/register', async (req, res) => {
     const missingFields = requiredFields.filter(field => !cleanData[field]);
     
     if (missingFields.length > 0) {
-      console.log("❌ Missing fields:", missingFields);
       return res.status(400).json({
         success: false,
         message: `Missing required fields: ${missingFields.join(', ')}`,
@@ -458,7 +463,7 @@ app.post('/api/members/register', async (req, res) => {
       });
     }
     
-    // Check for existing member by phone
+    // Check for existing member by phone (MUST be unique)
     const existingMember = await Member.findOne({ phone: cleanData.phone });
     if (existingMember) {
       console.log("❌ Phone already exists:", cleanData.phone);
@@ -565,7 +570,11 @@ app.post('/api/members/register', async (req, res) => {
     console.log(`✅ Member saved! ID: ${memberId}`);
     
     // ========== CREATE USER ACCOUNT FOR MEMBER ==========
-    const username = generateUsername(newMember.fullName, newMember.phone);
+    // Get all existing usernames to ensure uniqueness
+    const existingUsers = await User.find({}, 'username');
+    const existingUsernames = existingUsers.map(u => u.username);
+    
+    const username = generateUsername(newMember.fullName, newMember.phone, existingUsernames);
     const plainPassword = generateRandomPassword();
     
     console.log(`👤 Generated username: ${username}`);
@@ -595,10 +604,6 @@ app.post('/api/members/register', async (req, res) => {
       console.log(`⚠️ User already exists for this member: ${existingUser.username}`);
       userAccount = existingUser;
     }
-    
-    // Verify the user was created correctly
-    const verifyUser = await User.findOne({ memberId: memberId });
-    console.log(`🔍 Verification: User found with memberId ${memberId}: ${verifyUser ? 'YES' : 'NO'}`);
     
     // Send response
     const responseData = {
@@ -631,20 +636,18 @@ app.post('/api/members/register', async (req, res) => {
     // Handle duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
+      let message = `${field} already exists.`;
+      
+      if (field === 'phone') {
+        message = 'Phone number already registered. Please use a different phone number.';
+      } else if (field === 'username') {
+        message = 'Username already exists. The system will try a different username.';
+      }
+      
       return res.status(400).json({
         success: false,
-        message: `${field} already exists. Please use a different value.`,
+        message: message,
         field: field
-      });
-    }
-    
-    // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(e => e.message);
-      return res.status(400).json({
-        success: false,
-        message: `Validation error: ${errors.join(', ')}`,
-        validationErrors: errors
       });
     }
     
