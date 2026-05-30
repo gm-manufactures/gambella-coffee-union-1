@@ -890,8 +890,7 @@ async function deleteMember(id) {
 
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-    console.log("📝 Submitting registration for second member...");
-  try {
+    
   const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
   const remainingShares = updateShareStatistics();
   if (shareCount > remainingShares) {
@@ -953,29 +952,7 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
     hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
   };
-  const token = localStorage.getItem('token');
-    console.log("Token exists:", !!token);
-    
-    const response = await fetch('/api/members/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(memberData)
-    });
-    
-    console.log("Response status:", response.status);
-    
-    const result = await response.json();
-    console.log("Response data:", result);
-    
-    if (!response.ok) {
-      // Show detailed error
-      alert(`❌ Registration failed!\n\n${result.message}\n\nPlease check:\n- Phone number must be unique\n- All required fields must be filled`);
-      return;
-    }
-    
+  
     // Success handling...
    const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
   if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
@@ -992,11 +969,7 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
   loadMembers();
   showTab('list');
     
-  } catch (error) {
-    console.error("Fetch error:", error);
-    alert("Network error: " + error.message);
-  }
-});
+  
  
 });
 function showMemberDetails(memberId) {
