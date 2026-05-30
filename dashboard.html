@@ -1896,16 +1896,216 @@ function validateShareAvailability(requestedShares) {
             alert(`✅ ${members.length} አባላት ወደ CSV ተልከዋል!`);
         }
         
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-            if (tabId === 'list') loadMembers();
-            if (tabId === 'sales') { loadAllSales(); loadMemberSales(); }
-            if (tabId === 'transfer') loadTransfers();
-            if (tabId === 'trading') { loadTradingStats(); loadPendingRequests(); loadAllRequests(); }
+       // ==================== TAB SWITCHING FUNCTION ====================
+function showTab(tabId) {
+    console.log("Switching to tab:", tabId);
+    
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    } else {
+        console.error("Tab not found:", tabId);
+        return;
+    }
+    
+    // Find and activate the corresponding button
+    const buttons = document.querySelectorAll('.tab-btn');
+    const tabMap = {
+        'register': 0,
+        'list': 1, 
+        'sales': 2,
+        'transfer': 3,
+        'trading': 4,
+        'search': 5,
+        'admin': 6
+    };
+    
+    const index = tabMap[tabId];
+    if (buttons[index]) {
+        buttons[index].classList.add('active');
+    }
+    
+    // Load data based on tab
+    if (tabId === 'list') {
+        loadMembers();
+    }
+    if (tabId === 'sales') {
+        if (typeof loadAllSales === 'function') loadAllSales();
+        if (typeof loadMemberSales === 'function') loadMemberSales();
+    }
+    if (tabId === 'transfer') {
+        if (typeof loadTransfers === 'function') loadTransfers();
+    }
+    if (tabId === 'trading') {
+        if (typeof loadTradingStats === 'function') loadTradingStats();
+        if (typeof loadPendingRequests === 'function') loadPendingRequests();
+        if (typeof loadAllRequests === 'function') loadAllRequests();
+    }
+}
+
+// ==================== MISSING FUNCTIONS ====================
+
+function cancelEditMode() {
+    const modal = document.getElementById('memberModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof loadMembers === 'function') loadMembers();
+}
+
+function enableEditMode() {
+    alert('Edit mode - You can edit member information here.');
+}
+
+async function saveMemberEdit() {
+    alert('Save functionality - Update member data here');
+    const modal = document.getElementById('memberModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof loadMembers === 'function') loadMembers();
+}
+
+function togglePowerOfAttorneyOptions() {
+    const type = document.getElementById('powerOfAttorneyType')?.value;
+    const detailsDiv = document.getElementById('powerOfAttorneyDetails');
+    if (detailsDiv) {
+        detailsDiv.style.display = type !== '' ? 'block' : 'none';
+    }
+}
+
+function generateBeneficiaryForms() {
+    const count = parseInt(document.getElementById('beneficiaryCount')?.value) || 0;
+    const container = document.getElementById('beneficiariesContainer');
+    if (!container) return;
+    
+    if (count <= 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    for (let i = 1; i <= count; i++) {
+        html += `
+            <div class="beneficiary-card">
+                <div class="beneficiary-title">👨‍👦 ወራሽ ${i}</div>
+                <div class="form-row">
+                    <div class="form-group"><label>ሙሉ ስም</label><input type="text" id="beneficiaryName_${i}" class="form-control"></div>
+                    <div class="form-group"><label>ፆታ</label><select id="beneficiaryGender_${i}" class="form-control"><option value="">ምረጥ</option><option value="ወንድ">ወንድ</option><option value="ሴት">ሴት</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>ዝምድና</label><select id="beneficiaryRelationship_${i}" class="form-control"><option value="">ምረጥ</option><option value="አባት">አባት</option><option value="እናት">እናት</option><option value="ወንድም">ወንድም</option><option value="እህት">እህት</option><option value="ልጅ">ልጅ</option><option value="ሚስት">ሚስት</option><option value="ሌላ">ሌላ</option></select></div>
+                    <div class="form-group"><label>አድራሻ</label><textarea id="beneficiaryAddress_${i}" rows="2" class="form-control"></textarea></div>
+                </div>
+            </div>
+        `;
+    }
+    container.innerHTML = html;
+}
+
+function collectBeneficiariesData() {
+    const count = parseInt(document.getElementById('beneficiaryCount')?.value) || 0;
+    const beneficiaries = [];
+    for (let i = 1; i <= count; i++) {
+        let relationship = document.getElementById(`beneficiaryRelationship_${i}`)?.value || '';
+        if (relationship === 'ሌላ') {
+            relationship = document.getElementById(`beneficiaryOtherRelationship_${i}`)?.value || '';
         }
+        beneficiaries.push({
+            name: document.getElementById(`beneficiaryName_${i}`)?.value || '',
+            gender: document.getElementById(`beneficiaryGender_${i}`)?.value || '',
+            relationship: relationship,
+            address: document.getElementById(`beneficiaryAddress_${i}`)?.value || ''
+        });
+    }
+    return beneficiaries;
+}
+
+function toggleOtherBank() {
+    const bankSelect = document.getElementById('bankName');
+    const otherDiv = document.getElementById('otherBankDiv');
+    if (otherDiv) {
+        otherDiv.style.display = bankSelect?.value === 'ሌላ' ? 'block' : 'none';
+    }
+}
+
+// ==================== LOAD MEMBERS FUNCTION ====================
+async function loadMembers() {
+    console.log("Loading members...");
+    try {
+        const response = await fetch('/api/members', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load members');
+        
+        const data = await response.json();
+        members = data.members || data;
+        if (!Array.isArray(members)) members = [];
+        
+        members.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+        
+        const search = document.getElementById('searchInput')?.value || '';
+        let filtered = members;
+        if (search) {
+            filtered = members.filter(m => 
+                (m.fullName && m.fullName.toLowerCase().includes(search.toLowerCase())) || 
+                (m.phone && m.phone.includes(search))
+            );
+        }
+        
+        document.getElementById('memberCount').innerHTML = filtered.length + ' አባላት';
+        const container = document.getElementById('membersList');
+        
+        if (!filtered.length) {
+            container.innerHTML = '<div class="no-data">📭 ምንም አባላት የሉም</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map((m, index) => `
+            <div class="member-card">
+                <div class="member-header">
+                    <div class="member-name">
+                        <span class="serial-number">#${index + 1}</span>
+                        ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
+                        <strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
+                        ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
+                        <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
+                    </div>
+                    <div class="member-role">${escapeHtml(m.role || 'Member')}</div>
+                </div>
+                <div class="member-details">
+                    <div>📞 ${escapeHtml(m.phone || 'N/A')}</div>
+                    <div>♂/♀ ${escapeHtml(m.gender || 'N/A')}</div>
+                    <div>📅 ${m.age || 'N/A'}</div>
+                    <div>🏠 ${escapeHtml((m.address || '').substring(0, 30))}${(m.address || '').length > 30 ? '...' : ''}</div>
+                </div>
+                <div class="member-actions">
+                    <button class="btn-edit" onclick="event.stopPropagation(); showMemberDetails('${m.id}')">✏️ አርትዕ</button>
+                    <button class="btn-danger" onclick="event.stopPropagation(); deleteMember('${m.id}')">🗑️ ሰርዝ</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Update dropdowns
+        const saleSelect = document.getElementById('selectedMemberId');
+        const transferSelect = document.getElementById('oldMemberId');
+        if (saleSelect) saleSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        if (transferSelect) transferSelect.innerHTML = '<option value="">አባል ይምረጡ</option>' + members.map(m => `<option value="${m.id}">${escapeHtml(m.fullName)} - ${m.phone}</option>`).join('');
+        
+    } catch (error) {
+        console.error('Error loading members:', error);
+        document.getElementById('membersList').innerHTML = '<div class="no-data">❌ ስህተት: ' + error.message + '</div>';
+    }
+}
+
 
         
         function logout() { stopInactivityTracking(); localStorage.clear(); window.location.href = '/'; }
