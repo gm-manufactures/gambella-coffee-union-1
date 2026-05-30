@@ -43,15 +43,14 @@ UserSchema.methods.comparePassword = async function(candidate) {
 
 const User = mongoose.model('User', UserSchema);
 
-// Member Schema - FIXED: Added all location fields properly
+// Member Schema
 const MemberSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   gender: { type: String, required: true },
   age: { type: Number, required: true },
   motherName: { type: String, required: true },
   nationality: { type: String, default: 'ኢትዮጵያዊ' },
-  education: { type: String },
-  // Address fields - FIXED: Made address not required, use individual fields
+  education: { type: String, default: '' },
   address: { type: String, default: '' },
   region: { type: String, default: '' },
   zone: { type: String, default: '' },
@@ -159,22 +158,112 @@ const TradingRequestSchema = new mongoose.Schema({
 
 const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
 
-// ==================== HELPER FUNCTIONS ====================
+// ==================== FIXED HELPER FUNCTIONS ====================
 
+// Generate username from full name and phone number
 function generateUsername(fullName, phone) {
-  let base = fullName.toLowerCase().replace(/[^a-z]/g, '').substring(0, 6);
-  if (base.length < 3) base = 'member';
-  // Remove any non-alphanumeric characters
-  base = base.replace(/[^a-z0-9]/g, '');
-  return `${base}${phone.slice(-4)}`;
+  console.log("🔑 Generating username for:", fullName);
+  
+  // Convert Amharic name to transliterated form (simplified)
+  // This map covers common Amharic to English sounds
+  const translitMap = {
+    'ሀ': 'ha', 'ሁ': 'hu', 'ሂ': 'hi', 'ሃ': 'ha', 'ሄ': 'he', 'ህ': 'h', 'ሆ': 'ho',
+    'ለ': 'le', 'ሉ': 'lu', 'ሊ': 'li', 'ላ': 'la', 'ሌ': 'le', 'ል': 'l', 'ሎ': 'lo',
+    'ሐ': 'ha', 'ሑ': 'hu', 'ሒ': 'hi', 'ሓ': 'ha', 'ሔ': 'he', 'ሕ': 'h', 'ሖ': 'ho',
+    'መ': 'me', 'ሙ': 'mu', 'ሚ': 'mi', 'ማ': 'ma', 'ሜ': 'me', 'ም': 'm', 'ሞ': 'mo',
+    'ሠ': 'se', 'ሡ': 'su', 'ሢ': 'si', 'ሣ': 'sa', 'ሤ': 'se', 'ሥ': 's', 'ሦ': 'so',
+    'ረ': 're', 'ሩ': 'ru', 'ሪ': 'ri', 'ራ': 'ra', 'ሬ': 're', 'ር': 'r', 'ሮ': 'ro',
+    'ሰ': 'se', 'ሱ': 'su', 'ሲ': 'si', 'ሳ': 'sa', 'ሴ': 'se', 'ስ': 's', 'ሶ': 'so',
+    'ሸ': 'she', 'ሹ': 'shu', 'ሺ': 'shi', 'ሻ': 'sha', 'ሼ': 'she', 'ሽ': 'sh', 'ሾ': 'sho',
+    'ቀ': 'qe', 'ቁ': 'qu', 'ቂ': 'qi', 'ቃ': 'qa', 'ቄ': 'qe', 'ቅ': 'q', 'ቆ': 'qo',
+    'በ': 'be', 'ቡ': 'bu', 'ቢ': 'bi', 'ባ': 'ba', 'ቤ': 'be', 'ብ': 'b', 'ቦ': 'bo',
+    'ተ': 'te', 'ቱ': 'tu', 'ቲ': 'ti', 'ታ': 'ta', 'ቴ': 'te', 'ት': 't', 'ቶ': 'to',
+    'ቸ': 'che', 'ቹ': 'chu', 'ቺ': 'chi', 'ቻ': 'cha', 'ቼ': 'che', 'ች': 'ch', 'ቾ': 'cho',
+    'ነ': 'ne', 'ኑ': 'nu', 'ኒ': 'ni', 'ና': 'na', 'ኔ': 'ne', 'ን': 'n', 'ኖ': 'no',
+    'ኘ': 'nye', 'ኙ': 'nyu', 'ኚ': 'nyi', 'ኛ': 'nya', 'ኜ': 'nye', 'ኝ': 'ny', 'ኞ': 'nyo',
+    'አ': 'a', 'ኡ': 'u', 'ኢ': 'i', 'ኣ': 'a', 'ኤ': 'e', 'እ': 'e', 'ኦ': 'o',
+    'ከ': 'ke', 'ኩ': 'ku', 'ኪ': 'ki', 'ካ': 'ka', 'ኬ': 'ke', 'ክ': 'k', 'ኮ': 'ko',
+    'ወ': 'we', 'ዉ': 'wu', 'ዊ': 'wi', 'ዋ': 'wa', 'ዌ': 'we', 'ው': 'w', 'ዎ': 'wo',
+    'ዘ': 'ze', 'ዙ': 'zu', 'ዚ': 'zi', 'ዛ': 'za', 'ዜ': 'ze', 'ዝ': 'z', 'ዞ': 'zo',
+    'ዠ': 'zhe', 'ዡ': 'zhu', 'ዢ': 'zhi', 'ዣ': 'zha', 'ዤ': 'zhe', 'ዥ': 'zh', 'ዦ': 'zho',
+    'የ': 'ye', 'ዩ': 'yu', 'ዪ': 'yi', 'ያ': 'ya', 'ዬ': 'ye', 'ይ': 'y', 'ዮ': 'yo',
+    'ደ': 'de', 'ዱ': 'du', 'ዲ': 'di', 'ዳ': 'da', 'ዴ': 'de', 'ድ': 'd', 'ዶ': 'do',
+    'ጀ': 'je', 'ጁ': 'ju', 'ጂ': 'ji', 'ጃ': 'ja', 'ጄ': 'je', 'ጅ': 'j', 'ጆ': 'jo',
+    'ገ': 'ge', 'ጉ': 'gu', 'ጊ': 'gi', 'ጋ': 'ga', 'ጌ': 'ge', 'ግ': 'g', 'ጎ': 'go',
+    'ጠ': 'te', 'ጡ': 'tu', 'ጢ': 'ti', 'ጣ': 'ta', 'ጤ': 'te', 'ጥ': 't', 'ጦ': 'to',
+    'ጨ': 'che', 'ጩ': 'chu', 'ጪ': 'chi', 'ጫ': 'cha', 'ጬ': 'che', 'ጭ': 'ch', 'ጮ': 'cho',
+    'ጰ': 'pe', 'ጱ': 'pu', 'ጲ': 'pi', 'ጳ': 'pa', 'ጴ': 'pe', 'ጵ': 'p', 'ጶ': 'po',
+    'ጸ': 'tse', 'ጹ': 'tsu', 'ጺ': 'tsi', 'ጻ': 'tsa', 'ጼ': 'tse', 'ጽ': 'ts', 'ጾ': 'tso',
+    'ፀ': 'tse', 'ፁ': 'tsu', 'ፂ': 'tsi', 'ፃ': 'tsa', 'ፄ': 'tse', 'ፅ': 'ts', 'ፆ': 'tso',
+    'ፈ': 'fe', 'ፉ': 'fu', 'ፊ': 'fi', 'ፋ': 'fa', 'ፌ': 'fe', 'ፍ': 'f', 'ፎ': 'fo',
+    'ፐ': 'pe', 'ፑ': 'pu', 'ፒ': 'pi', 'ፓ': 'pa', 'ፔ': 'pe', 'ፕ': 'p', 'ፖ': 'po'
+  };
+  
+  // Get first part of name (first word)
+  let firstName = fullName.trim().split(' ')[0];
+  let transliterated = '';
+  
+  // Transliterate Amharic to English
+  for (let char of firstName) {
+    if (translitMap[char]) {
+      transliterated += translitMap[char];
+    } else if (/[a-zA-Z0-9]/.test(char)) {
+      transliterated += char.toLowerCase();
+    }
+  }
+  
+  // If transliteration produced nothing, use 'member'
+  let base = transliterated || 'member';
+  
+  // Take first 6 characters
+  base = base.substring(0, 6);
+  
+  // Ensure at least 3 characters
+  while (base.length < 3) {
+    base += 'x';
+  }
+  
+  // Get last 4 digits of phone
+  const phoneSuffix = phone.slice(-4);
+  
+  // Create username
+  let username = `${base}${phoneSuffix}`;
+  
+  // Clean up - only allow alphanumeric
+  username = username.replace(/[^a-z0-9]/g, '');
+  
+  console.log(`✅ Generated username: ${username}`);
+  return username;
 }
 
+// Generate random secure password
 function generateRandomPassword() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  console.log("🔐 Generating random password...");
+  
+  const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lowercase = 'abcdefghijkmnopqrstuvwxyz';
+  const numbers = '23456789';
+  
   let password = '';
-  for (let i = 0; i < 8; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  
+  // Add 2 uppercase
+  password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+  password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+  
+  // Add 3 lowercase
+  for (let i = 0; i < 3; i++) {
+    password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
   }
+  
+  // Add 3 numbers
+  for (let i = 0; i < 3; i++) {
+    password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+  }
+  
+  // Shuffle the password
+  password = password.split('').sort(() => Math.random() - 0.5).join('');
+  
+  console.log(`✅ Generated password: ${password}`);
   return password;
 }
 
@@ -221,6 +310,7 @@ app.post('/api/auth/login', async (req, res) => {
       user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role }
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -248,6 +338,7 @@ app.post('/api/auth/member-login', async (req, res) => {
       user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role, memberId: user.memberId }
     });
   } catch (error) {
+    console.error('Member login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -284,6 +375,7 @@ app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Profile updated successfully' });
   } catch (error) {
+    console.error('Update profile error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -333,128 +425,205 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
   res.json({ success: true });
 });
 
-// ==================== MEMBER ROUTES ====================
+// ==================== FIXED MEMBER REGISTRATION ROUTE ====================
 
-// FIXED: Improved registration with better error handling
 app.post('/api/members/register', async (req, res) => {
-  console.log("📝 Registration request received for:", req.body.fullName);
+  console.log("=".repeat(60));
+  console.log("📝 NEW MEMBER REGISTRATION REQUEST");
+  console.log("=".repeat(60));
+  console.log("Received data:", JSON.stringify({
+    fullName: req.body.fullName,
+    phone: req.body.phone,
+    gender: req.body.gender,
+    age: req.body.age,
+    motherName: req.body.motherName,
+    role: req.body.role,
+    shareCount: req.body.shareCount
+  }, null, 2));
   
   try {
+    // Remove any id fields from request
+    const { id, _id, ...cleanData } = req.body;
+    
     // Validate required fields
     const requiredFields = ['fullName', 'gender', 'age', 'motherName', 'phone', 'role'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
+    const missingFields = requiredFields.filter(field => !cleanData[field]);
     
     if (missingFields.length > 0) {
-      return res.status(400).json({ 
+      console.log("❌ Missing fields:", missingFields);
+      return res.status(400).json({
+        success: false,
         message: `Missing required fields: ${missingFields.join(', ')}`,
-        missing: missingFields
+        missingFields: missingFields
       });
     }
     
     // Check for existing member by phone
-    const existingMember = await Member.findOne({ phone: req.body.phone });
+    const existingMember = await Member.findOne({ phone: cleanData.phone });
     if (existingMember) {
-      return res.status(400).json({ 
-        message: 'Phone number already registered',
+      console.log("❌ Phone already exists:", cleanData.phone);
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number already registered. Please use a different phone number.',
         field: 'phone'
       });
     }
     
-    // Build address from components if not provided directly
-    let address = req.body.address || '';
-    if (!address && (req.body.region || req.body.zone || req.body.district)) {
-      address = [
-        req.body.region,
-        req.body.zone,
-        req.body.district,
-        req.body.city,
-        req.body.kebele,
-        req.body.houseNumber
-      ].filter(Boolean).join(', ');
+    // Build address from components
+    let address = cleanData.address || '';
+    if (!address) {
+      const addressParts = [
+        cleanData.region,
+        cleanData.zone,
+        cleanData.district,
+        cleanData.city,
+        cleanData.kebele,
+        cleanData.houseNumber
+      ].filter(part => part && part.trim() !== '');
+      address = addressParts.join(', ');
     }
     
-    // Create member with all fields
-    const newMember = new Member({
-      fullName: req.body.fullName,
-      gender: req.body.gender,
-      age: parseInt(req.body.age) || 0,
-      motherName: req.body.motherName,
-      nationality: req.body.nationality || 'ኢትዮጵያዊ',
-      education: req.body.education || '',
+    // Calculate financial values
+    const shareCount = parseInt(cleanData.shareCount) || 0;
+    const sharePricePaid = parseFloat(cleanData.sharePricePaid) || 0;
+    const totalPayable = shareCount * 10000;
+    const remainingBalance = totalPayable - sharePricePaid;
+    
+    let paymentStatus = 'አልተከፈለም';
+    if (remainingBalance <= 0) {
+      paymentStatus = 'ተከፍሏል';
+    } else if (sharePricePaid > 0) {
+      paymentStatus = 'በከፊል ተከፍሏል';
+    }
+    
+    // Get bank name
+    let bankName = cleanData.bankName || '';
+    if (bankName === 'ሌላ' && cleanData.otherBankName) {
+      bankName = cleanData.otherBankName;
+    }
+    
+    // Create member
+    const memberData = {
+      fullName: cleanData.fullName,
+      gender: cleanData.gender,
+      age: parseInt(cleanData.age) || 0,
+      motherName: cleanData.motherName,
+      nationality: cleanData.nationality || 'ኢትዮጵያዊ',
+      education: cleanData.education || '',
       address: address,
-      region: req.body.region || '',
-      zone: req.body.zone || '',
-      district: req.body.district || '',
-      city: req.body.city || '',
-      kebele: req.body.kebele || '',
-      houseNumber: req.body.houseNumber || '',
-      phone: req.body.phone,
-      taxId: req.body.taxId || '',
-      role: req.body.role,
-      shareCount: parseInt(req.body.shareCount) || 0,
-      sharePercentage: parseFloat(req.body.sharePercentage) || 0,
-      sharePrice: req.body.sharePrice || 10000,
-      totalPayable: parseFloat(req.body.totalPayable) || 0,
-      sharePricePaid: parseFloat(req.body.sharePricePaid) || 0,
-      remainingBalance: parseFloat(req.body.remainingBalance) || 0,
-      paymentStatus: req.body.paymentStatus || 'አልተከፈለም',
-      year1Payment: parseFloat(req.body.year1Payment) || 0,
-      year2Payment: parseFloat(req.body.year2Payment) || 0,
-      year3Payment: parseFloat(req.body.year3Payment) || 0,
-      bankName: req.body.bankName || '',
-      bankBranch: req.body.bankBranch || '',
-      accountNumber: req.body.accountNumber || '',
-      accountName: req.body.accountName || '',
-      financialNotes: req.body.financialNotes || '',
-      beneficiaries: req.body.beneficiaries || [],
-      beneficiaryCount: (req.body.beneficiaries || []).length,
-      legalRepName: req.body.legalRepName || '',
-      legalRepAddress: req.body.legalRepAddress || '',
-      legalRepPhone: req.body.legalRepPhone || '',
-      powerOfAttorneyType: req.body.powerOfAttorneyType || '',
-      powerOfAttorneyNumber: req.body.powerOfAttorneyNumber || '',
-      powerOfAttorneyDate: req.body.powerOfAttorneyDate || '',
-      powerOfAttorneyIssuer: req.body.powerOfAttorneyIssuer || '',
-      powerOfAttorneyExpiry: req.body.powerOfAttorneyExpiry || '',
-      powerOfAttorneyNotes: req.body.powerOfAttorneyNotes || '',
-      memberPhoto: req.body.memberPhoto || null,
-      memberTaxDoc: req.body.memberTaxDoc || null,
-      repPhoto: req.body.repPhoto || null,
-      repTaxDoc: req.body.repTaxDoc || null,
-      hardCopyForm: req.body.hardCopyForm || null,
-      powerOfAttorneyPhoto: req.body.powerOfAttorneyPhoto || null,
-      hardCopyDocumentPhoto: req.body.hardCopyDocumentPhoto || null,
-      createdBy: req.body.createdBy || 'system',
+      region: cleanData.region || '',
+      zone: cleanData.zone || '',
+      district: cleanData.district || '',
+      city: cleanData.city || '',
+      kebele: cleanData.kebele || '',
+      houseNumber: cleanData.houseNumber || '',
+      phone: cleanData.phone,
+      taxId: cleanData.taxId || '',
+      role: cleanData.role,
+      shareCount: shareCount,
+      sharePercentage: shareCount > 0 ? (shareCount / 25000) * 100 : 0,
+      sharePrice: 10000,
+      totalPayable: totalPayable,
+      sharePricePaid: sharePricePaid,
+      remainingBalance: remainingBalance,
+      paymentStatus: paymentStatus,
+      year1Payment: totalPayable * 0.3,
+      year2Payment: totalPayable * 0.4,
+      year3Payment: totalPayable * 0.3,
+      bankName: bankName,
+      bankBranch: cleanData.bankBranch || '',
+      accountNumber: cleanData.accountNumber || '',
+      accountName: cleanData.accountName || '',
+      financialNotes: cleanData.financialNotes || '',
+      beneficiaries: cleanData.beneficiaries || [],
+      beneficiaryCount: (cleanData.beneficiaries || []).length,
+      legalRepName: cleanData.legalRepName || '',
+      legalRepAddress: cleanData.legalRepAddress || '',
+      legalRepPhone: cleanData.legalRepPhone || '',
+      powerOfAttorneyType: cleanData.powerOfAttorneyType || '',
+      powerOfAttorneyNumber: cleanData.powerOfAttorneyNumber || '',
+      powerOfAttorneyDate: cleanData.powerOfAttorneyDate || '',
+      powerOfAttorneyIssuer: cleanData.powerOfAttorneyIssuer || '',
+      powerOfAttorneyExpiry: cleanData.powerOfAttorneyExpiry || '',
+      powerOfAttorneyNotes: cleanData.powerOfAttorneyNotes || '',
+      memberPhoto: cleanData.memberPhoto || null,
+      memberTaxDoc: cleanData.memberTaxDoc || null,
+      repPhoto: cleanData.repPhoto || null,
+      repTaxDoc: cleanData.repTaxDoc || null,
+      hardCopyForm: cleanData.hardCopyForm || null,
+      powerOfAttorneyPhoto: cleanData.powerOfAttorneyPhoto || null,
+      hardCopyDocumentPhoto: cleanData.hardCopyDocumentPhoto || null,
+      createdBy: cleanData.createdBy || 'system',
       createdAt: new Date(),
       updatedAt: new Date()
-    });
+    };
     
+    const newMember = new Member(memberData);
     await newMember.save();
-    console.log(`✅ Member saved to database: ${newMember.fullName} (ID: ${newMember._id})`);
     
-    // Create user account for member
+    const memberId = newMember._id.toString();
+    console.log(`✅ Member saved! ID: ${memberId}`);
+    
+    // ========== CREATE USER ACCOUNT FOR MEMBER ==========
     const username = generateUsername(newMember.fullName, newMember.phone);
     const plainPassword = generateRandomPassword();
     
-    const newUser = new User({
-      username: username,
-      email: `${newMember.phone}@member.gambella.com`,
-      password: plainPassword,
-      fullName: newMember.fullName,
-      role: 'member',
-      memberId: newMember._id.toString(),
-      isActive: true
-    });
+    console.log(`👤 Generated username: ${username}`);
+    console.log(`🔐 Generated password: ${plainPassword}`);
     
-    await newUser.save();
-    console.log(`✅ User account created: ${username}`);
+    // Check if user already exists for this member
+    let existingUser = await User.findOne({ memberId: memberId });
     
-    res.status(201).json({
+    let userAccount;
+    if (!existingUser) {
+      userAccount = new User({
+        username: username,
+        email: `${newMember.phone}@member.gambella.com`,
+        password: plainPassword,
+        fullName: newMember.fullName,
+        role: 'member',
+        memberId: memberId,
+        isActive: true
+      });
+      
+      await userAccount.save();
+      console.log(`✅ User account created for member!`);
+      console.log(`   Username: ${username}`);
+      console.log(`   Password: ${plainPassword}`);
+      console.log(`   MemberId: ${memberId}`);
+    } else {
+      console.log(`⚠️ User already exists for this member: ${existingUser.username}`);
+      userAccount = existingUser;
+    }
+    
+    // Verify the user was created correctly
+    const verifyUser = await User.findOne({ memberId: memberId });
+    console.log(`🔍 Verification: User found with memberId ${memberId}: ${verifyUser ? 'YES' : 'NO'}`);
+    
+    // Send response
+    const responseData = {
       success: true,
-      message: 'Member registered successfully',
-      member: newMember,
-      credentials: { username, password: plainPassword }
-    });
+      message: 'Member registered successfully!',
+      member: {
+        id: newMember._id,
+        memberId: memberId,
+        fullName: newMember.fullName,
+        phone: newMember.phone,
+        shareCount: newMember.shareCount
+      }
+    };
+    
+    // Include credentials only if new user was created
+    if (!existingUser) {
+      responseData.credentials = {
+        username: username,
+        password: plainPassword,
+        memberId: memberId
+      };
+    }
+    
+    console.log("📤 Sending success response");
+    res.status(201).json(responseData);
     
   } catch (error) {
     console.error('❌ Registration error:', error);
@@ -462,8 +631,9 @@ app.post('/api/members/register', async (req, res) => {
     // Handle duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({ 
-        message: `Duplicate value for ${field}. This ${field} is already registered.`,
+      return res.status(400).json({
+        success: false,
+        message: `${field} already exists. Please use a different value.`,
         field: field
       });
     }
@@ -471,24 +641,29 @@ app.post('/api/members/register', async (req, res) => {
     // Handle validation errors
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(e => e.message);
-      return res.status(400).json({ 
+      return res.status(400).json({
+        success: false,
         message: `Validation error: ${errors.join(', ')}`,
         validationErrors: errors
       });
     }
     
-    res.status(500).json({ 
-      message: 'Server error: ' + error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    res.status(500).json({
+      success: false,
+      message: 'Server error: ' + error.message
     });
   }
 });
 
+// ==================== OTHER MEMBER ROUTES ====================
+
 app.get('/api/members', authMiddleware, async (req, res) => {
   try {
     const members = await Member.find().sort({ createdAt: -1 });
+    console.log(`📋 Retrieved ${members.length} members`);
     res.json(members);
   } catch (error) {
+    console.error('Error fetching members:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -513,6 +688,7 @@ app.get('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error fetching member:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -528,6 +704,7 @@ app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error fetching member profile:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -548,6 +725,7 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error updating member:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -563,6 +741,7 @@ app.delete('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json({ message: 'Member deleted successfully' });
   } catch (error) {
+    console.error('Error deleting member:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -583,6 +762,7 @@ app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
     
     res.json(members);
   } catch (error) {
+    console.error('Error searching members:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -597,6 +777,7 @@ app.get('/api/sales', authMiddleware, async (req, res) => {
     const sales = await Sale.find().sort({ date: -1 });
     res.json(sales);
   } catch (error) {
+    console.error('Error fetching sales:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -610,6 +791,7 @@ app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
     const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
     res.json(sales);
   } catch (error) {
+    console.error('Error fetching member sales:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -624,6 +806,7 @@ app.post('/api/sales', authMiddleware, async (req, res) => {
     await sale.save();
     res.status(201).json(sale);
   } catch (error) {
+    console.error('Error adding sale:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -637,6 +820,7 @@ app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
     await Sale.findByIdAndDelete(req.params.id);
     res.json({ message: 'Sale deleted' });
   } catch (error) {
+    console.error('Error deleting sale:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -651,6 +835,7 @@ app.get('/api/transfers', authMiddleware, async (req, res) => {
     const transfers = await Transfer.find().sort({ createdAt: -1 });
     res.json(transfers);
   } catch (error) {
+    console.error('Error fetching transfers:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -665,6 +850,7 @@ app.post('/api/transfers', authMiddleware, async (req, res) => {
     await transfer.save();
     res.status(201).json(transfer);
   } catch (error) {
+    console.error('Error adding transfer:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -678,6 +864,7 @@ app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
     await Transfer.findByIdAndDelete(req.params.id);
     res.json({ message: 'Transfer deleted' });
   } catch (error) {
+    console.error('Error deleting transfer:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -719,6 +906,7 @@ app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
     await request.save();
     res.status(201).json({ success: true, request });
   } catch (error) {
+    console.error('Error creating trading request:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -732,6 +920,7 @@ app.get('/api/share-trading/my-requests', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching my requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -745,6 +934,7 @@ app.get('/api/share-trading/requests', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find().sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching all requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -758,6 +948,7 @@ app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching pending requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -796,6 +987,7 @@ app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Request approved successfully' });
   } catch (error) {
+    console.error('Error approving request:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -821,6 +1013,7 @@ app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Request rejected' });
   } catch (error) {
+    console.error('Error rejecting request:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -838,8 +1031,23 @@ app.get('/api/share-trading/stats', authMiddleware, async (req, res) => {
     
     res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
   } catch (error) {
+    console.error('Error fetching trading stats:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// ==================== TEST ENDPOINT ====================
+
+app.get('/api/test-username/:fullName/:phone', (req, res) => {
+  const { fullName, phone } = req.params;
+  const username = generateUsername(fullName, phone);
+  const password = generateRandomPassword();
+  res.json({ 
+    fullName, 
+    phone, 
+    generatedUsername: username,
+    generatedPassword: password 
+  });
 });
 
 // ==================== CREATE DEFAULT ADMIN ====================
@@ -856,7 +1064,11 @@ const createDefaultAdmin = async () => {
         role: 'admin'
       });
       await admin.save();
-      console.log('✅ Default admin created! Username: admin, Password: Admin123!');
+      console.log('✅ Default admin created!');
+      console.log('   Username: admin');
+      console.log('   Password: Admin123!');
+    } else {
+      console.log('✅ Admin user already exists');
     }
   } catch (error) {
     console.error('Error creating admin:', error);
@@ -866,7 +1078,7 @@ const createDefaultAdmin = async () => {
 // ==================== SERVE FRONTEND ====================
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
 app.get('/dashboard.html', (req, res) => {
@@ -890,15 +1102,24 @@ app.get('/health', (req, res) => {
 const PORT = process.env.PORT || 10000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
 
+console.log('🚀 Starting server...');
+console.log(`📡 Port: ${PORT}`);
+
 mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('✅ MongoDB connected successfully');
+    console.log(`📊 Database: ${mongoose.connection.name}`);
+    console.log(`📍 Host: ${mongoose.connection.host}`);
+    
     await createDefaultAdmin();
     
     app.listen(PORT, '0.0.0.0', () => {
+      console.log('='.repeat(50));
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Admin Login: http://localhost:${PORT}`);
-      console.log(`👤 Admin: admin / Admin123!`);
+      console.log(`👤 Username: admin`);
+      console.log(`🔐 Password: Admin123!`);
+      console.log('='.repeat(50));
     });
   })
   .catch(err => {
