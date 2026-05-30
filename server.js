@@ -440,12 +440,12 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 
 // ==================== FIXED MEMBER REGISTRATION ROUTE ====================
 
-// ==================== FIXED MEMBER REGISTRATION ROUTE ====================
-
 app.post('/api/members/register', async (req, res) => {
   console.log("=".repeat(60));
   console.log("📝 NEW MEMBER REGISTRATION REQUEST");
   console.log("=".repeat(60));
+  console.log("Full Name:", req.body.fullName);
+  console.log("Phone:", req.body.phone);
   
   try {
     // Remove any id fields from request
@@ -456,6 +456,7 @@ app.post('/api/members/register', async (req, res) => {
     const missingFields = requiredFields.filter(field => !cleanData[field]);
     
     if (missingFields.length > 0) {
+      console.log("❌ Missing fields:", missingFields);
       return res.status(400).json({
         success: false,
         message: `Missing required fields: ${missingFields.join(', ')}`,
@@ -463,13 +464,13 @@ app.post('/api/members/register', async (req, res) => {
       });
     }
     
-    // Check for existing member by phone (MUST be unique)
+    // CRITICAL: Check for existing member by phone
     const existingMember = await Member.findOne({ phone: cleanData.phone });
     if (existingMember) {
-      console.log("❌ Phone already exists:", cleanData.phone);
+      console.log("❌ Phone number already exists:", cleanData.phone);
       return res.status(400).json({
         success: false,
-        message: 'Phone number already registered. Please use a different phone number.',
+        message: `Phone number ${cleanData.phone} is already registered. Please use a different phone number.`,
         field: 'phone'
       });
     }
@@ -569,44 +570,42 @@ app.post('/api/members/register', async (req, res) => {
     const memberId = newMember._id.toString();
     console.log(`✅ Member saved! ID: ${memberId}`);
     
-    // ========== CREATE USER ACCOUNT FOR MEMBER ==========
-    // Get all existing usernames to ensure uniqueness
+    // ========== CREATE UNIQUE USERNAME ==========
+    // Get all existing usernames
     const existingUsers = await User.find({}, 'username');
     const existingUsernames = existingUsers.map(u => u.username);
     
-    const username = generateUsername(newMember.fullName, newMember.phone, existingUsernames);
+    // Generate unique username
+    let baseUsername = generateUsername(newMember.fullName, newMember.phone);
+    let username = baseUsername;
+    let counter = 1;
+    
+    while (existingUsernames.includes(username)) {
+      username = `${baseUsername}${counter}`;
+      counter++;
+    }
+    
     const plainPassword = generateRandomPassword();
     
     console.log(`👤 Generated username: ${username}`);
     console.log(`🔐 Generated password: ${plainPassword}`);
     
-    // Check if user already exists for this member
-    let existingUser = await User.findOne({ memberId: memberId });
+    // Create user account
+    const userAccount = new User({
+      username: username,
+      email: `${newMember.phone}@member.gambella.com`,
+      password: plainPassword,
+      fullName: newMember.fullName,
+      role: 'member',
+      memberId: memberId,
+      isActive: true
+    });
     
-    let userAccount;
-    if (!existingUser) {
-      userAccount = new User({
-        username: username,
-        email: `${newMember.phone}@member.gambella.com`,
-        password: plainPassword,
-        fullName: newMember.fullName,
-        role: 'member',
-        memberId: memberId,
-        isActive: true
-      });
-      
-      await userAccount.save();
-      console.log(`✅ User account created for member!`);
-      console.log(`   Username: ${username}`);
-      console.log(`   Password: ${plainPassword}`);
-      console.log(`   MemberId: ${memberId}`);
-    } else {
-      console.log(`⚠️ User already exists for this member: ${existingUser.username}`);
-      userAccount = existingUser;
-    }
+    await userAccount.save();
+    console.log(`✅ User account created!`);
     
     // Send response
-    const responseData = {
+    res.status(201).json({
       success: true,
       message: 'Member registered successfully!',
       member: {
@@ -615,20 +614,13 @@ app.post('/api/members/register', async (req, res) => {
         fullName: newMember.fullName,
         phone: newMember.phone,
         shareCount: newMember.shareCount
-      }
-    };
-    
-    // Include credentials only if new user was created
-    if (!existingUser) {
-      responseData.credentials = {
+      },
+      credentials: {
         username: username,
         password: plainPassword,
         memberId: memberId
-      };
-    }
-    
-    console.log("📤 Sending success response");
-    res.status(201).json(responseData);
+      }
+    });
     
   } catch (error) {
     console.error('❌ Registration error:', error);
@@ -636,12 +628,14 @@ app.post('/api/members/register', async (req, res) => {
     // Handle duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      let message = `${field} already exists.`;
+      let message = '';
       
       if (field === 'phone') {
-        message = 'Phone number already registered. Please use a different phone number.';
+        message = `Phone number ${req.body.phone} is already registered. Please use a different phone number.`;
       } else if (field === 'username') {
-        message = 'Username already exists. The system will try a different username.';
+        message = 'Username already exists. Please try again.';
+      } else {
+        message = `${field} already exists. Please use a different value.`;
       }
       
       return res.status(400).json({
