@@ -43,15 +43,14 @@ UserSchema.methods.comparePassword = async function(candidate) {
 
 const User = mongoose.model('User', UserSchema);
 
-// Member Schema - FIXED: Added all location fields properly
+// Member Schema - Complete with all fields
 const MemberSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   gender: { type: String, required: true },
   age: { type: Number, required: true },
   motherName: { type: String, required: true },
   nationality: { type: String, default: 'ኢትዮጵያዊ' },
-  education: { type: String },
-  // Address fields - FIXED: Made address not required, use individual fields
+  education: { type: String, default: '' },
   address: { type: String, default: '' },
   region: { type: String, default: '' },
   zone: { type: String, default: '' },
@@ -164,7 +163,6 @@ const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
 function generateUsername(fullName, phone) {
   let base = fullName.toLowerCase().replace(/[^a-z]/g, '').substring(0, 6);
   if (base.length < 3) base = 'member';
-  // Remove any non-alphanumeric characters
   base = base.replace(/[^a-z0-9]/g, '');
   return `${base}${phone.slice(-4)}`;
 }
@@ -221,6 +219,7 @@ app.post('/api/auth/login', async (req, res) => {
       user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role }
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -248,6 +247,7 @@ app.post('/api/auth/member-login', async (req, res) => {
       user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role, memberId: user.memberId }
     });
   } catch (error) {
+    console.error('Member login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -284,6 +284,7 @@ app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Profile updated successfully' });
   } catch (error) {
+    console.error('Update profile error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -335,53 +336,87 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
 
 // ==================== MEMBER ROUTES ====================
 
-// FIXED: Improved registration with better error handling
+// REGISTER MEMBER - MAIN ROUTE
 app.post('/api/members/register', async (req, res) => {
-  console.log("📝 Registration request received for:", req.body.fullName);
+  console.log("=" .repeat(50));
+  console.log("📝 NEW MEMBER REGISTRATION REQUEST");
+  console.log("=" .repeat(50));
+  console.log("Received data:", JSON.stringify(req.body, null, 2));
   
   try {
     // Validate required fields
     const requiredFields = ['fullName', 'gender', 'age', 'motherName', 'phone', 'role'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
+    const missingFields = [];
+    
+    for (const field of requiredFields) {
+      if (!req.body[field] && req.body[field] !== 0) {
+        missingFields.push(field);
+      }
+    }
     
     if (missingFields.length > 0) {
+      console.log("❌ Missing required fields:", missingFields);
       return res.status(400).json({ 
+        success: false,
         message: `Missing required fields: ${missingFields.join(', ')}`,
-        missing: missingFields
+        missingFields: missingFields
       });
     }
     
-    // Check for existing member by phone
+    // Check if phone already exists
     const existingMember = await Member.findOne({ phone: req.body.phone });
     if (existingMember) {
+      console.log("❌ Phone already exists:", req.body.phone);
       return res.status(400).json({ 
+        success: false,
         message: 'Phone number already registered',
         field: 'phone'
       });
     }
     
-    // Build address from components if not provided directly
-    let address = req.body.address || '';
-    if (!address && (req.body.region || req.body.zone || req.body.district)) {
-      address = [
+    // Build complete address
+    let fullAddress = req.body.address || '';
+    if (!fullAddress) {
+      const addressParts = [
         req.body.region,
         req.body.zone,
         req.body.district,
         req.body.city,
         req.body.kebele,
         req.body.houseNumber
-      ].filter(Boolean).join(', ');
+      ].filter(part => part && part.trim() !== '');
+      fullAddress = addressParts.join(', ');
     }
     
-    // Create member with all fields
-    const newMember = new Member({
+    // Calculate financial values
+    const shareCount = parseInt(req.body.shareCount) || 0;
+    const sharePricePaid = parseFloat(req.body.sharePricePaid) || 0;
+    const totalPayable = shareCount * 10000;
+    const remainingBalance = totalPayable - sharePricePaid;
+    
+    // Determine payment status
+    let paymentStatus = 'አልተከፈለም';
+    if (remainingBalance <= 0) {
+      paymentStatus = 'ተከፍሏል';
+    } else if (sharePricePaid > 0) {
+      paymentStatus = 'በከፊል ተከፍሏል';
+    }
+    
+    // Get bank name (handle "ሌላ" option)
+    let bankName = req.body.bankName || '';
+    if (bankName === 'ሌላ' && req.body.otherBankName) {
+      bankName = req.body.otherBankName;
+    }
+    
+    // Create member object
+    const memberData = {
       fullName: req.body.fullName,
       gender: req.body.gender,
       age: parseInt(req.body.age) || 0,
       motherName: req.body.motherName,
       nationality: req.body.nationality || 'ኢትዮጵያዊ',
       education: req.body.education || '',
-      address: address,
+      address: fullAddress,
       region: req.body.region || '',
       zone: req.body.zone || '',
       district: req.body.district || '',
@@ -391,17 +426,17 @@ app.post('/api/members/register', async (req, res) => {
       phone: req.body.phone,
       taxId: req.body.taxId || '',
       role: req.body.role,
-      shareCount: parseInt(req.body.shareCount) || 0,
-      sharePercentage: parseFloat(req.body.sharePercentage) || 0,
-      sharePrice: req.body.sharePrice || 10000,
-      totalPayable: parseFloat(req.body.totalPayable) || 0,
-      sharePricePaid: parseFloat(req.body.sharePricePaid) || 0,
-      remainingBalance: parseFloat(req.body.remainingBalance) || 0,
-      paymentStatus: req.body.paymentStatus || 'አልተከፈለም',
-      year1Payment: parseFloat(req.body.year1Payment) || 0,
-      year2Payment: parseFloat(req.body.year2Payment) || 0,
-      year3Payment: parseFloat(req.body.year3Payment) || 0,
-      bankName: req.body.bankName || '',
+      shareCount: shareCount,
+      sharePercentage: shareCount > 0 ? (shareCount / 25000) * 100 : 0,
+      sharePrice: 10000,
+      totalPayable: totalPayable,
+      sharePricePaid: sharePricePaid,
+      remainingBalance: remainingBalance,
+      paymentStatus: paymentStatus,
+      year1Payment: totalPayable * 0.3,
+      year2Payment: totalPayable * 0.4,
+      year3Payment: totalPayable * 0.3,
+      bankName: bankName,
       bankBranch: req.body.bankBranch || '',
       accountNumber: req.body.accountNumber || '',
       accountName: req.body.accountName || '',
@@ -427,34 +462,53 @@ app.post('/api/members/register', async (req, res) => {
       createdBy: req.body.createdBy || 'system',
       createdAt: new Date(),
       updatedAt: new Date()
-    });
+    };
     
+    console.log("📦 Saving member with data:", JSON.stringify(memberData, null, 2));
+    
+    const newMember = new Member(memberData);
     await newMember.save();
-    console.log(`✅ Member saved to database: ${newMember.fullName} (ID: ${newMember._id})`);
     
-    // Create user account for member
+    console.log(`✅ Member saved successfully! ID: ${newMember._id}`);
+    
+    // Generate credentials for member login
     const username = generateUsername(newMember.fullName, newMember.phone);
     const plainPassword = generateRandomPassword();
     
-    const newUser = new User({
-      username: username,
-      email: `${newMember.phone}@member.gambella.com`,
-      password: plainPassword,
-      fullName: newMember.fullName,
-      role: 'member',
-      memberId: newMember._id.toString(),
-      isActive: true
-    });
+    // Check if user already exists for this member
+    let existingUser = await User.findOne({ memberId: newMember._id.toString() });
     
-    await newUser.save();
-    console.log(`✅ User account created: ${username}`);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Member registered successfully',
-      member: newMember,
-      credentials: { username, password: plainPassword }
-    });
+    if (!existingUser) {
+      const newUser = new User({
+        username: username,
+        email: `${newMember.phone}@member.gambella.com`,
+        password: plainPassword,
+        fullName: newMember.fullName,
+        role: 'member',
+        memberId: newMember._id.toString(),
+        isActive: true
+      });
+      
+      await newUser.save();
+      console.log(`✅ User account created: ${username} / ${plainPassword}`);
+      
+      res.status(201).json({
+        success: true,
+        message: 'Member registered successfully',
+        member: newMember,
+        credentials: { 
+          username: username, 
+          password: plainPassword 
+        }
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: 'Member registered successfully (user already existed)',
+        member: newMember,
+        credentials: null
+      });
+    }
     
   } catch (error) {
     console.error('❌ Registration error:', error);
@@ -463,8 +517,10 @@ app.post('/api/members/register', async (req, res) => {
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
       return res.status(400).json({ 
+        success: false,
         message: `Duplicate value for ${field}. This ${field} is already registered.`,
-        field: field
+        field: field,
+        error: error.message
       });
     }
     
@@ -472,36 +528,45 @@ app.post('/api/members/register', async (req, res) => {
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(e => e.message);
       return res.status(400).json({ 
+        success: false,
         message: `Validation error: ${errors.join(', ')}`,
-        validationErrors: errors
+        validationErrors: errors,
+        error: error.message
       });
     }
     
     res.status(500).json({ 
+      success: false,
       message: 'Server error: ' + error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      error: error.message
     });
   }
 });
 
+// GET ALL MEMBERS
 app.get('/api/members', authMiddleware, async (req, res) => {
   try {
     const members = await Member.find().sort({ createdAt: -1 });
+    console.log(`📋 Retrieved ${members.length} members`);
     res.json(members);
   } catch (error) {
+    console.error('Error fetching members:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
 
+// GET MEMBER COUNT
 app.get('/api/members/count', authMiddleware, async (req, res) => {
   try {
     const count = await Member.countDocuments();
     res.json({ count });
   } catch (error) {
+    console.error('Error counting members:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// GET MEMBER BY ID
 app.get('/api/members/:id', authMiddleware, async (req, res) => {
   try {
     const member = await Member.findById(req.params.id);
@@ -513,10 +578,12 @@ app.get('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error fetching member:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// GET MY PROFILE (for member login)
 app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'member' || !req.user.memberId) {
@@ -528,10 +595,12 @@ app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error fetching member profile:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// UPDATE MEMBER
 app.put('/api/members/:id', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -548,10 +617,12 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json(member);
   } catch (error) {
+    console.error('Error updating member:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
 
+// DELETE MEMBER
 app.delete('/api/members/:id', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -563,10 +634,12 @@ app.delete('/api/members/:id', authMiddleware, async (req, res) => {
     
     res.json({ message: 'Member deleted successfully' });
   } catch (error) {
+    console.error('Error deleting member:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// SEARCH MEMBERS
 app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
@@ -583,6 +656,7 @@ app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
     
     res.json(members);
   } catch (error) {
+    console.error('Error searching members:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -597,6 +671,7 @@ app.get('/api/sales', authMiddleware, async (req, res) => {
     const sales = await Sale.find().sort({ date: -1 });
     res.json(sales);
   } catch (error) {
+    console.error('Error fetching sales:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -610,6 +685,7 @@ app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
     const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
     res.json(sales);
   } catch (error) {
+    console.error('Error fetching member sales:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -624,6 +700,7 @@ app.post('/api/sales', authMiddleware, async (req, res) => {
     await sale.save();
     res.status(201).json(sale);
   } catch (error) {
+    console.error('Error adding sale:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -637,6 +714,7 @@ app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
     await Sale.findByIdAndDelete(req.params.id);
     res.json({ message: 'Sale deleted' });
   } catch (error) {
+    console.error('Error deleting sale:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -651,6 +729,7 @@ app.get('/api/transfers', authMiddleware, async (req, res) => {
     const transfers = await Transfer.find().sort({ createdAt: -1 });
     res.json(transfers);
   } catch (error) {
+    console.error('Error fetching transfers:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -665,6 +744,7 @@ app.post('/api/transfers', authMiddleware, async (req, res) => {
     await transfer.save();
     res.status(201).json(transfer);
   } catch (error) {
+    console.error('Error adding transfer:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -678,6 +758,7 @@ app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
     await Transfer.findByIdAndDelete(req.params.id);
     res.json({ message: 'Transfer deleted' });
   } catch (error) {
+    console.error('Error deleting transfer:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -719,6 +800,7 @@ app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
     await request.save();
     res.status(201).json({ success: true, request });
   } catch (error) {
+    console.error('Error creating trading request:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -732,6 +814,7 @@ app.get('/api/share-trading/my-requests', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching my requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -745,6 +828,7 @@ app.get('/api/share-trading/requests', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find().sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching all requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -758,6 +842,7 @@ app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
     const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching pending requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -796,6 +881,7 @@ app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Request approved successfully' });
   } catch (error) {
+    console.error('Error approving request:', error);
     res.status(500).json({ message: 'Server error: ' + error.message });
   }
 });
@@ -821,6 +907,7 @@ app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
     
     res.json({ success: true, message: 'Request rejected' });
   } catch (error) {
+    console.error('Error rejecting request:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -838,6 +925,7 @@ app.get('/api/share-trading/stats', authMiddleware, async (req, res) => {
     
     res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
   } catch (error) {
+    console.error('Error fetching trading stats:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -856,7 +944,11 @@ const createDefaultAdmin = async () => {
         role: 'admin'
       });
       await admin.save();
-      console.log('✅ Default admin created! Username: admin, Password: Admin123!');
+      console.log('✅ Default admin created!');
+      console.log('   Username: admin');
+      console.log('   Password: Admin123!');
+    } else {
+      console.log('✅ Admin user already exists');
     }
   } catch (error) {
     console.error('Error creating admin:', error);
@@ -866,7 +958,7 @@ const createDefaultAdmin = async () => {
 // ==================== SERVE FRONTEND ====================
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
 app.get('/dashboard.html', (req, res) => {
@@ -890,18 +982,33 @@ app.get('/health', (req, res) => {
 const PORT = process.env.PORT || 10000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
 
+console.log('🚀 Starting server...');
+console.log(`📡 MongoDB URI: ${MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@')}`);
+console.log(`🔌 Port: ${PORT}`);
+
 mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('✅ MongoDB connected successfully');
+    
+    // Log connection info
+    console.log(`📊 Database: ${mongoose.connection.name}`);
+    console.log(`📍 Host: ${mongoose.connection.host}`);
+    
     await createDefaultAdmin();
     
     app.listen(PORT, '0.0.0.0', () => {
+      console.log('=' .repeat(50));
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Admin Login: http://localhost:${PORT}`);
-      console.log(`👤 Admin: admin / Admin123!`);
+      console.log(`👤 Username: admin`);
+      console.log(`🔐 Password: Admin123!`);
+      console.log('=' .repeat(50));
     });
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err.message);
+    console.error('💡 Make sure MongoDB is running!');
+    console.error('   For local MongoDB: mongod --dbpath ./data');
+    console.error('   Or use MongoDB Atlas connection string');
     process.exit(1);
   });
