@@ -438,219 +438,220 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
   res.json({ success: true });
 });
 
-// ==================== FIXED MEMBER REGISTRATION ROUTE ====================
+// ==================== FIXED REGISTRATION ROUTE ====================
 
 app.post('/api/members/register', async (req, res) => {
-  console.log("=".repeat(60));
-  console.log("📝 NEW MEMBER REGISTRATION REQUEST");
-  console.log("=".repeat(60));
-  console.log("Full Name:", req.body.fullName);
-  console.log("Phone:", req.body.phone);
-  
-  try {
-    // Remove any id fields from request
-    const { id, _id, ...cleanData } = req.body;
+    console.log("=".repeat(60));
+    console.log("📝 NEW MEMBER REGISTRATION");
+    console.log("=".repeat(60));
+    console.log("Full Name:", req.body.fullName);
+    console.log("Phone:", req.body.phone);
     
-    // Validate required fields
-    const requiredFields = ['fullName', 'gender', 'age', 'motherName', 'phone', 'role'];
-    const missingFields = requiredFields.filter(field => !cleanData[field]);
-    
-    if (missingFields.length > 0) {
-      console.log("❌ Missing fields:", missingFields);
-      return res.status(400).json({
-        success: false,
-        message: `Missing required fields: ${missingFields.join(', ')}`,
-        missingFields: missingFields
-      });
+    try {
+        // Remove any id fields from request
+        const { id, _id, ...cleanData } = req.body;
+        
+        // Validate required fields
+        const requiredFields = ['fullName', 'gender', 'age', 'motherName', 'phone', 'role'];
+        const missingFields = requiredFields.filter(field => !cleanData[field]);
+        
+        if (missingFields.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `Missing required fields: ${missingFields.join(', ')}`
+            });
+        }
+        
+        // CRITICAL: Check if phone already exists (MUST BE UNIQUE)
+        const existingMember = await Member.findOne({ phone: cleanData.phone });
+        if (existingMember) {
+            console.log("❌ Phone already exists:", cleanData.phone);
+            console.log("   Existing member:", existingMember.fullName);
+            return res.status(400).json({
+                success: false,
+                message: `Phone number ${cleanData.phone} is already registered to ${existingMember.fullName}. Please use a different phone number.`,
+                field: 'phone'
+            });
+        }
+        
+        // Build address
+        let address = cleanData.address || '';
+        if (!address) {
+            const addressParts = [
+                cleanData.region, cleanData.zone, cleanData.district,
+                cleanData.city, cleanData.kebele, cleanData.houseNumber
+            ].filter(part => part && part.trim() !== '');
+            address = addressParts.join(', ');
+        }
+        
+        // Calculate financial values
+        const shareCount = parseInt(cleanData.shareCount) || 0;
+        const sharePricePaid = parseFloat(cleanData.sharePricePaid) || 0;
+        const totalPayable = shareCount * 10000;
+        const remainingBalance = totalPayable - sharePricePaid;
+        
+        let paymentStatus = 'አልተከፈለም';
+        if (remainingBalance <= 0) paymentStatus = 'ተከፍሏል';
+        else if (sharePricePaid > 0) paymentStatus = 'በከፊል ተከፍሏል';
+        
+        let bankName = cleanData.bankName || '';
+        if (bankName === 'ሌላ' && cleanData.otherBankName) {
+            bankName = cleanData.otherBankName;
+        }
+        
+        // Create member
+        const memberData = {
+            fullName: cleanData.fullName,
+            gender: cleanData.gender,
+            age: parseInt(cleanData.age) || 0,
+            motherName: cleanData.motherName,
+            nationality: cleanData.nationality || 'ኢትዮጵያዊ',
+            education: cleanData.education || '',
+            address: address,
+            region: cleanData.region || '',
+            zone: cleanData.zone || '',
+            district: cleanData.district || '',
+            city: cleanData.city || '',
+            kebele: cleanData.kebele || '',
+            houseNumber: cleanData.houseNumber || '',
+            phone: cleanData.phone,
+            taxId: cleanData.taxId || '',
+            role: cleanData.role,
+            shareCount: shareCount,
+            sharePercentage: shareCount > 0 ? (shareCount / 25000) * 100 : 0,
+            sharePrice: 10000,
+            totalPayable: totalPayable,
+            sharePricePaid: sharePricePaid,
+            remainingBalance: remainingBalance,
+            paymentStatus: paymentStatus,
+            year1Payment: totalPayable * 0.3,
+            year2Payment: totalPayable * 0.4,
+            year3Payment: totalPayable * 0.3,
+            bankName: bankName,
+            bankBranch: cleanData.bankBranch || '',
+            accountNumber: cleanData.accountNumber || '',
+            accountName: cleanData.accountName || '',
+            financialNotes: cleanData.financialNotes || '',
+            beneficiaries: cleanData.beneficiaries || [],
+            beneficiaryCount: (cleanData.beneficiaries || []).length,
+            legalRepName: cleanData.legalRepName || '',
+            legalRepAddress: cleanData.legalRepAddress || '',
+            legalRepPhone: cleanData.legalRepPhone || '',
+            powerOfAttorneyType: cleanData.powerOfAttorneyType || '',
+            powerOfAttorneyNumber: cleanData.powerOfAttorneyNumber || '',
+            powerOfAttorneyDate: cleanData.powerOfAttorneyDate || '',
+            powerOfAttorneyIssuer: cleanData.powerOfAttorneyIssuer || '',
+            powerOfAttorneyExpiry: cleanData.powerOfAttorneyExpiry || '',
+            powerOfAttorneyNotes: cleanData.powerOfAttorneyNotes || '',
+            memberPhoto: cleanData.memberPhoto || null,
+            memberTaxDoc: cleanData.memberTaxDoc || null,
+            repPhoto: cleanData.repPhoto || null,
+            repTaxDoc: cleanData.repTaxDoc || null,
+            hardCopyForm: cleanData.hardCopyForm || null,
+            powerOfAttorneyPhoto: cleanData.powerOfAttorneyPhoto || null,
+            hardCopyDocumentPhoto: cleanData.hardCopyDocumentPhoto || null,
+            createdBy: cleanData.createdBy || 'system',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+        
+        const newMember = new Member(memberData);
+        await newMember.save();
+        console.log(`✅ Member saved! ID: ${newMember._id}`);
+        
+        // ========== CREATE UNIQUE USERNAME ==========
+        // Generate base username from name
+        let baseUsername = cleanData.fullName.toLowerCase()
+            .replace(/[^a-z]/g, '')
+            .substring(0, 6);
+        if (baseUsername.length < 3) baseUsername = 'member';
+        
+        const phoneSuffix = cleanData.phone.slice(-4);
+        let username = `${baseUsername}${phoneSuffix}`;
+        
+        // Check if username exists and make it unique
+        let counter = 1;
+        let existingUser = await User.findOne({ username: username });
+        while (existingUser) {
+            username = `${baseUsername}${phoneSuffix}${counter}`;
+            existingUser = await User.findOne({ username: username });
+            counter++;
+        }
+        
+        // Create UNIQUE email
+        const email = `${cleanData.phone}${Date.now()}@member.gambella.com`;
+        const plainPassword = generateRandomPassword();
+        
+        // Create user account
+        const newUser = new User({
+            username: username,
+            email: email,
+            password: plainPassword,
+            fullName: newMember.fullName,
+            role: 'member',
+            memberId: newMember._id.toString(),
+            isActive: true
+        });
+        
+        await newUser.save();
+        console.log(`✅ User account created! Username: ${username}`);
+        
+        res.status(201).json({
+            success: true,
+            message: 'Member registered successfully!',
+            member: {
+                id: newMember._id,
+                fullName: newMember.fullName,
+                phone: newMember.phone,
+                shareCount: newMember.shareCount
+            },
+            credentials: {
+                username: username,
+                password: plainPassword
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Registration error:', error);
+        
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            let message = '';
+            
+            if (field === 'phone') {
+                message = `Phone number ${req.body.phone} is already registered. Please use a DIFFERENT phone number.`;
+            } else if (field === 'username') {
+                message = `Username already exists. Please try again.`;
+            } else if (field === 'email') {
+                message = `Email already exists. Please try again.`;
+            } else {
+                message = `${field} already exists. Please use a different value.`;
+            }
+            
+            return res.status(400).json({
+                success: false,
+                message: message,
+                field: field
+            });
+        }
+        
+        res.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
-    
-    // CRITICAL: Check for existing member by phone
-    const existingMember = await Member.findOne({ phone: cleanData.phone });
-    if (existingMember) {
-      console.log("❌ Phone number already exists:", cleanData.phone);
-      return res.status(400).json({
-        success: false,
-        message: `Phone number ${cleanData.phone} is already registered. Please use a different phone number.`,
-        field: 'phone'
-      });
-    }
-    
-    // Build address from components
-    let address = cleanData.address || '';
-    if (!address) {
-      const addressParts = [
-        cleanData.region,
-        cleanData.zone,
-        cleanData.district,
-        cleanData.city,
-        cleanData.kebele,
-        cleanData.houseNumber
-      ].filter(part => part && part.trim() !== '');
-      address = addressParts.join(', ');
-    }
-    
-    // Calculate financial values
-    const shareCount = parseInt(cleanData.shareCount) || 0;
-    const sharePricePaid = parseFloat(cleanData.sharePricePaid) || 0;
-    const totalPayable = shareCount * 10000;
-    const remainingBalance = totalPayable - sharePricePaid;
-    
-    let paymentStatus = 'አልተከፈለም';
-    if (remainingBalance <= 0) {
-      paymentStatus = 'ተከፍሏል';
-    } else if (sharePricePaid > 0) {
-      paymentStatus = 'በከፊል ተከፍሏል';
-    }
-    
-    // Get bank name
-    let bankName = cleanData.bankName || '';
-    if (bankName === 'ሌላ' && cleanData.otherBankName) {
-      bankName = cleanData.otherBankName;
-    }
-    
-    // Create member
-    const memberData = {
-      fullName: cleanData.fullName,
-      gender: cleanData.gender,
-      age: parseInt(cleanData.age) || 0,
-      motherName: cleanData.motherName,
-      nationality: cleanData.nationality || 'ኢትዮጵያዊ',
-      education: cleanData.education || '',
-      address: address,
-      region: cleanData.region || '',
-      zone: cleanData.zone || '',
-      district: cleanData.district || '',
-      city: cleanData.city || '',
-      kebele: cleanData.kebele || '',
-      houseNumber: cleanData.houseNumber || '',
-      phone: cleanData.phone,
-      taxId: cleanData.taxId || '',
-      role: cleanData.role,
-      shareCount: shareCount,
-      sharePercentage: shareCount > 0 ? (shareCount / 25000) * 100 : 0,
-      sharePrice: 10000,
-      totalPayable: totalPayable,
-      sharePricePaid: sharePricePaid,
-      remainingBalance: remainingBalance,
-      paymentStatus: paymentStatus,
-      year1Payment: totalPayable * 0.3,
-      year2Payment: totalPayable * 0.4,
-      year3Payment: totalPayable * 0.3,
-      bankName: bankName,
-      bankBranch: cleanData.bankBranch || '',
-      accountNumber: cleanData.accountNumber || '',
-      accountName: cleanData.accountName || '',
-      financialNotes: cleanData.financialNotes || '',
-      beneficiaries: cleanData.beneficiaries || [],
-      beneficiaryCount: (cleanData.beneficiaries || []).length,
-      legalRepName: cleanData.legalRepName || '',
-      legalRepAddress: cleanData.legalRepAddress || '',
-      legalRepPhone: cleanData.legalRepPhone || '',
-      powerOfAttorneyType: cleanData.powerOfAttorneyType || '',
-      powerOfAttorneyNumber: cleanData.powerOfAttorneyNumber || '',
-      powerOfAttorneyDate: cleanData.powerOfAttorneyDate || '',
-      powerOfAttorneyIssuer: cleanData.powerOfAttorneyIssuer || '',
-      powerOfAttorneyExpiry: cleanData.powerOfAttorneyExpiry || '',
-      powerOfAttorneyNotes: cleanData.powerOfAttorneyNotes || '',
-      memberPhoto: cleanData.memberPhoto || null,
-      memberTaxDoc: cleanData.memberTaxDoc || null,
-      repPhoto: cleanData.repPhoto || null,
-      repTaxDoc: cleanData.repTaxDoc || null,
-      hardCopyForm: cleanData.hardCopyForm || null,
-      powerOfAttorneyPhoto: cleanData.powerOfAttorneyPhoto || null,
-      hardCopyDocumentPhoto: cleanData.hardCopyDocumentPhoto || null,
-      createdBy: cleanData.createdBy || 'system',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    const newMember = new Member(memberData);
-    await newMember.save();
-    
-    const memberId = newMember._id.toString();
-    console.log(`✅ Member saved! ID: ${memberId}`);
-    
-    // ========== CREATE UNIQUE USERNAME ==========
-    // Get all existing usernames
-    const existingUsers = await User.find({}, 'username');
-    const existingUsernames = existingUsers.map(u => u.username);
-    
-    // Generate unique username
-    let baseUsername = generateUsername(newMember.fullName, newMember.phone);
-    let username = baseUsername;
-    let counter = 1;
-    
-    while (existingUsernames.includes(username)) {
-      username = `${baseUsername}${counter}`;
-      counter++;
-    }
-    
-    const plainPassword = generateRandomPassword();
-    
-    console.log(`👤 Generated username: ${username}`);
-    console.log(`🔐 Generated password: ${plainPassword}`);
-    
-    // Create user account
-    const userAccount = new User({
-      username: username,
-      email: `${newMember.phone}@member.gambella.com`,
-      password: plainPassword,
-      fullName: newMember.fullName,
-      role: 'member',
-      memberId: memberId,
-      isActive: true
-    });
-    
-    await userAccount.save();
-    console.log(`✅ User account created!`);
-    
-    // Send response
-    res.status(201).json({
-      success: true,
-      message: 'Member registered successfully!',
-      member: {
-        id: newMember._id,
-        memberId: memberId,
-        fullName: newMember.fullName,
-        phone: newMember.phone,
-        shareCount: newMember.shareCount
-      },
-      credentials: {
-        username: username,
-        password: plainPassword,
-        memberId: memberId
-      }
-    });
-    
-  } catch (error) {
-    console.error('❌ Registration error:', error);
-    
-    // Handle duplicate key errors
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
-      let message = '';
-      
-      if (field === 'phone') {
-        message = `Phone number ${req.body.phone} is already registered. Please use a different phone number.`;
-      } else if (field === 'username') {
-        message = 'Username already exists. Please try again.';
-      } else {
-        message = `${field} already exists. Please use a different value.`;
-      }
-      
-      return res.status(400).json({
-        success: false,
-        message: message,
-        field: field
-      });
-    }
-    
-    res.status(500).json({
-      success: false,
-      message: 'Server error: ' + error.message
-    });
-  }
 });
+
+// Helper function
+function generateRandomPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
 
 // ==================== OTHER MEMBER ROUTES ====================
 
