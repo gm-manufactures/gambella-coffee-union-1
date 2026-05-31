@@ -1283,8 +1283,6 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
 });
 // ==================== SHOW MEMBER DETAILS MODAL ====================
 
-// ==================== MODAL FUNCTIONS - COMPLETELY FIXED ====================
-
 let currentViewingMember = null;
 
 async function showMemberDetails(memberId) {
@@ -1785,9 +1783,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
-function closeMemberModal() {
+/*function closeMemberModal() {
   document.getElementById('memberModal').style.display = 'none';
-}
+}*/
 
 function enableEditMode() {
   const member = members.find(m => m.id === currentEditingMemberId);
