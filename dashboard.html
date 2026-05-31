@@ -847,21 +847,332 @@ async function loadMembers() {
   updateShareStatistics();
 }
 
-// አባል ለማርትዕ ተጨማሪ ቀላል ተግባር
+// ==================== COMPLETE EDIT/UPDATE MEMBER FUNCTIONS ====================
+
+let currentEditingMemberId = null;
+let currentMemberData = null;
+
+// Edit member - loads all data into form
 async function editMember(memberId) {
-  console.log("Editing member:", memberId);
-  const member = members.find(m => (m._id || m.id) === memberId);
-  if (!member) {
-    alert('አባል አልተገኘም!');
-    return;
-  }
-  currentEditingMemberId = null;
-  showMemberDetails(memberId);
-  
-  // በራስ-ሰር አርትዕ ሁነታ ይክፈት
-  setTimeout(() => {
-    enableEditMode();
-  }, 500);
+    console.log("✏️ Editing member:", memberId);
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/members/${memberId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Member not found');
+        
+        const member = await response.json();
+        currentEditingMemberId = memberId;
+        currentMemberData = member;
+        
+        // Fill ALL form fields with member data
+        // Personal Information
+        document.getElementById('fullName').value = member.fullName || '';
+        document.getElementById('gender').value = member.gender || '';
+        document.getElementById('age').value = member.age || '';
+        document.getElementById('motherName').value = member.motherName || '';
+        document.getElementById('nationality').value = member.nationality || 'ኢትዮጵያዊ';
+        document.getElementById('education').value = member.education || '';
+        
+        // Address Information
+        document.getElementById('region').value = member.region || '';
+        await loadZones(); // Wait for zones to load
+        if (member.zone) {
+            document.getElementById('zone').value = member.zone;
+            await loadDistricts();
+        }
+        if (member.district) {
+            document.getElementById('district').value = member.district;
+            await loadCities();
+        }
+        if (member.city) document.getElementById('city').value = member.city;
+        document.getElementById('kebele').value = member.kebele || '';
+        document.getElementById('houseNumber').value = member.houseNumber || '';
+        
+        // Contact Information
+        document.getElementById('phone').value = member.phone || '';
+        document.getElementById('taxId').value = member.taxId || '';
+        document.getElementById('role').value = member.role || '';
+        
+        // Share Information
+        document.getElementById('shareCount').value = member.shareCount || 0;
+        document.getElementById('sharePricePaid').value = member.sharePricePaid || 0;
+        calculateShareTotal();
+        calculateRemainingBalance();
+        
+        // Bank Information
+        if (member.bankName) {
+            document.getElementById('bankName').value = member.bankName;
+            if (member.bankName === 'ሌላ' && member.otherBankName) {
+                document.getElementById('otherBankName').value = member.otherBankName;
+                document.getElementById('otherBankDiv').style.display = 'block';
+            }
+        }
+        document.getElementById('bankBranch').value = member.bankBranch || '';
+        document.getElementById('accountNumber').value = member.accountNumber || '';
+        document.getElementById('accountName').value = member.accountName || '';
+        document.getElementById('financialNotes').value = member.financialNotes || '';
+        
+        // Legal Representative
+        document.getElementById('legalRepName').value = member.legalRepName || '';
+        document.getElementById('legalRepAddress').value = member.legalRepAddress || '';
+        document.getElementById('legalRepPhone').value = member.legalRepPhone || '';
+        
+        // Power of Attorney
+        if (member.powerOfAttorneyType) {
+            document.getElementById('powerOfAttorneyType').value = member.powerOfAttorneyType;
+            togglePowerOfAttorneyOptions();
+            document.getElementById('powerOfAttorneyNumber').value = member.powerOfAttorneyNumber || '';
+            document.getElementById('powerOfAttorneyDate').value = member.powerOfAttorneyDate || '';
+            document.getElementById('powerOfAttorneyIssuer').value = member.powerOfAttorneyIssuer || '';
+            document.getElementById('powerOfAttorneyExpiry').value = member.powerOfAttorneyExpiry || '';
+            document.getElementById('powerOfAttorneyNotes').value = member.powerOfAttorneyNotes || '';
+        }
+        
+        // Beneficiaries
+        if (member.beneficiaries && member.beneficiaries.length > 0) {
+            document.getElementById('beneficiaryCount').value = member.beneficiaries.length;
+            generateBeneficiaryForms();
+            setTimeout(() => {
+                member.beneficiaries.forEach((ben, index) => {
+                    const i = index + 1;
+                    document.getElementById(`beneficiaryName_${i}`).value = ben.name || '';
+                    document.getElementById(`beneficiaryGender_${i}`).value = ben.gender || '';
+                    document.getElementById(`beneficiaryRelationship_${i}`).value = ben.relationship || '';
+                    document.getElementById(`beneficiaryAddress_${i}`).value = ben.address || '';
+                });
+            }, 100);
+        }
+        
+        // Show existing photos
+        if (member.memberPhoto) {
+            const previewDiv = document.getElementById('memberPhotoPreview');
+            previewDiv.innerHTML = `<img src="${member.memberPhoto}" onclick="openLightbox('${member.memberPhoto}')" style="max-width:100px;max-height:100px;border-radius:8px;cursor:pointer;">`;
+        }
+        if (member.repPhoto) {
+            const previewDiv = document.getElementById('repPhotoPreview');
+            previewDiv.innerHTML = `<img src="${member.repPhoto}" onclick="openLightbox('${member.repPhoto}')" style="max-width:100px;max-height:100px;border-radius:8px;cursor:pointer;">`;
+        }
+        if (member.powerOfAttorneyPhoto) {
+            const previewDiv = document.getElementById('powerOfAttorneyPreview');
+            previewDiv.innerHTML = `<img src="${member.powerOfAttorneyPhoto}" onclick="openLightbox('${member.powerOfAttorneyPhoto}')" style="max-width:100px;max-height:100px;border-radius:8px;cursor:pointer;">`;
+        }
+        if (member.hardCopyForm) {
+            const previewDiv = document.getElementById('hardCopyPreview');
+            previewDiv.innerHTML = `<img src="${member.hardCopyForm}" onclick="openLightbox('${member.hardCopyForm}')" style="max-width:100px;max-height:100px;border-radius:8px;cursor:pointer;">`;
+        }
+        
+        // Change button to UPDATE mode
+        const submitBtn = document.querySelector('#memberForm button[type="submit"]');
+        submitBtn.innerHTML = '✏️ አዘምን';
+        submitBtn.style.background = '#ffc107';
+        submitBtn.style.color = '#333';
+        
+        // Change form handler
+        const form = document.getElementById('memberForm');
+        const originalSubmit = form.onsubmit;
+        
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            await updateFullMember(currentEditingMemberId);
+            form.onsubmit = originalSubmit;
+            submitBtn.innerHTML = '✅ አስመዝግብ';
+            submitBtn.style.background = '#2d6a1a';
+            submitBtn.style.color = 'white';
+            currentEditingMemberId = null;
+        };
+        
+        // Switch to register tab
+        showTab('register');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        alert('✏️ አርትዕ ሁነታ: መረጃውን ይቀይሩ እና "አዘምን" ይጫኑ');
+        
+    } catch (error) {
+        console.error('Error loading member for edit:', error);
+        alert('አባሉን ማምጣት አልተሳካም: ' + error.message);
+    }
+}
+
+// Update ALL member information including photos
+async function updateFullMember(memberId) {
+    console.log("🔄 Updating full member:", memberId);
+    
+    try {
+        // Collect ALL form data
+        const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+        const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+        const totalPayable = shareCount * 10000;
+        const remainingBalance = totalPayable - sharePricePaid;
+        
+        let paymentStatus = document.getElementById('paymentStatus').value;
+        if (remainingBalance <= 0) paymentStatus = 'ተከፍሏል';
+        else if (sharePricePaid > 0) paymentStatus = 'በከፊል ተከፍሏል';
+        
+        let bankName = document.getElementById('bankName').value;
+        let otherBankName = '';
+        if (bankName === 'ሌላ') {
+            otherBankName = document.getElementById('otherBankName').value;
+            bankName = otherBankName;
+        }
+        
+        // Collect beneficiaries
+        const beneficiaryCount = parseInt(document.getElementById('beneficiaryCount').value) || 0;
+        const beneficiaries = [];
+        for (let i = 1; i <= beneficiaryCount; i++) {
+            let relationship = document.getElementById(`beneficiaryRelationship_${i}`)?.value || '';
+            if (relationship === 'ሌላ') {
+                relationship = document.getElementById(`beneficiaryOtherRelationship_${i}`)?.value || '';
+            }
+            beneficiaries.push({
+                name: document.getElementById(`beneficiaryName_${i}`)?.value || '',
+                gender: document.getElementById(`beneficiaryGender_${i}`)?.value || '',
+                relationship: relationship,
+                address: document.getElementById(`beneficiaryAddress_${i}`)?.value || '',
+                photo: await getFileAsBase64(document.getElementById(`beneficiaryPhoto_${i}`)?.files[0]),
+                taxDoc: await getFileAsBase64(document.getElementById(`beneficiaryTaxDoc_${i}`)?.files[0])
+            });
+        }
+        
+        // Build address
+        const address = [
+            document.getElementById('region').value,
+            document.getElementById('zone').value,
+            document.getElementById('district').value,
+            document.getElementById('city').value,
+            document.getElementById('kebele').value,
+            document.getElementById('houseNumber').value
+        ].filter(part => part && part.trim() !== '').join(', ');
+        
+        // Prepare update data with ALL fields
+        const updateData = {
+            // Personal Information
+            fullName: document.getElementById('fullName').value,
+            gender: document.getElementById('gender').value,
+            age: parseInt(document.getElementById('age').value) || 0,
+            motherName: document.getElementById('motherName').value,
+            nationality: document.getElementById('nationality').value,
+            education: document.getElementById('education').value,
+            
+            // Address
+            address: address,
+            region: document.getElementById('region').value,
+            zone: document.getElementById('zone').value,
+            district: document.getElementById('district').value,
+            city: document.getElementById('city').value,
+            kebele: document.getElementById('kebele').value,
+            houseNumber: document.getElementById('houseNumber').value,
+            
+            // Contact
+            phone: document.getElementById('phone').value,
+            taxId: document.getElementById('taxId').value,
+            role: document.getElementById('role').value,
+            
+            // Share Information
+            shareCount: shareCount,
+            sharePricePaid: sharePricePaid,
+            totalPayable: totalPayable,
+            remainingBalance: remainingBalance,
+            paymentStatus: paymentStatus,
+            year1Payment: totalPayable * 0.3,
+            year2Payment: totalPayable * 0.4,
+            year3Payment: totalPayable * 0.3,
+            
+            // Bank Information
+            bankName: bankName,
+            bankBranch: document.getElementById('bankBranch').value,
+            accountNumber: document.getElementById('accountNumber').value,
+            accountName: document.getElementById('accountName').value,
+            financialNotes: document.getElementById('financialNotes').value,
+            
+            // Beneficiaries
+            beneficiaries: beneficiaries,
+            beneficiaryCount: beneficiaryCount,
+            
+            // Legal Representative
+            legalRepName: document.getElementById('legalRepName').value,
+            legalRepAddress: document.getElementById('legalRepAddress').value,
+            legalRepPhone: document.getElementById('legalRepPhone').value,
+            
+            // Power of Attorney
+            powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
+            powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
+            powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
+            powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
+            powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
+            powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
+            
+            // Photos (only if new ones are selected)
+            memberPhoto: await getFileAsBase64(document.getElementById('memberPhoto')?.files[0]),
+            memberTaxDoc: await getFileAsBase64(document.getElementById('memberTaxDoc')?.files[0]),
+            repPhoto: await getFileAsBase64(document.getElementById('repPhoto')?.files[0]),
+            repTaxDoc: await getFileAsBase64(document.getElementById('repTaxDoc')?.files[0]),
+            hardCopyForm: await getFileAsBase64(document.getElementById('hardCopyForm')?.files[0]),
+            powerOfAttorneyPhoto: await getFileAsBase64(document.getElementById('powerOfAttorneyPhoto')?.files[0]),
+            hardCopyDocumentPhoto: await getFileAsBase64(document.getElementById('hardCopyDocumentPhoto')?.files[0]),
+            
+            updatedAt: new Date()
+        };
+        
+        // Remove null/undefined photo fields (keep existing if no new photo)
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] === null || updateData[key] === undefined) {
+                delete updateData[key];
+            }
+        });
+        
+        console.log("📤 Sending update data:", updateData);
+        
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/members/${memberId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('✅ አባል በሚገባ ተሻሽሏል!');
+            
+            // Reset form
+            document.getElementById('memberForm').reset();
+            document.getElementById('shareCount').value = '0';
+            document.getElementById('sharePricePaid').value = '0';
+            document.getElementById('beneficiaryCount').value = '0';
+            document.getElementById('beneficiariesContainer').innerHTML = '';
+            document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
+            
+            // Reload members list
+            await loadMembers();
+            
+            // Switch to list tab
+            showTab('list');
+        } else {
+            alert('❌ ማዘመን አልተሳካም: ' + (result.message || 'Unknown error'));
+        }
+        
+    } catch (error) {
+        console.error('Update error:', error);
+        alert('❌ ስህተት: ' + error.message);
+    }
+}
+
+// Helper function to convert file to base64
+async function getFileAsBase64(file) {
+    if (!file) return null;
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
 }
 
 // የተሻሻለ የአባል ሰርዝ ተግባር
