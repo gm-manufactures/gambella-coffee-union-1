@@ -1283,6 +1283,10 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
 });
 // ==================== SHOW MEMBER DETAILS MODAL ====================
 
+// ==================== MODAL FUNCTIONS - COMPLETELY FIXED ====================
+
+let currentViewingMember = null;
+
 async function showMemberDetails(memberId) {
     console.log("👤 Showing member details for ID:", memberId);
     
@@ -1297,7 +1301,8 @@ async function showMemberDetails(memberId) {
         }
         
         const member = await response.json();
-        console.log("📋 Member data:", member);
+        currentViewingMember = member;
+        currentEditingMemberId = memberId;
         
         // Find serial number for display
         const serialNumber = members.findIndex(m => (m._id || m.id) === memberId) + 1;
@@ -1316,7 +1321,7 @@ async function showMemberDetails(memberId) {
             <div id="viewMode">
                 <!-- Profile Header -->
                 <div class="profile-header">
-                    <div class="profile-photo" style="background:#2d6a1a; display:flex; align-items:center; justify-content:center; font-size:48px; color:white;">
+                    <div class="profile-photo" style="background:#2d6a1a; display:flex; align-items:center; justify-content:center; font-size:48px; color:white; width:80px; height:80px; border-radius:50%;">
                         ${member.memberPhoto ? 
                             `<img src="${member.memberPhoto}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">` : 
                             '👤'}
@@ -1465,6 +1470,31 @@ async function showMemberDetails(memberId) {
                 </div>
                 ` : ''}
                 
+                <!-- Power of Attorney -->
+                ${member.powerOfAttorneyType ? `
+                <div class="section-card">
+                    <div class="section-title">📜 ውክልና (Power of Attorney)</div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">አይነት</div>
+                            <div class="info-value">${escapeHtml(member.powerOfAttorneyType)}</div>
+                        </div>
+                        ${member.powerOfAttorneyNumber ? `
+                        <div class="info-item">
+                            <div class="info-label">ቁጥር</div>
+                            <div class="info-value">${escapeHtml(member.powerOfAttorneyNumber)}</div>
+                        </div>
+                        ` : ''}
+                        ${member.powerOfAttorneyDate ? `
+                        <div class="info-item">
+                            <div class="info-label">ቀን</div>
+                            <div class="info-value">${escapeHtml(member.powerOfAttorneyDate)}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                ` : ''}
+                
                 <!-- Notes -->
                 ${member.financialNotes ? `
                 <div class="section-card">
@@ -1488,116 +1518,207 @@ async function showMemberDetails(memberId) {
         document.getElementById('saveEditBtn').style.display = 'none';
         document.getElementById('cancelEditBtn').style.display = 'none';
         
-        // Store current member ID for editing
-        currentEditingMemberId = memberId;
-        
     } catch (error) {
         console.error('❌ Error showing member details:', error);
         alert('የአባል ዝርዝር ማምጣት አልተሳካም: ' + error.message);
     }
 }
-//Enable edit mode from modal
+
+// Enable edit mode - loads the edit form
 function enableEditMode() {
+    console.log("✏️ Enabling edit mode for:", currentViewingMember?.fullName);
+    
+    if (!currentViewingMember) {
+        alert('No member data to edit');
+        return;
+    }
+    
+    // Hide view mode, show edit mode
     document.getElementById('viewMode').style.display = 'none';
     document.getElementById('editMode').style.display = 'block';
     document.getElementById('editModeBtn').style.display = 'none';
     document.getElementById('saveEditBtn').style.display = 'inline-block';
     document.getElementById('cancelEditBtn').style.display = 'inline-block';
     
-    // Load edit form
-    loadEditForm(currentEditingMemberId);
+    // Load the edit form
+    loadEditForm();
 }
 
 // Load edit form with member data
-async function loadEditForm(memberId) {
-    console.log("Loading edit form for:", memberId);
+function loadEditForm() {
+    const member = currentViewingMember;
     
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`/api/members/${memberId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+    console.log("Loading edit form for:", member.fullName);
+    
+    const editHtml = `
+        <h3 style="color:#2d6a1a; margin-bottom:20px; border-bottom:2px solid #2d6a1a; padding-bottom:10px;">
+            ✏️ አባል አርትዕ - ${escapeHtml(member.fullName)}
+        </h3>
         
-        const member = await response.json();
-        
-        const editHtml = `
-            <h3 style="color:#2d6a1a; margin-bottom:20px;">✏️ አባል አርትዕ</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ሙሉ ስም</label>
-                    <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>ፆታ</label>
-                    <select id="editGender" class="form-control">
-                        <option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
-                        <option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ዕድሜ</label>
-                    <input type="number" id="editAge" value="${member.age || ''}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>የእናት ሙሉ ስም</label>
-                    <input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" class="form-control">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ስልክ ቁጥር</label>
-                    <input type="tel" id="editPhone" value="${escapeHtml(member.phone)}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>ኃላፊነት</label>
-                    <input type="text" id="editRole" value="${escapeHtml(member.role)}" class="form-control">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>የአክሲዬን ብዛት</label>
-                    <input type="number" id="editShareCount" value="${member.shareCount || 0}" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>የተከፈለ ብር</label>
-                    <input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}" class="form-control">
-                </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>ሙሉ ስም *</label>
+                <input type="text" id="editFullName" value="${escapeHtml(member.fullName)}" class="form-control">
             </div>
             <div class="form-group">
-                <label>አድራሻ</label>
-                <textarea id="editAddress" rows="3" class="form-control">${escapeHtml(member.address || '')}</textarea>
+                <label>ፆታ</label>
+                <select id="editGender" class="form-control">
+                    <option ${member.gender === 'ወንድ' ? 'selected' : ''}>ወንድ</option>
+                    <option ${member.gender === 'ሴት' ? 'selected' : ''}>ሴት</option>
+                </select>
             </div>
-            <div class="form-row" style="margin-top:20px;">
-                <button onclick="saveEditFromModal()" class="btn-primary">💾 አስቀምጥ</button>
-                <button onclick="cancelEditMode()" class="btn-cancel">❌ ሰርዝ</button>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>ዕድሜ *</label>
+                <input type="number" id="editAge" value="${member.age || ''}" class="form-control">
             </div>
-        `;
+            <div class="form-group">
+                <label>የእናት ሙሉ ስም *</label>
+                <input type="text" id="editMotherName" value="${escapeHtml(member.motherName)}" class="form-control">
+            </div>
+        </div>
         
-        document.getElementById('editMode').innerHTML = editHtml;
+        <div class="form-row">
+            <div class="form-group">
+                <label>ስልክ ቁጥር *</label>
+                <input type="tel" id="editPhone" value="${escapeHtml(member.phone)}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>ኃላፊነት *</label>
+                <input type="text" id="editRole" value="${escapeHtml(member.role)}" class="form-control">
+            </div>
+        </div>
         
-    } catch (error) {
-        console.error('Error loading edit form:', error);
-        document.getElementById('editMode').innerHTML = '<div style="color:red;">ስህተት: መረጃ ማምጣት አልተሳካም</div>';
-    }
+        <div class="form-row">
+            <div class="form-group">
+                <label>ክልል</label>
+                <input type="text" id="editRegion" value="${escapeHtml(member.region || '')}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>ዞን</label>
+                <input type="text" id="editZone" value="${escapeHtml(member.zone || '')}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>ወረዳ</label>
+                <input type="text" id="editDistrict" value="${escapeHtml(member.district || '')}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>ከተማ</label>
+                <input type="text" id="editCity" value="${escapeHtml(member.city || '')}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>ቀበሌ</label>
+                <input type="text" id="editKebele" value="${escapeHtml(member.kebele || '')}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>ቤት ቁጥር</label>
+                <input type="text" id="editHouseNumber" value="${escapeHtml(member.houseNumber || '')}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>የአክሲዬን ብዛት</label>
+                <input type="number" id="editShareCount" value="${member.shareCount || 0}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>የተከፈለ ብር</label>
+                <input type="number" id="editSharePricePaid" value="${member.sharePricePaid || 0}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>ባንክ ስም</label>
+                <input type="text" id="editBankName" value="${escapeHtml(member.bankName || '')}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>ቅርንጫፍ</label>
+                <input type="text" id="editBankBranch" value="${escapeHtml(member.bankBranch || '')}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>የአካውንት ቁጥር</label>
+                <input type="text" id="editAccountNumber" value="${escapeHtml(member.accountNumber || '')}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>የአካውንት ስም</label>
+                <input type="text" id="editAccountName" value="${escapeHtml(member.accountName || '')}" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>ማስታወሻ</label>
+            <textarea id="editFinancialNotes" rows="3" class="form-control">${escapeHtml(member.financialNotes || '')}</textarea>
+        </div>
+        
+        <div class="form-row" style="margin-top:20px;">
+            <button onclick="saveModalEdit()" class="btn-primary" style="padding:12px 24px;">💾 አስቀምጥ</button>
+            <button onclick="cancelEditMode()" class="btn-cancel" style="padding:12px 24px;">❌ ሰርዝ</button>
+        </div>
+    `;
+    
+    document.getElementById('editMode').innerHTML = editHtml;
 }
 
 // Save edit from modal
-async function saveEditFromModal() {
-    console.log("Saving edit for member:", currentEditingMemberId);
+async function saveModalEdit() {
+    console.log("💾 Saving edit for member:", currentEditingMemberId);
     
     try {
-        const updatedData = {
+        const shareCount = parseInt(document.getElementById('editShareCount').value) || 0;
+        const sharePricePaid = parseFloat(document.getElementById('editSharePricePaid').value) || 0;
+        const totalPayable = shareCount * 10000;
+        const remainingBalance = totalPayable - sharePricePaid;
+        
+        let paymentStatus = 'አልተከፈለም';
+        if (remainingBalance <= 0) paymentStatus = 'ተከፍሏል';
+        else if (sharePricePaid > 0) paymentStatus = 'በከፊል ተከፍሏል';
+        
+        // Build address
+        const address = [
+            document.getElementById('editRegion').value,
+            document.getElementById('editZone').value,
+            document.getElementById('editDistrict').value,
+            document.getElementById('editCity').value,
+            document.getElementById('editKebele').value,
+            document.getElementById('editHouseNumber').value
+        ].filter(part => part && part.trim() !== '').join(', ');
+        
+        const updateData = {
             fullName: document.getElementById('editFullName').value,
             gender: document.getElementById('editGender').value,
             age: parseInt(document.getElementById('editAge').value) || 0,
             motherName: document.getElementById('editMotherName').value,
             phone: document.getElementById('editPhone').value,
             role: document.getElementById('editRole').value,
-            shareCount: parseInt(document.getElementById('editShareCount').value) || 0,
-            sharePricePaid: parseFloat(document.getElementById('editSharePricePaid').value) || 0,
-            address: document.getElementById('editAddress').value,
+            region: document.getElementById('editRegion').value,
+            zone: document.getElementById('editZone').value,
+            district: document.getElementById('editDistrict').value,
+            city: document.getElementById('editCity').value,
+            kebele: document.getElementById('editKebele').value,
+            houseNumber: document.getElementById('editHouseNumber').value,
+            address: address,
+            shareCount: shareCount,
+            sharePricePaid: sharePricePaid,
+            totalPayable: totalPayable,
+            remainingBalance: remainingBalance,
+            paymentStatus: paymentStatus,
+            bankName: document.getElementById('editBankName').value,
+            bankBranch: document.getElementById('editBankBranch').value,
+            accountNumber: document.getElementById('editAccountNumber').value,
+            accountName: document.getElementById('editAccountName').value,
+            financialNotes: document.getElementById('editFinancialNotes').value,
             updatedAt: new Date()
         };
         
@@ -1608,7 +1729,7 @@ async function saveEditFromModal() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(updatedData)
+            body: JSON.stringify(updateData)
         });
         
         const result = await response.json();
@@ -1616,7 +1737,7 @@ async function saveEditFromModal() {
         if (response.ok) {
             alert('✅ አባል በሚገባ ተሻሽሏል!');
             closeMemberModal();
-            await loadMembers();
+            await loadMembers(); // Refresh the list
         } else {
             alert('❌ ማዘመን አልተሳካም: ' + (result.message || 'Unknown error'));
         }
@@ -1627,9 +1748,30 @@ async function saveEditFromModal() {
     }
 }
 
-// Make sure click handlers are set up
+// Cancel edit mode
+function cancelEditMode() {
+    console.log("Cancelling edit mode");
+    
+    // Show view mode, hide edit mode
+    document.getElementById('viewMode').style.display = 'block';
+    document.getElementById('editMode').style.display = 'none';
+    document.getElementById('editModeBtn').style.display = 'inline-block';
+    document.getElementById('saveEditBtn').style.display = 'none';
+    document.getElementById('cancelEditBtn').style.display = 'none';
+}
+
+// Close modal
+function closeMemberModal() {
+    document.getElementById('memberModal').style.display = 'none';
+    // Reset to view mode for next time
+    if (document.getElementById('viewMode')) {
+        document.getElementById('viewMode').style.display = 'block';
+        document.getElementById('editMode').style.display = 'none';
+    }
+}
+
+// Make sure modal close button works
 document.addEventListener('DOMContentLoaded', function() {
-    // Close modal when clicking X
     const closeBtn = document.querySelector('.close-modal');
     if (closeBtn) {
         closeBtn.onclick = closeMemberModal;
@@ -1643,7 +1785,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
-
 function closeMemberModal() {
   document.getElementById('memberModal').style.display = 'none';
 }
