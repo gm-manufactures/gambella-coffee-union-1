@@ -5,96 +5,1009 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
 <style>
-.stat-card {transition: transform 0.3s;}
+/* ==================== GOOGLE FONTS ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+/* ==================== CSS VARIABLES / THEME ==================== */
+:root {
+    --primary-dark: #1a472a;
+    --primary: #2d6a1a;
+    --primary-light: #4a8c35;
+    --primary-gradient: linear-gradient(135deg, #1a472a 0%, #2d6a1a 50%, #3e8e2a 100%);
+    --secondary: #d4a017;
+    --secondary-light: #f5c542;
+    --secondary-gradient: linear-gradient(135deg, #c49a0c 0%, #e6b422 100%);
+    --danger: #dc3545;
+    --danger-light: #ff4757;
+    --warning: #ff9800;
+    --success: #28a745;
+    --info: #17a2b8;
+    --dark: #1a1a2e;
+    --gray-dark: #2d3436;
+    --gray: #636e72;
+    --gray-light: #b2bec3;
+    --gray-bg: #f8f9fa;
+    --white: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ==================== BASE STYLES ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', 'Inter', sans-serif;
+    background: linear-gradient(145deg, #e8f0e8 0%, #d4e4d4 100%);
+    min-height: 100vh;
+    color: var(--dark);
+}
+
+/* ==================== CUSTOM SCROLLBAR ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* ==================== NAVBAR ==================== */
+.navbar {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.union-logo-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary-light);
+    background: white;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
+}
+
+.union-logo-img:hover {
+    transform: scale(1.05);
+    border-color: white;
+}
+
+.logo-area div strong {
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+.logout-btn {
+    background: rgba(220, 53, 69, 0.95);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.logout-btn:hover {
+    background: var(--danger);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==================== CONTAINER ==================== */
+.container {
+    max-width: 1440px;
+    margin: 24px auto;
+    padding: 0 24px;
+}
+
+/* ==================== TABS ==================== */
+.tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 12px 28px;
+    background: var(--white);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--gray-dark);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: var(--transition-fast);
+    z-index: -1;
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: var(--primary);
+}
+
+.tab-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.tab-btn.active::before {
+    opacity: 1;
+}
+
+/* ==================== TAB CONTENT ==================== */
+.tab-content {
+    display: none;
+    background: var(--white);
+    padding: 32px;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.4s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== FORM SECTIONS ==================== */
+.form-section {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: var(--gray-bg);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition-fast);
+}
+
+.form-section:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.form-section h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.form-section h3::before {
+    content: '🌿 ';
+}
+
+/* ==================== FORM ROWS ==================== */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+/* ==================== FORM GROUPS ==================== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius-md);
+    font-size: 14px;
+    transition: all var(--transition-fast);
+    background: var(--white);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(45, 106, 26, 0.1);
+}
+
+.form-group input[type="file"] {
+    padding: 10px;
+    border: 2px dashed var(--gray-light);
+    background: var(--gray-bg);
+    cursor: pointer;
+}
+
+/* ==================== IMAGE PREVIEW ==================== */
+.image-preview {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: var(--border-radius-md);
+    border: 2px solid var(--primary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.image-preview img:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==================== BUTTONS ==================== */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #ff6b6b 100%);
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-export {
+    background: linear-gradient(135deg, var(--info) 0%, #28a7c9 100%);
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--warning) 0%, #ffc107 100%);
+    color: var(--dark);
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--success) 0%, #34ce57 100%);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-cancel {
+    background: linear-gradient(135deg, var(--gray) 0%, #8a8e94 100%);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ==================== MEMBER LIST ==================== */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stats {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--primary-gradient);
+    padding: 8px 18px;
+    border-radius: 50px;
+    color: white;
+}
+
+/* ==================== SEARCH BAR ==================== */
+.search-bar {
+    margin-bottom: 24px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    font-size: 16px;
+    transition: var(--transition-fast);
+    background: var(--white);
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(45, 106, 26, 0.1);
+}
+
+/* ==================== MEMBER CARD ==================== */
+.member-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: var(--border-radius-lg);
+    background: var(--white);
+    border-left: 5px solid var(--primary);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.member-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: var(--transition-normal);
+    z-index: 0;
+}
+
+.member-card:hover {
+    transform: translateX(8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.member-card:hover::before {
+    opacity: 0.03;
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.member-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.serial-number {
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.member-thumb {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid var(--primary);
+    transition: var(--transition-fast);
+}
+
+.member-thumb:hover {
+    transform: scale(1.1);
+    border-color: var(--secondary);
+}
+
+.member-role {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.member-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+}
+
+.member-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== PAYMENT STATUS ==================== */
+.payment-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-paid {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.status-partial {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+    color: #856404;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+/* ==================== SHARE BADGE ==================== */
+.share-badge {
+    background: var(--secondary-gradient);
+    color: var(--dark);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* ==================== MODAL ==================== */
+.modal-bottom {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 800px;
+    max-width: 90%;
+    max-height: 85vh;
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.close-modal {
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: var(--transition-fast);
+}
+
+.close-modal:hover {
+    color: var(--secondary-light);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--gray-bg);
+}
+
+/* ==================== PROFILE HEADER ==================== */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.profile-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+    border-color: var(--secondary);
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/* ==================== INFO GRID ==================== */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.info-item {
+    background: var(--gray-bg);
+    padding: 14px;
+    border-radius: var(--border-radius-md);
+    border-left: 3px solid var(--primary);
+    transition: var(--transition-fast);
+}
+
+.info-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-sm);
+}
+
+.info-label {
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    color: var(--gray-dark);
+    word-break: break-word;
+    font-size: 0.95rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* ==================== SECTION CARD ==================== */
+.section-card {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+    padding: 18px;
+    border-radius: var(--border-radius-lg);
+    margin-top: 18px;
+    border: 1px solid #ffecb3;
+    transition: var(--transition-fast);
+}
+
+.section-card:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 12px;
+    font-size: 1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* ==================== BENEFICIARY CARD ==================== */
+.beneficiary-card {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+    border: 1px solid #ffecb3;
+    border-radius: var(--border-radius-lg);
+    padding: 18px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    transition: var(--transition-fast);
+}
+
+.beneficiary-card:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.beneficiary-title {
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-beneficiary {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: var(--transition-fast);
+}
+
+.remove-beneficiary:hover {
+    background: var(--danger-light);
+    transform: scale(1.05);
+}
+
+/* ==================== LIGHTBOX ==================== */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    cursor: pointer;
+}
+
+.lightbox-content {
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: var(--border-radius-lg);
+}
+
+.close-lightbox {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: white;
+    font-size: 45px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.close-lightbox:hover {
+    color: var(--secondary-light);
+    transform: scale(1.1);
+}
+
+/* ==================== STAT CARDS ==================== */
+.stat-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+    text-align: center;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+}
+
 .stat-card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
 }
-.stat-label {
-  font-size: 0.9em;
-  margin-bottom: 10px;
-  opacity: 0.9;
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .navbar {
+        padding: 12px 20px;
+    }
+    
+    .tab-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+    
+    .tab-content {
+        padding: 20px;
+    }
+    
+    .modal-bottom {
+        width: 95%;
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .member-name {
+        font-size: 1rem;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
-.navbar{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:15px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-.logo-area{display:flex;align-items:center;gap:15px}
-.union-logo-img{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;background:white}
-.logout-btn{background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer}
-.container{max-width:1400px;margin:20px auto;padding:0 20px}
-.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.tab-btn{padding:12px 24px;background:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-.tab-btn.active{background:#2d6a1a;color:white}
-.tab-content{display:none;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
-.tab-content.active{display:block}
-.form-section{margin-bottom:30px;padding:20px;background:#f9f9f9;border-radius:8px;border:1px solid #e0e0e0}
-.form-section h3{color:#2d6a1a;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #2d6a1a}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.form-group{margin-bottom:15px}
-.form-group label{display:block;margin-bottom:5px;font-weight:bold}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
-.form-group input[type="file"]{padding:10px;border:2px dashed #ddd;background:white;cursor:pointer}
-.image-preview{margin-top:10px;text-align:center}
-.image-preview img{max-width:100px;max-height:100px;border-radius:8px;border:2px solid #ddd;cursor:pointer}
-.btn-primary{background:#2d6a1a;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
-.btn-primary:hover{background:#1a4a0e}
-.btn-danger{background:#dc3545;color:white;padding:5px 15px;border:none;border-radius:4px;cursor:pointer}
-.btn-export{background:#17a2b8;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer}
-.btn-edit{background:#ffc107;color:#333;padding:5px 15px;border:none;border-radius:4px;cursor:pointer;font-weight:bold}
-.btn-save{background:#28a745;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
-.btn-cancel{background:#6c757d;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:bold}
-.list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.stats{display:flex;gap:10px;align-items:center}
-.search-bar{margin-bottom:20px}
-.search-bar input{width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-size:16px}
-.member-card{border:1px solid #ddd;padding:20px;margin-bottom:15px;border-radius:8px;background:#fafafa;border-left:5px solid #2d6a1a;transition:all 0.3s}
-.member-card:hover{transform:translateX(5px);box-shadow:0 5px 15px rgba(0,0,0,0.1)}
-.member-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap}
-.member-name{font-size:1.2em;font-weight:bold;color:#2d6a1a;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.serial-number{background:#2d6a1a;color:white;padding:3px 10px;border-radius:20px;font-size:0.8em}
-.member-thumb{width:40px;height:40px;border-radius:50%;object-fit:cover;cursor:pointer}
-.member-role{background:#2d6a1a;color:white;padding:5px 10px;border-radius:5px;font-size:0.85em}
-.member-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;font-size:0.9em}
-.member-actions{margin-top:15px;display:flex;gap:10px;border-top:1px solid #eee;padding-top:15px}
-.payment-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
-.status-paid{background:#d4edda;color:#155724}
-.status-partial{background:#fff3cd;color:#856404}
-.status-pending{background:#f8d7da;color:#721c24}
-.share-badge{background:#f5c542;color:#2d6a1a;padding:3px 10px;border-radius:20px;font-size:0.8em;font-weight:bold}
-.modal-bottom{display:none;position:fixed;bottom:20px;right:20px;width:750px;max-width:90%;max-height:85vh;background:white;border-radius:12px;box-shadow:0 5px 30px rgba(0,0,0,0.3);z-index:1000;overflow:hidden;animation:slideUp 0.3s ease}
-@keyframes slideUp{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:#2d6a1a;color:white}
-.modal-header h3{margin:0}
-.close-modal{font-size:28px;font-weight:bold;cursor:pointer;color:white}
-.close-modal:hover{color:#ffc107}
-.modal-body{padding:20px;max-height:60vh;overflow-y:auto}
-.modal-footer{padding:15px 20px;border-top:1px solid #ddd;display:flex;justify-content:flex-end;gap:10px;background:#f9f9f9}
-.profile-header{display:flex;align-items:center;gap:20px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #2d6a1a}
-.profile-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #2d6a1a;cursor:pointer}
-.profile-name{font-size:1.4em;font-weight:bold;color:#2d6a1a}
-.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}
-.info-item{background:#f9f9f9;padding:12px;border-radius:8px;border-left:3px solid #2d6a1a}
-.info-label{font-weight:bold;color:#2d6a1a;margin-bottom:5px;font-size:0.85em}
-.info-value{color:#333;word-break:break-word}
-.full-width{grid-column:span 2}
-.section-card{background:#fff8e1;padding:15px;border-radius:8px;margin-top:15px;border:1px solid #ffecb3}
-.section-title{font-weight:bold;color:#2d6a1a;margin-bottom:10px;font-size:1em;border-bottom:1px solid #ddd;padding-bottom:5px}
-.beneficiary-card{background:#fff8e1;border:1px solid #ffecb3;border-radius:8px;padding:15px;margin-top:15px;margin-bottom:15px}
-.beneficiary-title{background:#2d6a1a;color:white;padding:8px 12px;border-radius:6px;margin-bottom:15px;font-weight:bold}
-.remove-beneficiary{background:#dc3545;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;float:right;font-size:12px}
-.lightbox{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.9);cursor:pointer}
-.lightbox-content{display:block;max-width:90%;max-height:90%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-.close-lightbox{position:absolute;top:20px;right:35px;color:white;font-size:40px;cursor:pointer}
-@media(max-width:768px){.form-row{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}}
-.form-control {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
-.form-control:focus {
-  outline: none;
-  border-color: #2d6a1a;
+
+.pulse {
+    animation: pulse 1s ease infinite;
+}
+
+/* ==================== LOADING SPINNER ==================== */
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(45, 106, 26, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== TOAST NOTIFICATIONS ==================== */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    z-index: 10000;
+    animation: slideUp 0.3s ease;
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+    .navbar,
+    .tabs,
+    .logout-btn,
+    .member-actions,
+    .btn-export,
+    .btn-primary,
+    .btn-danger,
+    .btn-edit {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .container {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .member-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+/* ==================== GLASSMORPHISM EFFECTS ==================== */
+.glass-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-lg);
+}
+
+/* ==================== GRADIENT TEXT ==================== */
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ==================== STATUS INDICATORS ==================== */
+.status-active {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    margin-right: 8px;
+    animation: pulse 1.5s ease infinite;
+}
+
+.status-inactive {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gray);
+    margin-right: 8px;
 }
 </style>
 </head>
@@ -922,20 +1835,15 @@ function loadRegions() {
     
     regionSelect.innerHTML = '<option value="">ክልል ይምረጡ</option>';
     
-    const regions = Object.keys(ethiopiaLocationData);
-    regions.sort();
+    // List of regions in order
+    const regions = [
+        'አዲስ አበባ', 'ድሬደዋ', 'ኦሮሚያ', 'አማራ', 'ትግራይ', 
+        'ሲዳማ', 'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች', 'ደቡብ ኢትዮጵያ',
+        'ማዕከላዊ ኢትዮጵያ', 'ቤንሻንጉል', 'አፋር', 'ሶማሌ', 'ሀረሪ', 'ጋምቤላ'
+    ];
     
     regions.forEach(region => {
-        const option = document.createElement('option');
-        option.value = region;
-        option.textContent = region;
-        regionSelect.appendChild(option);
-    });
-    
-    // Also add the special region names
-    const specialRegions = ['አዲስ አበባ', 'ድሬደዋ', 'ሀረሪ', 'ጋምቤላ', 'ሲዳማ', 'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች'];
-    specialRegions.forEach(region => {
-        if (!regionSelect.querySelector(`option[value="${region}"]`)) {
+        if (ethiopiaLocationData[region]) {
             const option = document.createElement('option');
             option.value = region;
             option.textContent = region;
@@ -949,38 +1857,46 @@ function loadZones() {
     const zoneSelect = document.getElementById('zone');
     const districtSelect = document.getElementById('district');
     const citySelect = document.getElementById('city');
+    const kebeleInput = document.getElementById('kebele');
     
+    // Reset all dependent fields
     zoneSelect.innerHTML = '<option value="">ዞን ይምረጡ</option>';
     districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
     citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    if (kebeleInput) kebeleInput.value = '';
     
     if (!region) return;
     
     const regionData = ethiopiaLocationData[region];
     if (!regionData) return;
     
-    // Handle special cases (Addis Ababa, Dire Dawa, Harari)
-    if (regionData.type === 'subCity' || region === 'አዲስ አበባ' || region === 'ድሬደዋ') {
-        const subCitySelect = zoneSelect;
-        subCitySelect.innerHTML = '<option value="">ክፍለ ከተማ ይምረጡ</option>';
-        
-        let subCities = [];
-        if (region === 'አዲስ አበባ' && ethiopiaLocationData['አዲስ አበባ'].subCities) {
-            subCities = ethiopiaLocationData['አዲስ አበባ'].subCities;
-        } else if (regionData.subCities) {
-            subCities = regionData.subCities;
-        }
-        
+    // Handle Addis Ababa (special case)
+    if (region === 'አዲስ አበባ') {
+        zoneSelect.innerHTML = '<option value="">ክፍለ ከተማ ይምረጡ</option>';
+        const subCities = Object.keys(regionData.subCities);
         subCities.forEach(subCity => {
             const option = document.createElement('option');
             option.value = subCity;
             option.textContent = subCity;
-            subCitySelect.appendChild(option);
+            zoneSelect.appendChild(option);
         });
         return;
     }
     
-    // Get zones for the selected region
+    // Handle Dire Dawa
+    if (region === 'ድሬደዋ') {
+        zoneSelect.innerHTML = '<option value="">ክፍለ ከተማ ይምረጡ</option>';
+        const subCities = Object.keys(regionData.subCities);
+        subCities.forEach(subCity => {
+            const option = document.createElement('option');
+            option.value = subCity;
+            option.textContent = subCity;
+            zoneSelect.appendChild(option);
+        });
+        return;
+    }
+    
+    // For other regions, show zones
     const zones = Object.keys(regionData);
     zones.sort();
     
@@ -997,30 +1913,53 @@ function loadDistricts() {
     const zone = document.getElementById('zone').value;
     const districtSelect = document.getElementById('district');
     const citySelect = document.getElementById('city');
+    const kebeleInput = document.getElementById('kebele');
     
+    // Reset dependent fields
     districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
     citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    if (kebeleInput) kebeleInput.value = '';
     
     if (!region || !zone) return;
     
     const regionData = ethiopiaLocationData[region];
-    if (!regionData || regionData.type === 'subCity') {
-        loadTownsFromZone(region, zone);
+    if (!regionData) return;
+    
+    // Handle Addis Ababa - Load woredas for selected sub-city
+    if (region === 'አዲስ አበባ' && regionData.type === 'subCity') {
+        const subCityData = regionData.subCities[zone];
+        if (subCityData && subCityData.woredas && subCityData.woredas.length > 0) {
+            districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
+            subCityData.woredas.forEach(woreda => {
+                const option = document.createElement('option');
+                option.value = woreda;
+                option.textContent = woreda;
+                districtSelect.appendChild(option);
+            });
+        } else {
+            districtSelect.innerHTML = '<option value="">ወረዳ የለም</option>';
+        }
         return;
     }
     
+    // Handle Dire Dawa
+    if (region === 'ድሬደዋ') {
+        districtSelect.innerHTML = '<option value="">ወረዳ የለም</option>';
+        return;
+    }
+    
+    // Handle other regions
     const zoneData = regionData[zone];
     if (!zoneData) return;
     
-    // Add towns/cities if they exist
+    // Add towns/cities
     if (zoneData.towns && zoneData.towns.length > 0) {
-        const townSelect = document.getElementById('city');
-        townSelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+        citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
         zoneData.towns.forEach(town => {
             const option = document.createElement('option');
             option.value = town;
             option.textContent = town;
-            townSelect.appendChild(option);
+            citySelect.appendChild(option);
         });
     }
     
@@ -1032,33 +1971,6 @@ function loadDistricts() {
             option.textContent = woreda;
             districtSelect.appendChild(option);
         });
-    } else if (zoneData.type === 'zone') {
-        districtSelect.innerHTML = '<option value="">ወረዳ የለም</option>';
-    }
-}
-
-function loadTownsFromZone(region, zone) {
-    // For Gambella - handle special case with Meti town kebeles
-    if (region === 'ጋምቤላ' && zone === 'ማጃንግ ዞን') {
-        const townSelect = document.getElementById('city');
-        townSelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
-        const metiOption = document.createElement('option');
-        metiOption.value = 'ሜጢ';
-        metiOption.textContent = 'ሜጢ';
-        townSelect.appendChild(metiOption);
-        
-        // Add Meti kebeles
-        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
-        const kebeleSelect = document.getElementById('kebele');
-        if (kebeleSelect && kebeleSelect.tagName === 'SELECT') {
-            kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
-            metiKebeles.forEach(kebele => {
-                const option = document.createElement('option');
-                option.value = kebele;
-                option.textContent = kebele;
-                kebeleSelect.appendChild(option);
-            });
-        }
     }
 }
 
@@ -1067,64 +1979,81 @@ function loadCities() {
     const zone = document.getElementById('zone').value;
     const district = document.getElementById('district').value;
     const citySelect = document.getElementById('city');
+    const kebeleInput = document.getElementById('kebele');
+    
+    // Reset kebele
+    if (kebeleInput) kebeleInput.value = '';
     
     if (!region || !zone) return;
+    
+    // For Addis Ababa, cities are the sub-cities themselves
+    if (region === 'አዲስ አበባ') {
+        return;
+    }
     
     const regionData = ethiopiaLocationData[region];
     if (!regionData) return;
     
-    // For sub-city type
-    if (regionData.type === 'subCity') {
-        return;
-    }
-    
     const zoneData = regionData[zone];
     if (!zoneData) return;
     
-    // If towns already loaded, don't reload
-    if (citySelect && citySelect.options.length > 1) return;
-    
-    if (zoneData.towns && zoneData.towns.length > 0) {
-        citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
-        zoneData.towns.forEach(town => {
-            const option = document.createElement('option');
-            option.value = town;
-            option.textContent = town;
-            citySelect.appendChild(option);
-        });
-    }
-    
-    // Special case for Meti town kebeles
-    if (region === 'ጋምቤላ' && zone === 'ማጃንግ ዞን' && district === 'ሜጢ') {
-        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
-        const kebeleSelect = document.getElementById('kebele');
-        if (kebeleSelect && kebeleSelect.tagName === 'SELECT') {
-            kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
+    // Gambella special case - Meti town kebeles
+    if (region === 'ጋምቤላ' && zone === 'ማጃንግ ዞን' && district === 'ጎደሬ ወረዳ') {
+        const citySelectElem = document.getElementById('city');
+        citySelectElem.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+        const metiOption = document.createElement('option');
+        metiOption.value = 'ሜጢ';
+        metiOption.textContent = 'ሜጢ';
+        citySelectElem.appendChild(metiOption);
+        
+        // Add kebele selector instead of input for Meti
+        if (kebeleInput && kebeleInput.tagName === 'INPUT') {
+            // Replace input with select for kebeles
+            const parent = kebeleInput.parentNode;
+            const select = document.createElement('select');
+            select.id = 'kebele';
+            select.className = 'form-control';
+            select.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
+            const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
             metiKebeles.forEach(kebele => {
                 const option = document.createElement('option');
                 option.value = kebele;
                 option.textContent = kebele;
-                kebeleSelect.appendChild(option);
+                select.appendChild(option);
             });
+            parent.replaceChild(select, kebeleInput);
         }
     }
 }
 
-// Initialize address fields when page loads
+// Initialize address fields
 function initializeAddressFields() {
     loadRegions();
     
-    // Add event listeners
     const regionSelect = document.getElementById('region');
     const zoneSelect = document.getElementById('zone');
     const districtSelect = document.getElementById('district');
     
-    if (regionSelect) regionSelect.addEventListener('change', loadZones);
-    if (zoneSelect) zoneSelect.addEventListener('change', loadDistricts);
+    if (regionSelect) regionSelect.addEventListener('change', function() {
+        loadZones();
+        // Clear woreda field when region changes
+        const districtField = document.getElementById('district');
+        if (districtField) districtField.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
+        const cityField = document.getElementById('city');
+        if (cityField) cityField.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    });
+    
+    if (zoneSelect) zoneSelect.addEventListener('change', function() {
+        loadDistricts();
+        // Clear city field when zone changes
+        const cityField = document.getElementById('city');
+        if (cityField) cityField.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    });
+    
     if (districtSelect) districtSelect.addEventListener('change', loadCities);
 }
 
-// Call this when document is ready
+// Call initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     initializeAddressFields();
 });
