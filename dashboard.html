@@ -820,7 +820,7 @@ async function loadMembers() {
           <div class="member-name">
             <span class="serial-number">#${index + 1}</span>
             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-           `<strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${member._id}')">${escapeHtml(member.fullName)}</strong>`
+            <strong style="cursor:pointer; color:#2d6a1a; font-size:1.1em;" onclick="showMemberDetails('${m._id || m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
             <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
           </div>
