@@ -138,39 +138,46 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
           <div class="form-group"><label>ዜግነት</label><input type="text" id="nationality" value="ኢትዮጵያዊ"></div>
           <div class="form-group"><label>የትምህርት ደረጃ</label><select id="education"><option>አንደኛ ደረጃ</option><option>ሁለተኛ ደረጃ</option><option>ዲፕሎማ</option><option>ዲግሪ</option><option>ማስተርስ</option></select></div>
         </div>
-        <h4>📍 አድራሻ</h4>
-        <div class="form-row">
-          <div class="form-group"><label>ክልል (Region)</label>
-            <select id="region" onchange="loadZones()">
-              <option value="">ምረጥ</option>
-              <option value="ጋምቤላ">ጋምቤላ</option>
-              <option value="አዲስ አበባ">አዲስ አበባ</option>
-              <option value="ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች">ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች</option>
-              <option value="ሌላ">ሌላ</option>
-            </select>
-          </div>
-          <div class="form-group"><label>ዞን (Zone)</label>
-            <select id="zone" onchange="loadDistricts()">
-              <option value="">በመጀመሪያ ክልል ይምረጡ</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>ወረዳ (District/Woreda)</label>
-            <select id="district" onchange="loadCities()">
-              <option value="">በመጀመሪያ ዞን ይምረጡ</option>
-            </select>
-          </div>
-          <div class="form-group"><label>ከተማ (City/Town)</label>
-            <select id="city">
-              <option value="">በመጀመሪያ ወረዳ ይምረጡ</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>ቀበሌ (Kebele)</label><input type="text" id="kebele" placeholder="ቀበሌ"></div>
-          <div class="form-group"><label>ቤት ቁጥር (House No.)</label><input type="text" id="houseNumber" placeholder="ቤት ቁጥር"></div>
-        </div>
+ <!-- Address Section -->
+<h4>📍 አድራሻ</h4>
+<div class="form-row">
+    <div class="form-group">
+        <label>ክልል (Region)</label>
+        <select id="region" class="form-control" required>
+            <option value="">ክልል ይምረጡ</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>ዞን (Zone)</label>
+        <select id="zone" class="form-control">
+            <option value="">በመጀመሪያ ክልል ይምረጡ</option>
+        </select>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group">
+        <label>ወረዳ (Woreda/District)</label>
+        <select id="district" class="form-control">
+            <option value="">በመጀመሪያ ዞን ይምረጡ</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>ከተማ (City/Town)</label>
+        <select id="city" class="form-control">
+            <option value="">በመጀመሪያ ወረዳ ይምረጡ</option>
+        </select>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group">
+        <label>ቀበሌ (Kebele)</label>
+        <input type="text" id="kebele" class="form-control" placeholder="ለምሳሌ: 01 ቀበሌ">
+    </div>
+    <div class="form-group">
+        <label>ቤት ቁጥር (House Number)</label>
+        <input type="text" id="houseNumber" class="form-control" placeholder="ለምሳሌ: 123">
+    </div>
+</div>
         <div class="form-row">
           <div class="form-group"><label>ስልክ ቁጥር</label><input type="tel" id="phone"></div>
           <div class="form-group"><label>የፋይዳ መለያ ቁጥር</label><input type="text" id="taxId"></div>
@@ -449,142 +456,668 @@ let currentEditingMemberId = null;
 const TOTAL_SHARES_LIMIT = 25000;
 const SHARE_PRICE = 10000;
 
-// Location Data
-const locationData = {
-  'ጋምቤላ': {
-    'ማጃንግ ዞን': {
-      districts: ['ጎደሬ ወረዳ', 'መንገሽ ወረዳ'],
-      cities: {
-        'ጎደሬ ወረዳ': ['ሜጢ ከተማ', 'ጎደሬ'],
-        'መንገሽ ወረዳ': ['መንገሽ', 'ኮንጋ']
-      }
+// location Data
+// ==================== ETHIOPIAN LOCATION DATA ====================
+
+const ethiopiaLocationData = {
+    // Addis Ababa - 11 sub-cities
+    'አዲስ አበባ': {
+        subCities: ['ቦሌ', 'የካ', 'አራዳ', 'ቂርቆስ', 'ልደታ', 'ንፋስ ስልክ ላፍቶ', 'ኮልፌ ቀራንዮ', 'አዲስ ከተማ', 'ጉለሌ', 'አቃቂ ቃሊቲ', 'ለሚኩራ'],
+        type: 'subCity'
     },
-    'አኝዋ (አኙዋክ) ዞን': {
-      districts: ['ጋምቤላ ወረዳ', 'ዲማ ወረዳ', 'አበቦ ወረዳ', 'ጋምቤላ ዙሪያ ወረዳ', 'ጎግ ወረዳ', 'ጆር ወረዳ'],
-      cities: {
-        'ጋምቤላ ወረዳ': ['ጋምቤላ', 'ቦር'],
-        'ዲማ ወረዳ': ['ዲማ', 'ቤሪ'],
-        'አበቦ ወረዳ': ['አበቦ', 'ሜታ'],
-        'ጋምቤላ ዙሪያ ወረዳ': ['ኢታንግ', 'ኮማ'],
-        'ጎግ ወረዳ': ['ጎግ', 'ፑኮንግ'],
-        'ጆር ወረዳ': ['ጆር', 'ኒዌር']
-      }
+    
+    // Oromia Region
+    'ኦሮሚያ': {
+        'ሰሜን ሸዋ ዞን': {
+            towns: ['ፍቼ'],
+            woredas: ['ደብረ ሊባኖስ', 'ያያ ጉሌሌ', 'ግራር ጃርሶ', 'ደገም', 'ኩዩ', 'ወረ ጃርሶ', 'ሳላሌ', 'ሂዳቡ አቦቴ', 'ሻኖ', 'አቡና ግንደ በረት', 'ሱሉልታ']
+        },
+        'ምዕራብ ሸዋ ዞን': {
+            towns: ['አምቦ'],
+            woredas: ['ሆለታ', 'መታ ሮቢ', '��ልዱ', 'ዳኖ', 'አምቦ ወረዳ', 'ኖኖ', 'ወንጪ', 'ሜታ ወልቂጤ', 'ኤጀሬ', 'ጨሊያ', 'ሊበን ጃዊ', 'ቶኬ ኩታዬ', 'አደአ በርጋ', 'ዲንዲ']
+        },
+        'ምስራቅ ሸዋ ዞን': {
+            towns: ['አዳማ', 'ቢሾፍቱ', 'ሞጆ', 'ባቱ', 'መተሐራ'],
+            woredas: ['አደአ', 'ሉሜ', 'ቦሰት', 'አዳማ ወረዳ', 'ፈንታሌ', 'ዱግዳ', 'ቦራ', 'ሊበን ጩቃላ']
+        },
+        'ደቡብ ምዕራብ ሸዋ ዞን': {
+            towns: ['ወሊሶ'],
+            woredas: ['ወሊሶ ወረዳ', 'ሉቄ', 'በቾ', 'ጎሮ', 'ሰደን ሶዶ', 'አዋሽ መልካ', 'ከርሳ ማሊማ', 'ቶሌ', 'ወንጪ']
+        },
+        'አርሲ ዞን': {
+            towns: ['አሰላ'],
+            woredas: ['ቆሬ', 'ዙዋይ ዱግዳ', 'ዲገሉና ቲጆ', 'ሙኔና', 'ጠነና', 'ሺርካ', 'ቾሌ', 'ሆናሎ ዋጂ', 'መርቲ', 'ጀጁ', 'ጎሎልቻ አሚኛ', 'ስሬ', 'ዲክሲስ', 'ሮቤ', 'ቲቾ']
+        },
+        'ምዕራብ አርሲ ዞን': {
+            towns: ['ሻሸመኔ', 'ነገሌ አርሲ', 'ኩፈሌ'],
+            woredas: ['ሻሸመኔ ወረዳ', 'አርሲ ነገሌ', 'ሻላ', 'ሲርባ', 'አሳሳ', 'ኮፈሌ ወረዳ', 'ኮሬ', 'ዶዶላ', 'ገደብ አሳሳ', 'አዶባ']
+        },
+        'ባሌ ዞን': {
+            towns: ['ሮቤ', 'ጎባ'],
+            woredas: ['ሲናና', 'ዲንሾ', 'ጋስራ', 'ጎሎልቻ', 'አጋርፋ', 'በርበረ', 'ጉራ ዳሞሌ', 'መና አንጌቱ', 'ሃረና ቡሉቅ']
+        },
+        'ምስራቅ ባሌ ዞን': {
+            towns: ['ጊኒር'],
+            woredas: ['ጊኒር ወረዳ', 'ጎልባ', 'ራዩ', 'ሰወይና', 'ለገሂዳ', 'ዳዌ ሰረር', 'ዳዌ ቀቼን']
+        },
+        'ቦረና ዞን': {
+            towns: ['ያቤሎ'],
+            woredas: ['ያቤሎ ወረዳ', 'ዲላሎ', 'ዱብሉቅ', 'ጎረሌ', 'ተልተሌ', 'ሞያሌ', 'ሜልካ ሶዳ', 'ኤልወዬ']
+        },
+        'ጉጂ ዞን': {
+            towns: ['ነገሌ ቦረና'],
+            woredas: ['አዶላ ሬዴ', 'ዋደራ', 'ሊበን', 'ቦሬ', 'አና ሶራ', 'ኡራጋ', 'ገላና', 'ሻኪሶ', 'ጉጂ ወረዳ']
+        },
+        'ምዕራብ ጉጂ ዞን': {
+            towns: ['ቡሌ ሆራ'],
+            woredas: ['ቡሌ ሆራ ወረዳ', 'ዱግዳ ዳዋ', 'መልካ ሶዳ', 'ሱሮ በርጉዳ', 'አባያ', 'ከርቻ', 'ብሬ']
+        },
+        'ኢሉባቦር ዞን': {
+            towns: ['መቱ'],
+            woredas: ['መቱ ወረዳ', 'ዳሪሙ', 'ሀሉ', 'ያዩ', 'ዶሮኒ', 'አሌ', 'በቾ', 'ቡሬ', 'ኑኖ ቱምባ']
+        },
+        'ቡኖ በደሌ ዞን': {
+            towns: ['በደሌ'],
+            woredas: ['በደሌ ወረዳ', 'ገቺ', 'ደጋ', 'ጮራ', 'መኮ', 'ቦሬቻ']
+        },
+        'ጅማ ዞን': {
+            towns: ['ጅማ', 'አጋሮ'],
+            woredas: ['መና', 'ከርሳ', 'ማና', 'ሊሙ ኮሳ', 'ሊሙ ሰቃ', 'ኖኖ ቤንጃ', 'ጎማ', 'ጌራ', 'ሴካ ጨቆርሳ', 'ደዶ', 'ኦሞ ናዳ', 'ኦሞ ቤዬ', 'ሲገሞ']
+        },
+        'ምዕራብ ወለጋ ዞን': {
+            towns: ['ጊምቢ'],
+            woredas: ['ጊምቢ ወረዳ', 'መንዲ', 'ነጆ', 'ላሎ አሳቢ', 'ሀሩ', 'ቦጂ ዲርመጂ', 'ጉሊሶ', 'ዩብዶ', 'አይራ', 'ቃንቃ']
+        },
+        'ምስራቅ ወለጋ ዞን': {
+            towns: ['ነቀምቴ'],
+            woredas: ['ጉቶ ጊዳ', 'ዋማ', 'ሲቡ ሲሬ', 'ጎቡ ሰዮ', 'ሌቃ ዱለቻ', 'ኑኑ ኢንባ', 'ዲጋ', 'ሳሲጋ']
+        },
+        'ቄለም ወለጋ ዞን': {
+            towns: ['ደምቢዶሎ'],
+            woredas: ['ሰዮ', 'አናፊሎ', 'ዮን', 'ሀዋ ገላን', 'ጊዳል', 'ጋዎ', 'ዴቤ', 'ዳለ ዋበራ']
+        },
+        'ሆሮ ጉድሩ ወለጋ ዞን': {
+            towns: ['ሻምቡ'],
+            woredas: ['ሆሮ ጉድሩ', 'አባይ ጮመን', 'ጃርደጋ ጃርቴ', 'ጂማ ራሬ', 'ጂማ ገነት', 'አቡና']
+        },
+        'ምስራቅ ሀረርጌ ዞን': {
+            towns: ['ሀረማያ', 'አወዳይ'],
+            woredas: ['ባቢሌ', 'ፈዲስ', 'ሚዳ ተጋ', 'ሀረማያ ወረዳ', 'ጎሮ ጉቱ', 'ዴደር', 'መልካ በሎ', 'ሜታ', 'ጃርሶ', 'ጉርሱም']
+        },
+        'ምዕራብ ሀረርጌ ዞን': {
+            towns: ['ጭሮ'],
+            woredas: ['ጭሮ ወረዳ', 'ቱሎ', 'ዶባ', 'ሚኤሶ', 'ሀብሮ', 'ዳሩ ሌቡ', 'በዴኖ', 'ቦኬ', 'ገመቺስ']
+        },
+        'ሸገር ሲቲ ልዩ ዞን': {
+            towns: ['ቡራዩ', 'ሱሉልታ', 'ሰበታ', 'ገላን', 'ለገጣፎ-ለገዳዲ', 'ሰንዳፋ-በኬ', 'መናገሻ'],
+            woredas: ['በረህ', 'ወልመራ', 'አቃቂ', 'ሱሉልታ']
+        }
     },
-    'ኑዌር ዞን': {
-      districts: ['ላሬ ወረዳ', 'አኮቦ ወረዳ', 'ዋንቱዋር (ዋንቱዋ) ወረዳ', 'ማኩዌይ ወረዳ', 'ጂካዋ ወረዳ'],
-      cities: {
-        'ላሬ ወረዳ': ['ላሬ', 'ንጋት'],
-        'አኮቦ ወረዳ': ['አኮቦ', 'ቲማ'],
-        'ዋንቱዋር (ዋንቱዋ) ወረዳ': ['ዋንቱዋ', 'ማጫር'],
-        'ማኩዌይ ወረዳ': ['ማኩዌይ', 'ቡል'],
-        'ጂካዋ ወረዳ': ['ጂካዋ', 'ሊከ']
-      }
+    
+    // Amhara Region
+    'አማራ': {
+        'ሰሜን ጎንደር ዞን': {
+            towns: ['ደባርቅ'],
+            woredas: ['ደባርቅ ወረዳ', 'አዲ አርቃይ', 'ጃናሞራ', 'በየዳ', 'ጠለምት', 'ደባት ወረዳ']
+        },
+        'ማዕከላዊ ጎንደር ዞን': {
+            towns: ['ጎንደር'],
+            woredas: ['ጎንደር ዙሪያ', 'ላይ አርማጭሆ', 'ጭልጋ 1ኛ', 'ጭልጋ 2ኛ', 'ታክሳ', 'ምዕራብ በለሳ', 'ደምቢያ 1ኛ', 'ደምቢያ 2ኛ', 'ቋሪት']
+        },
+        'ምዕራብ ጎንደር ዞን': {
+            towns: ['መተማ'],
+            woredas: ['መተማ ወረዳ', 'ቁዋራ', 'ሰንደሆ', 'አብርሃጅራ']
+        },
+        'ደቡብ ጎንደር ዞን': {
+            towns: ['ደብረ ታቦር'],
+            woredas: ['ሊቦ ከምከም', 'እጅፈታ', 'እስቴ', 'ላይ ጋይንት', 'ታች ጋይንት', 'ስማዳ', 'ፋርጣ', 'ደራ', 'እብናት', 'ሚሊንዛ']
+        },
+        'ሰሜን ወሎ ዞን': {
+            towns: ['ወልድያ', 'ላሊበላ'],
+            woredas: ['ቆቦ', 'ራያ ቆቦ ወረዳ', 'ሀብሩ', 'መርሳ', 'ጉባ ላፍቶ', 'ግሸን ደብረ ከርቤ', 'መቄት', 'ዋድላ', 'ቡግና', 'ላስታ']
+        },
+        'ደቡብ ወሎ ዞን': {
+            towns: ['ደሴ', 'ኮምቦልቻ', 'ሐይቅ'],
+            woredas: ['ደሴ ዙሪያ', 'ቃሉ', 'ተሁለደሬ', 'ወረባቦ', 'አምባሰል', 'ኩታበር', 'ቀላላ', 'ለገሀምቦ', 'ደላንታ', 'ተንታ', 'መቅደላ', 'ሳይንት', 'ቦረና', 'ወግዲ', 'ወረኢሉ']
+        },
+        'ሰሜን ሸዋ ዞን': {
+            towns: ['ደብረ ብርሃን', 'ሸዋ ሮቢት'],
+            woredas: ['ባሶና ወራና', 'አንኮበር', 'ሀገረ ማርያም ከሰም', 'መንዝ ጌራ ምድር', 'መንዝ ማማ ምድር', 'መንዝ ሌሎ ምድር', 'ጌዴም', 'ኤፍራታና ግድም', 'ቀውት', 'ሞጃና ወደራ', 'ጣርማበር', 'ከላላ', 'መራኛ', 'ግሼ ራቤል', 'ሐረምባ']
+        },
+        'ምስራቅ ጎጃም ዞን': {
+            towns: ['ደብረ ማርቆስ', 'ሞጣ'],
+            woredas: ['ማቻከል', 'ጎዛምን', 'አናደድ', 'አዋባል', 'ደጀን', 'እነማይ', 'እናርጅ እናውጋ', 'ጎንቻ ሲሶ እነሴ', 'እነሴ', 'ሁለት እጁ እነሴ', 'ቢብኝ', 'ሰዴ', 'ሲናን']
+        },
+        'ምዕራብ ጎጃም ዞን': {
+            towns: ['ባህር ዳር', 'ፍኖተ ሰላም', 'ቡሬ'],
+            woredas: ['ባህር ዳር ዙሪያ', 'ይስማላ', 'ደጋ ዳሞት', 'ሰከላ', 'ቁዋሪት', 'ጁጋና አውራሪ', 'ቡሬ ዙሪያ', 'ጃቢጠህናን', 'ደብረ ኤልያስ', 'ደቡብ አቺፈር', 'ሰሜን አቺፈር']
+        },
+        'አዊ ዞን': {
+            towns: ['እንጅባራ', 'ሻሸመኔ'],
+            woredas: ['አንገጫ', 'ባንጃ', '��ጉሳ ሽኩዳድ', 'አንከሻ ጓጉሳ', 'ጃዊ', 'ዚገም', 'ዳንግላ ወረዳ']
+        },
+        'ዋግ ኽምራ ዞን': {
+            towns: ['ሰቆጣ'],
+            woredas: ['ሰቆጣ ወረዳ', 'ዘቋላ', 'ሰሀላ', 'ደሀና', 'ኦፍላ', 'ጋዝጊብላ']
+        },
+        'የኦሮሞ ብሔረሰብ ዞን': {
+            towns: ['ከሚሴ'],
+            woredas: ['ደወሀረዋ', 'ደዌ ጨፌ', 'አርጡማ ፉርሲ', 'ጅሌ ጥሙጋ', 'ባቲ ወረዳ']
+        }
+    },
+    
+    // Tigray Region
+    'ትግራይ': {
+        'መቐለ ልዩ ዞን': {
+            subCities: ['ኲሓ', 'ዓዲ ሓቂ', 'ሓወልቲ', 'ሰሜን', 'ሰገን', 'ቀደማይ ወያነ', 'ዓይደር'],
+            type: 'subCity'
+        },
+        'ማዕከላዊ ትግራይ ዞን': {
+            towns: ['አክሱም', 'ዓድዋ'],
+            woredas: ['ዓድዋ ወረዳ', 'አሕፈሮም', 'መረብ ለኸ', 'ወርዒ ለኸ', 'ታሕታይ ማይጨው', 'ላዕላይ ማይጨው', 'ናዕዴር ዓዴት', 'ቆላ ተምቤን', 'ደጉዓ ተምቤን']
+        },
+        'ምስራቃዊ ትግራይ ዞን': {
+            towns: ['ዓዲግራት', 'ውቅሮ'],
+            woredas: ['ጋንታ ኣፈሹም', 'ጉሎ መኸዳ', 'ኢሮብ', 'ሳዕሲዕ ጻዕዳ እምባ', 'ክልተ ኣውላዕሎ', 'ሓውዜን', 'አፅቢ ወንበርታ']
+        },
+        'ሰሜናዊ ምዕራብ ትግራይ ዞን': {
+            towns: ['ሽሬ እንዳሥላሴ'],
+            woredas: ['ታሕታይ ኣዲያቦ', 'ላዕላይ ኣዲያቦ', 'አሰገደ ፅምብላ', 'እንዳባጉና', 'መደባይ ዘና']
+        },
+        'ደቡባዊ ትግራይ ዞን': {
+            towns: ['ማይጨው', 'አላማጣ'],
+            woredas: ['እንዳመሆኒ', 'ኦፍላ', 'ራያ ዓዘቦ', 'አላማጣ ወረዳ', 'እምባ ኣላጄ', 'ሰቆጣ']
+        },
+        'ደቡብ ምስራቅ ትግራይ ዞን': {
+            towns: ['መደባይ'],
+            woredas: ['እንደርታ', 'ሕንጣሎ ወጅራት', 'ሰሐርቲ ሳምረ', 'ደጉዓ ተምቤን']
+        },
+        'ምዕራባዊ ትግራይ ዞን': {
+            towns: ['ሁመራ'],
+            woredas: ['ቃፍታ ሑመራ', 'ወልቃይት', 'ፀገዴ']
+        }
+    },
+    
+    // Gambella Region
+    'ጋምቤላ': {
+        'አኝዋክ ዞን': {
+            towns: ['አቦቦ'],
+            woredas: ['ጋምቤላ ወረዳ', 'አቦቦ ወረዳ', 'ጎግ ወረዳ', 'ጆር ወረዳ', 'ዲማ ወረዳ']
+        },
+        'ኑዌር ዞን': {
+            towns: ['ኩልኒያንግ'],
+            woredas: ['ላሬ ወረዳ', 'ጂካዎ ወረዳ', 'አካቦ ወረዳ', 'ወንቱዋ ወረዳ', 'ማኩዌይ ወረዳ']
+        },
+        'ማጃንግ ዞን': {
+            towns: ['ሜጢ'],
+            woredas: ['መንገሺ ወረዳ', 'ጎደሬ ወረዳ']
+        },
+        'ጋምቤላ ከተማ አስተዳደር': {
+            type: 'city',
+            kebeles: ['01 ቀበሌ', '02 ቀበሌ', '03 ቀበሌ', '04 ቀበሌ', '05 ቀበሌ']
+        },
+        'ኢታንግ ልዩ ወረዳ': {
+            type: 'special'
+        }
+    },
+    
+    // Sidama Region
+    'ሲዳማ': {
+        'የሐዋሳ ከተማ አስተዳደር': {
+            subCities: ['የካ', 'ታቦር', 'ምናለሽ', 'መናሀሪያ', 'ሐይቅ ዳር', 'ሚሼል', 'ባህላዊቱ', 'ጪፍሬ'],
+            type: 'subCity'
+        },
+        'ማዕከላዊ ሲዳማ ዞን': {
+            towns: ['ይርጋለም'],
+            woredas: ['ዳሌ ወረዳ', 'ይርጋለም ዙሪያ', 'ወንዶ ገነት ወረዳ', 'ሎኮ አባያ ወረዳ', 'ሸበዲኖ ወረዳ']
+        },
+        'ደቡባዊ ሲዳማ ዞን': {
+            towns: ['ዲላ', 'አለታ ወንዶ'],
+            woredas: ['አለታ ወንዶ ወረዳ', 'ዳራ ወረዳ', 'ጩኮ ወረዳ', 'ቦርቻ ወረዳ', 'አውሳ ወረዳ', 'ሆላ ወረዳ']
+        },
+        'ምሥራቃዊ ሲዳማ ዞን': {
+            towns: ['ለኩ'],
+            woredas: ['አርቤጎና ወረዳ', 'ቦና ዙሪያ ወረዳ', 'ብልንሳ ወረዳ', 'ሆከቻ ወረዳ', 'ቡርሳ ወረዳ']
+        },
+        'ሰሜናዊ ሲዳማ ዞን': {
+            towns: ['ይርባ'],
+            woredas: ['አዋሳ ዙሪያ ወረዳ', 'ሲራሮ ወረዳ', 'ወንዶ ወረዳ', 'ማልጋ ወረዳ', 'ጎሮቼ ወረዳ']
+        }
+    },
+    
+    // South West Ethiopia Peoples Region
+    'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች': {
+        'ካፋ ዞን': {
+            towns: ['ቦንጋ'],
+            woredas: ['ጊምቦ ወረዳ', 'መና ወረዳ', 'ጨና ወረዳ', 'ደቻ ወረዳ', 'ቢቶ ወረዳ', 'ጌሻ ወረዳ', 'ቴሎ ወረዳ', 'ሻሆ ወረዳ', 'ቦንጋ ዙሪያ']
+        },
+        'ቤንች ሸኮ ዞን': {
+            towns: ['ሚዛን አማን'],
+            woredas: ['ሰሜን ቤንች ወረዳ', 'ደቡብ ቤንች ወረዳ', 'ሸኮ ወረዳ', 'ጉራፈርዳ ወረዳ', 'ሻኢ ቤንች ወረዳ', 'ሚዛን ዙሪያ']
+        },
+        'ዳውሮ ዞን': {
+            towns: ['ጠርጫ'],
+            woredas: ['ማረቃ ወረዳ', 'ኢሳራ ወረዳ', 'ቶቻ ወረዳ', 'ሎማ ወረዳ', 'ጋቺ ወረዳ', 'ታርጫ ዙሪያ']
+        },
+        'ሸካ ዞን': {
+            towns: ['ቴፒ', 'ማሻ'],
+            woredas: ['ማሻ ወረዳ', 'አንደርቻ ወረዳ', 'ዮኪ ጪጪ ወረዳ']
+        },
+        'ምዕራብ ኦሞ ዞን': {
+            towns: ['ጅማ ራጂ'],
+            woredas: ['መጂ ወረዳ', 'ሱርማ ወረዳ', 'ቤሮ ወረዳ', 'ጎሬ ዲማ ወረዳ', 'ቃስታ ወረዳ']
+        },
+        'ኮንታ ዞን': {
+            towns: ['አመያ'],
+            woredas: ['ኮንታ ወረዳ', 'ኮይሻ ወረዳ']
+        },
+        'የያም ልዩ ወረዳ': {
+            type: 'special'
+        }
+    },
+    
+    // South Ethiopia Region
+    'ደቡብ ኢትዮጵያ': {
+        'ጋሞ ዞን': {
+            towns: ['አርባ ምንጭ'],
+            woredas: ['አርባ ምንጭ ዙሪያ', 'ቼንቻ ወረዳ', 'ቦነኬ ወረዳ', 'ደራማሎ ወረዳ', 'ቁጫ ወረዳ', 'መሎ ኮዛ ወረዳ', 'ምርአብ አባያ', 'ቦረዳ ወረዳ', 'ዛላ ወረዳ']
+        },
+        'ወላይታ ዞን': {
+            towns: ['ሶዶ'],
+            woredas: ['ሶዶ ዙሪያ', 'ዳሞት ጋሌ ወረዳ', 'ዳሞት ወይዴ ወረዳ', 'ዳሞት ፉላሳ ወረዳ', 'ቦሎሶ ሶሬ ወረዳ', 'ቦሎሶ ቦምቤ ወረዳ', 'ሁምቦ ወረዳ', 'ኪንዶ ኮይሻ ወረዳ', 'ኪንዶ ዲዳዬ ወረዳ', 'ኦፋ ወረዳ', 'ዱጉና ፋንጎ ወረዳ', 'ከዎ ኮይሻ ወረዳ']
+        },
+        'ጌዴኦ ዞን': {
+            towns: ['ዲላ', 'ይርጋጨፌ'],
+            woredas: ['ዲላ ዙሪያ', 'ይርጋጨፌ ወረዳ', 'ጨለለቅቱ ወረዳ', 'ቡሌ ወረዳ', 'ገደብ ወረዳ', 'ኮቼሬ ወረዳ', 'ወንጮ ወረዳ']
+        },
+        'ጎፋ ዞን': {
+            towns: ['ሳውላ'],
+            woredas: ['ሳውላ ዙሪያ', 'ኡባ ደብረ ፀሐይ ወረዳ', 'ዘሎ ወረዳ', 'ገዜ ጎፋ ወረዳ', 'መሎ ጋዶ ወረዳ', 'ኦይዳ ወረዳ']
+        },
+        'ደቡብ ኦሞ ዞን': {
+            towns: ['ጂንካ'],
+            woredas: ['ሐመር ወረዳ', 'በና ፀማይ ወረዳ', 'ሰሜን አሪ ወረዳ', 'ደቡብ አሪ ወረዳ', 'ማሌ ወረዳ', 'ዳሰነች ወረዳ', 'ኛንጋቶም ወረዳ', 'ሰላማጎ ወረዳ']
+        },
+        'ኮንሶ ዞን': {
+            towns: ['ካራት'],
+            woredas: ['ኮንሶ ወረዳ', 'ሰገን ዙሪያ ወረዳ', 'ኮልሜ ወረዳ']
+        },
+        'ጌኦ ዞን': { type: 'zone', woredas: [] },
+        'ቡርጂ ዞን': { type: 'zone', woredas: [] },
+        'ዲራሼ ዞን': { type: 'zone', woredas: [] },
+        'አደ ባስኬቶ ዞን': { type: 'zone', woredas: [] },
+        'አሌ ዞን': { type: 'zone', woredas: [] },
+        'ጋርዱላ ዞን': { type: 'zone', woredas: [] }
+    },
+    
+    // Central Ethiopia Region
+    'ማዕከላዊ ኢትዮጵያ': {
+        'ሐዲያ ዞን': {
+            towns: ['ሆሳዕና'],
+            woredas: ['ሆሳዕና ዙሪያ', 'ሶሮ ወረዳ', 'ሻሸጎ ወረዳ', 'ሚሻ ወረዳ', 'ዱና ወረዳ', 'ጎንቦራ ወረዳ', 'አናሌሞ ወረዳ', 'ምሥራቅ ባደዋቾ ወረዳ', 'ምዕራብ ባደዋቾ ወረዳ']
+        },
+        'ጉራጌ ዞን': {
+            towns: ['ወልቂጤ', 'ቡታጅራ'],
+            woredas: ['ጨሃ ወረዳ', 'እኖር ወረዳ', 'እዥ ወረዳ', 'መስቃን ወረዳ', 'ኮክሪር ወረዳ', 'ሶዶ ወረዳ', 'ሙኸርና አክሊል ወረዳ', 'አቤሽጌ ወረዳ', 'ገደባኖ ጉታዘር ወረዳ']
+        },
+        'ስልጤ ዞን': {
+            towns: ['ወራቤ'],
+            woredas: ['ስልጢ ወረዳ', 'ዳሎቻ ወረዳ', 'ላንፉሮ ወረዳ', 'ሳንኩራ ወረዳ', 'ምሥራቅ አዘርነት በርበሬ ወረዳ', 'ምዕራብ አዘርነት በርበሬ ወረዳ', 'ሁልባረግ ወረዳ', 'መረቆ ወረዳ']
+        },
+        'ከምባታ ጠምባሮ ዞን': {
+            towns: ['ዱራሜ'],
+            woredas: ['ዱራሜ ዙሪያ', 'አንጋጫ ወረዳ', 'ጠምባሮ ወረዳ', 'አዲሎ ወረዳ', 'ዳንቦያ ወረዳ', 'ሐደሮ ጡንቶ ወረዳ']
+        },
+        'ሃላባ ዞን': {
+            towns: ['ቁሊቶ'],
+            woredas: ['ሃላባ ወረዳ', 'ወንሾ ወረዳ']
+        },
+        'ምሥራቅ ጉራጌ ዞን': {
+            towns: ['እንዳብር'],
+            woredas: ['ሶዶ ወረዳ', 'መስቃን ወረዳ', 'ማረቆ ወረዳ']
+        },
+        'ቀቤና ዞን': {
+            towns: ['ወልቂጤ'],
+            woredas: ['ቀቤና ወረዳ']
+        },
+        'የየም ልዩ ወረዳ': { type: 'special' },
+        'አልቾ ዊሪሮ ልዩ ወረዳ': { type: 'special' },
+        'ላንጋኖ ልዩ ወረዳ': { type: 'special' }
+    },
+    
+    // Benishangul-Gumuz Region
+    'ቤንሻንጉል': {
+        'አሶሳ ከተማ አስተዳደር': { type: 'city' },
+        'አሶሳ ዞን': {
+            towns: ['ሸርቆሌ'],
+            woredas: ['አሶሳ ወረዳ', 'ባምባሲ ወረዳ', 'ሆሞሻ ወረዳ', 'ኩርሙክ ወረዳ', 'መንጌ ወረዳ', 'ኦዳ ቢልዲግሉ ወረዳ', 'ሸርቆሌ ወረዳ']
+        },
+        'መተከል ዞን': {
+            towns: ['ጊልገል በለስ', 'ቻግኒ'],
+            woredas: ['ቡለን ወረዳ', 'ድባጤ ወረዳ', 'ጉባ ወረዳ', 'ማንዱራ ወረዳ', 'ወንበራ ወረዳ', 'ድንገፅ ወረዳ']
+        },
+        'ካማሺ ዞን': {
+            towns: ['ካማሺ'],
+            woredas: ['ካማሺ ወረዳ', 'አጋሎ ሚቴ ወረዳ', 'ቤሎ ጀጋንፎይ ወረዳ', 'ሲርባ አባይ ወረዳ', 'ያሶ ወረዳ']
+        },
+        'ማኦ-ኮሞ ልዩ ወረዳ': { type: 'special' },
+        'ፓዊ ልዩ ወረዳ': { type: 'special' },
+        'ያረንጋ ልዩ ወረዳ': { type: 'special' }
+    },
+    
+    // Afar Region
+    'አፋር': {
+        'አውሲ ረሱ ዞን': {
+            towns: ['ሰመራ-ሎግያ', 'አሳይታ'],
+            woredas: ['አሳይታ ወረዳ', 'አፋምቦ', 'ዱብቲ', 'ጭፍራ', 'ሚሌ', 'ኤልዳር', 'ገላኢሎ']
+        },
+        'ኪልበቲ ረሱ ዞን': {
+            towns: ['አብዓላ'],
+            woredas: ['አብዓላ ወረዳ', 'አፍደራ', 'ዳልል', 'ኤሪብቲ', 'በራህሌ', 'ኮነባ', 'መጋሌ']
+        },
+        'ገቢ ረሱ ዞን': {
+            towns: ['አዋሽ ሰባት ኪሎ'],
+            woredas: ['አዋሽ ፈንታሌ', 'አሚባራ', 'ቡሬ ሙዳይቱ', 'ደዋ', 'ገዋኔ', 'አርጎባ ልዩ ወረዳ']
+        },
+        'ፋንቲ ረሱ ዞን': {
+            towns: ['ኡዋ'],
+            woredas: ['ጭፍራ', 'ዩዋ', 'ጉሊና', 'አውራ', 'ኤዋ', 'ያሎ']
+        },
+        'ሃሪ ረሱ ዞን': {
+            towns: ['ጨለንቆ'],
+            woredas: ['ተለላክ', 'ደወ', 'ሀድሌ', 'ሲሙሮቢ ገላልቻ', 'አርጡማ']
+        }
+    },
+    
+    // Somali Region
+    'ሶማሌ': {
+        'ፋፈን ዞን': {
+            towns: ['ጅጅጋ'],
+            woredas: ['ጅጅጋ ወረዳ', 'ባቢሌ', 'አዋሬ', 'ደገሀቡር', 'ጉርሱም', 'ከብሪበያህ', 'ሀረሺን', 'ሙላ', 'ቦምባስ']
+        },
+        'ሲቲ ዞን': {
+            towns: ['ሺንሌ'],
+            woredas: ['ሺንሌ ወረዳ', 'አይሻ', 'ደምበል', 'ኤረር', 'አስማኢል', 'ሀዳጋላ']
+        },
+        'ሊበን ዞን': {
+            towns: ['ነገሌ'],
+            woredas: ['ፊልቱ', 'ዶሎ ኦዶ', 'ደካሱፍቱ', 'ቦኮልማዮ', 'ጉራዳሞሌ']
+        },
+        'ዳዋ ዞን': {
+            towns: ['ለገሂዳ'],
+            woredas: ['ሁደት', 'ሞያሌ', 'ሙባረክ', 'ቀድአዱማ']
+        },
+        'ቆራሄ ዞን': {
+            towns: ['ቀብሪደሃር'],
+            woredas: ['ቀብሪደሃር ወረዳ', 'ዶቦወይን', 'ሺላቦ', 'ሸይቆሽ ማርስን']
+        },
+        'ሻበሌ ዞን': {
+            towns: ['ጎዴ'],
+            woredas: ['ጎዴ ወረዳ', 'አዳድሌ', 'በርአኖ', 'ደንናን', 'እምባሬ', 'ካላፎ', 'ሙስታሂል']
+        },
+        'ጃረር ዞን': {
+            towns: ['ደገሀቡር'],
+            woredas: ['ደገሀቡር ወረዳ', 'ደገሀመዶ', 'አሮሬሳ', 'ቢርቆድ', 'ጉናጋዶ', 'ቀብሪበያህ']
+        },
+        'ዶሎ ዞን': {
+            towns: ['ዋርዴር'],
+            woredas: ['ዋርዴር ወረዳ', 'ቦህ', 'ጋላዲ', 'ጋሳሞ', 'ዳራትእሌ']
+        },
+        'አፍዴር ዞን': {
+            towns: ['ኤልካሬ'],
+            woredas: ['ኤልካሬ ወረዳ', 'አፍዴር ወረዳ', 'ሌገሂዳ', 'ቆሀሌ', 'ጉራዳሞሌ', 'ጫርቲ', 'ሀርገሌ']
+        },
+        'ኖጎብ ዞን': {
+            towns: ['ፊቅ'],
+            woredas: ['ፊቅ ወረዳ', 'ለገሂዳ', 'ሀሙሮ', 'መዩሙሉቄ', 'ሰገግ', 'የኸብ']
+        },
+        'ኤረር ዞን': {
+            towns: ['ደሀመዶ'],
+            woredas: ['ፊቅ', 'ላገሂዳ', 'ሁን ሰንየ', 'ሳላሀድ', 'ኩቢ']
+        }
+    },
+    
+    // Harari Region
+    'ሀረሪ': {
+        'ሐረር ከተማ': { type: 'city' },
+        'አሚር ኑር ወረዳ': { type: 'woreda' },
+        'አቦከር ወረዳ': { type: 'woreda' },
+        'ባህር ኡስማን ወረዳ': { type: 'woreda' },
+        'ሸንኮር ወረዳ': { type: 'woreda' },
+        'ጂንኤላ ወረዳ': { type: 'woreda' },
+        'ሐኪም ወረዳ': { type: 'woreda' },
+        'ሶፊ ወረዳ': { type: 'woreda' },
+        'ኤረር ወረዳ': { type: 'woreda' },
+        'ድሬ ጢያራ ወረዳ': { type: 'woreda' }
+    },
+    
+    // Dire Dawa
+    'ድሬደዋ': {
+        'ድሬደዋ ከተማ': {
+            subCities: ['ደቺቱ', 'አዲስ ከተማ', 'አራዳ', 'መጋላ', 'ገንደ ተስፋ', 'ቀበሌ 01', 'ልደታ', 'መልካ ጀብዱ', 'ሺንሌ'],
+            type: 'subCity'
+        },
+        'ቢዮ አዋሌ ወረዳ': { type: 'woreda' },
+        'ጀልዴሳ ወረዳ': { type: 'woreda' },
+        'ዋህኢል ወረዳ': { type: 'woreda' },
+        'ቶኒ ወረዳ': { type: 'woreda' }
     }
-  },
-  'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች': {
-    'የካፋ ዞን': { districts: ['ባሮ', 'ቢታ', 'ባጃ', 'ቤታ', 'ገዋ'], cities: {} },
-    'የቤንች ሸኮ ዞን': { districts: ['ቤንች', 'ሸኮ'], cities: {} },
-    'የሸካ ዞን': { districts: ['ማሻ', 'አንድራቻ'], cities: {} },
-    'የምዕራብ ኦሞ ዞን': { districts: ['ጋቻ', 'ሱሪ'], cities: {} },
-    'የዳውሮ ዞን': { districts: ['ኢሳራ', 'ሎማ'], cities: {} },
-    'የኮንታ ዞን': { districts: ['ኮንታ ልዩ', 'አምባ'], cities: {} },
-    'ሌላ ዞን': { districts: ['ሌላ'], cities: {} }
-  },
-  'አዲስ አበባ': {
-    'ቅርንጫፍ': {
-      districts: ['ቃሊቲ', 'ኮልፌ ቀራኒዮ', 'ነፋስ ስልክ-ላፍቶ', 'አዲስ ከተማ', 'አራዳ', 'ሊደታ', 'ንጋ ወረዳ', 'ጉለሌ', 'ቦሌ', 'የካ'],
-      cities: {}
-    }
-  }
 };
 
-const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
+// ==================== ADDRESS FIELD FUNCTIONS ====================
+
+function loadRegions() {
+    const regionSelect = document.getElementById('region');
+    if (!regionSelect) return;
+    
+    regionSelect.innerHTML = '<option value="">ክልል ይምረጡ</option>';
+    
+    const regions = Object.keys(ethiopiaLocationData);
+    regions.sort();
+    
+    regions.forEach(region => {
+        const option = document.createElement('option');
+        option.value = region;
+        option.textContent = region;
+        regionSelect.appendChild(option);
+    });
+    
+    // Also add the special region names
+    const specialRegions = ['አዲስ አበባ', 'ድሬደዋ', 'ሀረሪ', 'ጋምቤላ', 'ሲዳማ', 'ደቡብ ምዕራብ ኢትዮጵያ ህዝቦች'];
+    specialRegions.forEach(region => {
+        if (!regionSelect.querySelector(`option[value="${region}"]`)) {
+            const option = document.createElement('option');
+            option.value = region;
+            option.textContent = region;
+            regionSelect.appendChild(option);
+        }
+    });
+}
 
 function loadZones() {
-  const region = document.getElementById('region').value;
-  const zoneSelect = document.getElementById('zone');
-  zoneSelect.innerHTML = '<option value="">ዞን ይምረጡ</option>';
-  document.getElementById('district').innerHTML = '<option value="">በመጀመሪያ ዞን ይምረጡ</option>';
-  document.getElementById('city').innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
-  if (region && locationData[region]) {
-    const zones = Object.keys(locationData[region]);
+    const region = document.getElementById('region').value;
+    const zoneSelect = document.getElementById('zone');
+    const districtSelect = document.getElementById('district');
+    const citySelect = document.getElementById('city');
+    
+    zoneSelect.innerHTML = '<option value="">ዞን ይምረጡ</option>';
+    districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
+    citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    
+    if (!region) return;
+    
+    const regionData = ethiopiaLocationData[region];
+    if (!regionData) return;
+    
+    // Handle special cases (Addis Ababa, Dire Dawa, Harari)
+    if (regionData.type === 'subCity' || region === 'አዲስ አበባ' || region === 'ድሬደዋ') {
+        const subCitySelect = zoneSelect;
+        subCitySelect.innerHTML = '<option value="">ክፍለ ከተማ ይምረጡ</option>';
+        
+        let subCities = [];
+        if (region === 'አዲስ አበባ' && ethiopiaLocationData['አዲስ አበባ'].subCities) {
+            subCities = ethiopiaLocationData['አዲስ አበባ'].subCities;
+        } else if (regionData.subCities) {
+            subCities = regionData.subCities;
+        }
+        
+        subCities.forEach(subCity => {
+            const option = document.createElement('option');
+            option.value = subCity;
+            option.textContent = subCity;
+            subCitySelect.appendChild(option);
+        });
+        return;
+    }
+    
+    // Get zones for the selected region
+    const zones = Object.keys(regionData);
+    zones.sort();
+    
     zones.forEach(zone => {
-      const option = document.createElement('option');
-      option.value = zone;
-      option.textContent = zone;
-      zoneSelect.appendChild(option);
+        const option = document.createElement('option');
+        option.value = zone;
+        option.textContent = zone;
+        zoneSelect.appendChild(option);
     });
-  }
-  if (region === 'ሌላ') {
-    zoneSelect.innerHTML = '<option value="ሌላ">ሌላ</option>';
-  }
 }
 
 function loadDistricts() {
-  const region = document.getElementById('region').value;
-  const zone = document.getElementById('zone').value;
-  const districtSelect = document.getElementById('district');
-  districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
-  document.getElementById('city').innerHTML = '<option value="">በመጀመሪያ ወረዳ ይምረጡ</option>';
-  document.getElementById('kebele').value = '';
-  if (region === 'ሌላ' || zone === 'ሌላ') {
-    districtSelect.innerHTML = '<option value="ሌላ">ሌላ</option>';
-    return;
-  }
-  if (region && zone && locationData[region] && locationData[region][zone]) {
-    const districts = locationData[region][zone].districts;
-    districts.forEach(district => {
-      const option = document.createElement('option');
-      option.value = district;
-      option.textContent = district;
-      districtSelect.appendChild(option);
-    });
-  }
-  if (zone === 'ማጃንግ ዞን') {
-    const metiOption = document.createElement('option');
-    metiOption.value = 'ሜጢ ከተማ አስተዳደር';
-    metiOption.textContent = 'ሜጢ ከተማ አስተዳደር';
-    districtSelect.appendChild(metiOption);
-  }
+    const region = document.getElementById('region').value;
+    const zone = document.getElementById('zone').value;
+    const districtSelect = document.getElementById('district');
+    const citySelect = document.getElementById('city');
+    
+    districtSelect.innerHTML = '<option value="">ወረዳ ይምረጡ</option>';
+    citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+    
+    if (!region || !zone) return;
+    
+    const regionData = ethiopiaLocationData[region];
+    if (!regionData || regionData.type === 'subCity') {
+        loadTownsFromZone(region, zone);
+        return;
+    }
+    
+    const zoneData = regionData[zone];
+    if (!zoneData) return;
+    
+    // Add towns/cities if they exist
+    if (zoneData.towns && zoneData.towns.length > 0) {
+        const townSelect = document.getElementById('city');
+        townSelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+        zoneData.towns.forEach(town => {
+            const option = document.createElement('option');
+            option.value = town;
+            option.textContent = town;
+            townSelect.appendChild(option);
+        });
+    }
+    
+    // Add woredas
+    if (zoneData.woredas && zoneData.woredas.length > 0) {
+        zoneData.woredas.forEach(woreda => {
+            const option = document.createElement('option');
+            option.value = woreda;
+            option.textContent = woreda;
+            districtSelect.appendChild(option);
+        });
+    } else if (zoneData.type === 'zone') {
+        districtSelect.innerHTML = '<option value="">ወረዳ የለም</option>';
+    }
+}
+
+function loadTownsFromZone(region, zone) {
+    // For Gambella - handle special case with Meti town kebeles
+    if (region === 'ጋምቤላ' && zone === 'ማጃንግ ዞን') {
+        const townSelect = document.getElementById('city');
+        townSelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+        const metiOption = document.createElement('option');
+        metiOption.value = 'ሜጢ';
+        metiOption.textContent = 'ሜጢ';
+        townSelect.appendChild(metiOption);
+        
+        // Add Meti kebeles
+        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
+        const kebeleSelect = document.getElementById('kebele');
+        if (kebeleSelect && kebeleSelect.tagName === 'SELECT') {
+            kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
+            metiKebeles.forEach(kebele => {
+                const option = document.createElement('option');
+                option.value = kebele;
+                option.textContent = kebele;
+                kebeleSelect.appendChild(option);
+            });
+        }
+    }
 }
 
 function loadCities() {
-  const region = document.getElementById('region').value;
-  const zone = document.getElementById('zone').value;
-  const district = document.getElementById('district').value;
-  const citySelect = document.getElementById('city');
-  citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
-  document.getElementById('kebele').value = '';
-  if (district === 'ሜጢ ከተማ አስተዳደር') {
-    citySelect.innerHTML = '<option value="ሜጢ">ሜጢ</option>';
-    loadKebelesForMeti();
-    return;
-  }
-  if (region && zone && district && locationData[region] && locationData[region][zone] && locationData[region][zone].cities[district]) {
-    const cities = locationData[region][zone].cities[district];
-    cities.forEach(city => {
-      const option = document.createElement('option');
-      option.value = city;
-      option.textContent = city;
-      citySelect.appendChild(option);
-    });
-  }
+    const region = document.getElementById('region').value;
+    const zone = document.getElementById('zone').value;
+    const district = document.getElementById('district').value;
+    const citySelect = document.getElementById('city');
+    
+    if (!region || !zone) return;
+    
+    const regionData = ethiopiaLocationData[region];
+    if (!regionData) return;
+    
+    // For sub-city type
+    if (regionData.type === 'subCity') {
+        return;
+    }
+    
+    const zoneData = regionData[zone];
+    if (!zoneData) return;
+    
+    // If towns already loaded, don't reload
+    if (citySelect && citySelect.options.length > 1) return;
+    
+    if (zoneData.towns && zoneData.towns.length > 0) {
+        citySelect.innerHTML = '<option value="">ከተማ ይምረጡ</option>';
+        zoneData.towns.forEach(town => {
+            const option = document.createElement('option');
+            option.value = town;
+            option.textContent = town;
+            citySelect.appendChild(option);
+        });
+    }
+    
+    // Special case for Meti town kebeles
+    if (region === 'ጋምቤላ' && zone === 'ማጃንግ ዞን' && district === 'ሜጢ') {
+        const metiKebeles = ['01 ቀበሌ', '02 ቀበሌ', 'አካሽ ቀበሌ', 'ሰሙይ ቀበሌ', 'ቶሊና ቶካሊ ቀበሌ', 'መካከለኛ ሜጢ ቀበሌ', 'ገንገቦዝ ቀበሌ'];
+        const kebeleSelect = document.getElementById('kebele');
+        if (kebeleSelect && kebeleSelect.tagName === 'SELECT') {
+            kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
+            metiKebeles.forEach(kebele => {
+                const option = document.createElement('option');
+                option.value = kebele;
+                option.textContent = kebele;
+                kebeleSelect.appendChild(option);
+            });
+        }
+    }
 }
 
-function loadKebelesForMeti() {
-  const kebeleSelect = document.getElementById('kebele');
-  if (kebeleSelect.tagName === 'SELECT') {
-    kebeleSelect.innerHTML = '<option value="">ቀበሌ ይምረጡ</option>';
-    metiKebeles.forEach(kebele => {
-      const option = document.createElement('option');
-      option.value = kebele;
-      option.textContent = kebele;
-      kebeleSelect.appendChild(option);
-    });
-  } else {
-    document.getElementById('kebele').value = '';
-  }
+// Initialize address fields when page loads
+function initializeAddressFields() {
+    loadRegions();
+    
+    // Add event listeners
+    const regionSelect = document.getElementById('region');
+    const zoneSelect = document.getElementById('zone');
+    const districtSelect = document.getElementById('district');
+    
+    if (regionSelect) regionSelect.addEventListener('change', loadZones);
+    if (zoneSelect) zoneSelect.addEventListener('change', loadDistricts);
+    if (districtSelect) districtSelect.addEventListener('change', loadCities);
 }
+
+// Call this when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAddressFields();
+});
 
 function calculateShareTotal() {
   const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
