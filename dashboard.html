@@ -300,12 +300,21 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
     <div id="membersList" class="members-list"></div>
   </div>
 
-  <!-- Member Modal -->
-  <div id="memberModal" class="modal-bottom">
-    <div class="modal-header"><h3>👤 የአባል መረጃ</h3><span class="close-modal" onclick="closeMemberModal()">&times;</span></div>
-    <div id="modalBody" class="modal-body"><div style="text-align:center;padding:20px">Loading...</div></div>
-    <div class="modal-footer"><button id="editModeBtn" class="btn-edit" onclick="enableEditMode()">✏️ አርትዕ</button><button id="saveEditBtn" class="btn-save" style="display:none" onclick="saveMemberEdit()">💾 አስቀምጥ</button><button id="cancelEditBtn" class="btn-cancel" style="display:none" onclick="cancelEditMode()">❌ ሰርዝ</button></div>
-  </div>
+ <!-- Member Modal -->
+<div id="memberModal" class="modal-bottom">
+    <div class="modal-header">
+        <h3>👤 የአባል መረጃ</h3>
+        <span class="close-modal" onclick="closeMemberModal()">&times;</span>
+    </div>
+    <div id="modalBody" class="modal-body">
+        <div style="text-align:center;padding:20px">Loading...</div>
+    </div>
+    <div class="modal-footer">
+        <button id="editModeBtn" class="btn-edit" onclick="enableEditMode()">✏️ አርትዕ</button>
+        <button id="saveEditBtn" class="btn-save" style="display:none" onclick="saveMemberEdit()">💾 አስቀምጥ</button>
+        <button id="cancelEditBtn" class="btn-cancel" style="display:none" onclick="cancelEditMode()">❌ ሰርዝ</button>
+    </div>
+</div>
 
   <!-- Sales Tab -->
   <div id="sales" class="tab-content">
@@ -809,7 +818,7 @@ async function loadMembers() {
           <div class="member-name">
             <span class="serial-number">#${index + 1}</span>
             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
-            <strong style="cursor:pointer; color:#2d6a1a; font-size:1.1em;" onclick="showMemberDetails('${m._id || m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
+           `<strong style="cursor:pointer; color:#2d6a1a;" onclick="showMemberDetails('${member._id}')">${escapeHtml(member.fullName)}</strong>`
             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
             <span class="payment-status ${getPaymentStatusClass(m.paymentStatus)}">${m.paymentStatus || 'አልተከፈለም'}</span>
           </div>
