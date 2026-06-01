@@ -347,7 +347,7 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
     res.json({ success: true });
 });
 
-// ==================== MEMBER REGISTRATION ROUTE ====================
+// ==================== MEMBER REGISTRATION ROUTE (FIXED) ====================
 
 app.post('/api/members/register', async (req, res) => {
     console.log("=".repeat(60));
@@ -357,7 +357,7 @@ app.post('/api/members/register', async (req, res) => {
     console.log("Phone:", req.body.phone);
     
     try {
-        // Remove any id fields (MongoDB will add _id automatically)
+        // Remove any id fields
         const { id, _id, ...cleanData } = req.body;
         
         // Validate required fields
@@ -467,12 +467,33 @@ app.post('/api/members/register', async (req, res) => {
         await newMember.save();
         console.log(`✅ Member saved! ID: ${newMember._id}`);
         
-        // Create user account
-        const username = await generateUniqueUsername(newMember.fullName, newMember.phone);
-        const plainPassword = generateRandomPassword();
-        const timestamp = Date.now();
-        const email = `${newMember.phone}_${timestamp}@member.gambella.com`;
+        // ========== CREATE UNIQUE USERNAME ==========
+        // Generate username from name (remove spaces, take first 6 chars + phone suffix)
+        let baseUsername = newMember.fullName
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')  // Remove non-alphanumeric
+            .substring(0, 6);
+        if (baseUsername.length < 3) baseUsername = 'member';
         
+        const phoneSuffix = newMember.phone.slice(-4);
+        let username = `${baseUsername}${phoneSuffix}`;
+        
+        // Ensure username is unique
+        let counter = 1;
+        let existingUser = await User.findOne({ username: username });
+        while (existingUser) {
+            username = `${baseUsername}${phoneSuffix}${counter}`;
+            existingUser = await User.findOne({ username: username });
+            counter++;
+        }
+        
+        // FIXED: Set password to "1234" for all members
+        const plainPassword = "1234";
+        
+        // Create unique email
+        const email = `${newMember.phone}@member.gambella.com`;
+        
+        // Create user account
         const newUser = new User({
             username: username,
             email: email,
@@ -484,8 +505,11 @@ app.post('/api/members/register', async (req, res) => {
         });
         
         await newUser.save();
-        console.log(`✅ User account created! Username: ${username}`);
+        console.log(`✅ User account created!`);
+        console.log(`   Username: ${username}`);
+        console.log(`   Password: ${plainPassword}`);
         
+        // Send response with credentials
         res.status(201).json({
             success: true,
             message: 'Member registered successfully!',
