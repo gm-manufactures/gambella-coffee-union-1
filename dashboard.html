@@ -2713,74 +2713,82 @@ async function deleteMember(id) {
   }
 }
 
+// ==================== COMPLETE FIXED SUBMISSION HANDLER ====================
+
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    e.preventDefault();
     
-  const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-  const remainingShares = updateShareStatistics();
-  if (shareCount > remainingShares) {
-    alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-    return;
-  }
-  const beneficiaries = await collectBeneficiariesData();
-  const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-  const totalPayable = shareCount * SHARE_PRICE;
-  const remainingBalance = totalPayable - sharePricePaid;
-  let bankName = document.getElementById('bankName').value;
-  if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
-  const member = {
-    fullName: document.getElementById('fullName').value,
-    gender: document.getElementById('gender').value,
-    age: parseInt(document.getElementById('age').value) || 0,
-    motherName: document.getElementById('motherName').value,
-    nationality: document.getElementById('nationality').value,
-    education: document.getElementById('education').value,
-    region: document.getElementById('region').value,
-    zone: document.getElementById('zone').value,
-    district: document.getElementById('district').value,
-    city: document.getElementById('city').value,
-    kebele: document.getElementById('kebele').value,
-    houseNumber: document.getElementById('houseNumber').value,
-    phone: document.getElementById('phone').value,
-    taxId: document.getElementById('taxId').value,
-    role: document.getElementById('role').value,
-    shareCount: shareCount,
-    sharePercentage: (shareCount / TOTAL_SHARES_LIMIT) * 100,  // Add this line
-    sharePrice: SHARE_PRICE,
-    totalPayable: totalPayable,
-    sharePricePaid: sharePricePaid,
-    remainingBalance: remainingBalance,
-    paymentStatus: document.getElementById('paymentStatus').value,
-    year1Payment: totalPayable * 0.3,
-    year2Payment: totalPayable * 0.4,
-    year3Payment: totalPayable * 0.3,
-    bankName: bankName,
-    bankBranch: document.getElementById('bankBranch').value,
-    accountNumber: document.getElementById('accountNumber').value,
-    accountName: document.getElementById('accountName').value,
-    financialNotes: document.getElementById('financialNotes').value,
-    beneficiaries: beneficiaries,
-    beneficiaryCount: beneficiaries.length,
-    legalRepName: document.getElementById('legalRepName').value,
-    legalRepAddress: document.getElementById('legalRepAddress').value,
-    legalRepPhone: document.getElementById('legalRepPhone').value,
-    powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
-    powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
-    powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
-    powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
-    powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
-    powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
-    memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
-    memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
-    repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
-    repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
-    hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
-    powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
-    hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
-  };
-  
-    // Success handling...
-   try {
+    console.log("📝 Starting registration...");
+    
+    const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+    const remainingShares = updateShareStatistics();
+    
+    if (shareCount > remainingShares) {
+        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
+        return;
+    }
+    
+    const beneficiaries = await collectBeneficiariesData();
+    const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+    const totalPayable = shareCount * SHARE_PRICE;
+    const remainingBalance = totalPayable - sharePricePaid;
+    
+    let bankName = document.getElementById('bankName').value;
+    if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
+    
+    const member = {
+        fullName: document.getElementById('fullName').value,
+        gender: document.getElementById('gender').value,
+        age: parseInt(document.getElementById('age').value) || 0,
+        motherName: document.getElementById('motherName').value,
+        nationality: document.getElementById('nationality').value,
+        education: document.getElementById('education').value,
+        region: document.getElementById('region').value,
+        zone: document.getElementById('zone').value,
+        district: document.getElementById('district').value,
+        city: document.getElementById('city').value,
+        kebele: document.getElementById('kebele').value,
+        houseNumber: document.getElementById('houseNumber').value,
+        phone: document.getElementById('phone').value,
+        taxId: document.getElementById('taxId').value,
+        role: document.getElementById('role').value,
+        shareCount: shareCount,
+        sharePercentage: (shareCount / TOTAL_SHARES_LIMIT) * 100,
+        sharePrice: SHARE_PRICE,
+        totalPayable: totalPayable,
+        sharePricePaid: sharePricePaid,
+        remainingBalance: remainingBalance,
+        paymentStatus: document.getElementById('paymentStatus').value,
+        year1Payment: totalPayable * 0.3,
+        year2Payment: totalPayable * 0.4,
+        year3Payment: totalPayable * 0.3,
+        bankName: bankName,
+        bankBranch: document.getElementById('bankBranch').value,
+        accountNumber: document.getElementById('accountNumber').value,
+        accountName: document.getElementById('accountName').value,
+        financialNotes: document.getElementById('financialNotes').value,
+        beneficiaries: beneficiaries,
+        beneficiaryCount: beneficiaries.length,
+        legalRepName: document.getElementById('legalRepName').value,
+        legalRepAddress: document.getElementById('legalRepAddress').value,
+        legalRepPhone: document.getElementById('legalRepPhone').value,
+        powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
+        powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
+        powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
+        powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
+        powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
+        powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
+        memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
+        memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
+        repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
+        repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
+        hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
+        powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
+        hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
+    };
+    
+    try {
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/members/register', {
             method: 'POST',
             headers: {
@@ -2801,15 +2809,19 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             
             if (result.credentials) {
                 successMessage += `🔐 የመግቢያ መረጃ:\n`;
+                successMessage += `━━━━━━━━━━━━━━━━━━━━\n`;
                 successMessage += `👤 የተጠቃሚ ስም: ${result.credentials.username}\n`;
-                successMessage += `🔑 የይለፍ ቃል: ${result.credentials.password}\n\n`;
+                successMessage += `🔑 የይለፍ ቃል: ${result.credentials.password}\n`;
+                successMessage += `━━━━━━━━━━━━━━━━━━━━\n\n`;
                 successMessage += `⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!`;
             }
             
             alert(successMessage);
             
-            // Also show in a popup div on the page (optional)
-            showCredentialPopup(result.credentials);
+            // Show popup with credentials
+            if (result.credentials) {
+                showCredentialPopup(result.credentials);
+            }
             
             // Reset form and refresh list
             document.getElementById('memberForm').reset();
@@ -2818,12 +2830,19 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             document.getElementById('sharePricePaid').value = '0';
             document.getElementById('beneficiaryCount').value = '0';
             document.getElementById('beneficiariesContainer').innerHTML = '';
+            document.getElementById('otherBankDiv').style.display = 'none';
+            document.getElementById('powerOfAttorneyDetails').style.display = 'none';
             
             await loadMembers();
             showTab('list');
             
         } else {
-            alert('❌ ምዝገባ አልተሳካም: ' + (result.message || 'Unknown error'));
+            let errorMsg = `❌ ምዝገባ አልተሳካም!\n\n`;
+            errorMsg += `ምክንያት: ${result.message || 'Unknown error'}\n`;
+            if (result.field === 'phone') {
+                errorMsg += `\n💡 እባክዎ ሌላ ስልክ ቁጥር ይጠቀሙ።`;
+            }
+            alert(errorMsg);
         }
         
     } catch (error) {
@@ -2832,7 +2851,8 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     }
 });
 
-// Optional: Show credentials in a nice popup
+// ==================== CREDENTIAL POPUP FUNCTION ====================
+
 function showCredentialPopup(credentials) {
     if (!credentials) return;
     
@@ -2849,40 +2869,54 @@ function showCredentialPopup(credentials) {
         left: 50%;
         transform: translate(-50%, -50%);
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        padding: 0;
         z-index: 10001;
-        min-width: 350px;
+        width: 380px;
+        max-width: 90%;
         text-align: center;
-        border-top: 5px solid #2d6a1a;
-        animation: fadeInUp 0.3s ease;
+        animation: slideUp 0.3s ease;
+        border-top: 8px solid #2d6a1a;
+        overflow: hidden;
     `;
     
     popup.innerHTML = `
-        <h3 style="color: #2d6a1a; margin-bottom: 15px;">✅ አባል ተመዝግቧል!</h3>
-        <div style="background: #f0f7f0; padding: 15px; border-radius: 10px; margin: 15px 0;">
-            <div style="margin-bottom: 10px;">
-                <strong>👤 የተጠቃሚ ስም:</strong><br>
-                <span style="font-size: 18px; font-weight: bold; color: #2d6a1a;">${credentials.username}</span>
-            </div>
-            <div>
-                <strong>🔑 የይለፍ ቃል:</strong><br>
-                <span style="font-size: 18px; font-weight: bold; color: #2d6a1a;">${credentials.password}</span>
-            </div>
+        <div style="background: #2d6a1a; color: white; padding: 15px; font-size: 18px; font-weight: bold;">
+            ✅ አባል ተመዝግቧል!
         </div>
-        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
-            ⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!
-        </p>
-        <button onclick="this.parentElement.remove()" class="btn-primary" style="padding: 8px 20px;">ዘጋ</button>
+        <div style="padding: 20px;">
+            <div style="background: #f0f7f0; padding: 20px; border-radius: 12px; margin: 10px 0;">
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">👤 የተጠቃሚ ስም</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #2d6a1a; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; word-break: break-all;">
+                        ${credentials.username}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">🔑 የይለፍ ቃል</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #2d6a1a; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                        ${credentials.password}
+                    </div>
+                </div>
+            </div>
+            <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin: 15px 0; font-size: 12px; color: #856404;">
+                ⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!
+            </div>
+            <button onclick="this.closest('#credentialPopup').remove()" 
+                style="background: #2d6a1a; color: white; border: none; padding: 10px 30px; border-radius: 25px; cursor: pointer; font-size: 14px; margin-top: 5px;">
+                ዘጋ
+            </button>
+        </div>
     `;
     
     document.body.appendChild(popup);
     
-    // Auto close after 10 seconds
+    // Auto close after 15 seconds
     setTimeout(() => {
-        if (popup) popup.remove();
-    }, 10000);
+        const popupEl = document.getElementById('credentialPopup');
+        if (popupEl) popupEl.remove();
+    }, 15000);
 }
 // ==================== MODAL FUNCTIONS - COMPLETELY FIXED ====================
 
