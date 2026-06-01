@@ -2715,79 +2715,115 @@ async function deleteMember(id) {
 
 // ==================== COMPLETE FIXED SUBMISSION HANDLER ====================
 
+// ==================== FIXED FORM SUBMISSION HANDLER ====================
+
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    console.log("📝 Starting registration...");
+    console.log("📝 Submitting registration form...");
     
-    const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
-    const remainingShares = updateShareStatistics();
-    
-    if (shareCount > remainingShares) {
-        alert(`⚠️ በቂ አክሲዬን የለም! የቀረው አክሲዬን: ${remainingShares}\n\nInsufficient shares! Remaining shares: ${remainingShares}`);
-        return;
-    }
-    
-    const beneficiaries = await collectBeneficiariesData();
-    const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
-    const totalPayable = shareCount * SHARE_PRICE;
-    const remainingBalance = totalPayable - sharePricePaid;
-    
-    let bankName = document.getElementById('bankName').value;
-    if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
-    
-    const member = {
-        fullName: document.getElementById('fullName').value,
-        gender: document.getElementById('gender').value,
-        age: parseInt(document.getElementById('age').value) || 0,
-        motherName: document.getElementById('motherName').value,
-        nationality: document.getElementById('nationality').value,
-        education: document.getElementById('education').value,
-        region: document.getElementById('region').value,
-        zone: document.getElementById('zone').value,
-        district: document.getElementById('district').value,
-        city: document.getElementById('city').value,
-        kebele: document.getElementById('kebele').value,
-        houseNumber: document.getElementById('houseNumber').value,
-        phone: document.getElementById('phone').value,
-        taxId: document.getElementById('taxId').value,
-        role: document.getElementById('role').value,
-        shareCount: shareCount,
-        sharePercentage: (shareCount / TOTAL_SHARES_LIMIT) * 100,
-        sharePrice: SHARE_PRICE,
-        totalPayable: totalPayable,
-        sharePricePaid: sharePricePaid,
-        remainingBalance: remainingBalance,
-        paymentStatus: document.getElementById('paymentStatus').value,
-        year1Payment: totalPayable * 0.3,
-        year2Payment: totalPayable * 0.4,
-        year3Payment: totalPayable * 0.3,
-        bankName: bankName,
-        bankBranch: document.getElementById('bankBranch').value,
-        accountNumber: document.getElementById('accountNumber').value,
-        accountName: document.getElementById('accountName').value,
-        financialNotes: document.getElementById('financialNotes').value,
-        beneficiaries: beneficiaries,
-        beneficiaryCount: beneficiaries.length,
-        legalRepName: document.getElementById('legalRepName').value,
-        legalRepAddress: document.getElementById('legalRepAddress').value,
-        legalRepPhone: document.getElementById('legalRepPhone').value,
-        powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
-        powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
-        powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
-        powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
-        powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
-        powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value,
-        memberPhoto: document.getElementById('memberPhoto').files[0] ? await fileToBase64(document.getElementById('memberPhoto').files[0]) : null,
-        memberTaxDoc: document.getElementById('memberTaxDoc').files[0] ? await fileToBase64(document.getElementById('memberTaxDoc').files[0]) : null,
-        repPhoto: document.getElementById('repPhoto').files[0] ? await fileToBase64(document.getElementById('repPhoto').files[0]) : null,
-        repTaxDoc: document.getElementById('repTaxDoc').files[0] ? await fileToBase64(document.getElementById('repTaxDoc').files[0]) : null,
-        hardCopyForm: document.getElementById('hardCopyForm').files[0] ? await fileToBase64(document.getElementById('hardCopyForm').files[0]) : null,
-        powerOfAttorneyPhoto: document.getElementById('powerOfAttorneyPhoto').files[0] ? await fileToBase64(document.getElementById('powerOfAttorneyPhoto').files[0]) : null,
-        hardCopyDocumentPhoto: document.getElementById('hardCopyDocumentPhoto').files[0] ? await fileToBase64(document.getElementById('hardCopyDocumentPhoto').files[0]) : null
-    };
+    // Disable submit button to prevent double submission
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '⏳ እባክዎ ይጠብቁ...';
+    submitBtn.disabled = true;
     
     try {
+        // Collect form data
+        const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+        const sharePricePaid = parseFloat(document.getElementById('sharePricePaid').value) || 0;
+        const totalPayable = shareCount * SHARE_PRICE;
+        const remainingBalance = totalPayable - sharePricePaid;
+        
+        let paymentStatus = document.getElementById('paymentStatus').value;
+        if (remainingBalance <= 0) paymentStatus = 'ተከፍሏል';
+        else if (sharePricePaid > 0) paymentStatus = 'በከፊል ተከፍሏል';
+        
+        let bankName = document.getElementById('bankName').value;
+        if (bankName === 'ሌላ') bankName = document.getElementById('otherBankName').value;
+        
+        const beneficiaries = await collectBeneficiariesData();
+        
+        const memberData = {
+            fullName: document.getElementById('fullName').value,
+            gender: document.getElementById('gender').value,
+            age: parseInt(document.getElementById('age').value) || 0,
+            motherName: document.getElementById('motherName').value,
+            nationality: document.getElementById('nationality').value || 'ኢትዮጵያዊ',
+            education: document.getElementById('education').value,
+            region: document.getElementById('region').value,
+            zone: document.getElementById('zone').value,
+            district: document.getElementById('district').value,
+            city: document.getElementById('city').value,
+            kebele: document.getElementById('kebele').value,
+            houseNumber: document.getElementById('houseNumber').value,
+            phone: document.getElementById('phone').value,
+            taxId: document.getElementById('taxId').value,
+            role: document.getElementById('role').value,
+            shareCount: shareCount,
+            sharePricePaid: sharePricePaid,
+            totalPayable: totalPayable,
+            remainingBalance: remainingBalance,
+            paymentStatus: paymentStatus,
+            bankName: bankName,
+            bankBranch: document.getElementById('bankBranch').value,
+            accountNumber: document.getElementById('accountNumber').value,
+            accountName: document.getElementById('accountName').value,
+            financialNotes: document.getElementById('financialNotes').value,
+            beneficiaries: beneficiaries,
+            legalRepName: document.getElementById('legalRepName').value,
+            legalRepAddress: document.getElementById('legalRepAddress').value,
+            legalRepPhone: document.getElementById('legalRepPhone').value,
+            powerOfAttorneyType: document.getElementById('powerOfAttorneyType').value,
+            powerOfAttorneyNumber: document.getElementById('powerOfAttorneyNumber').value,
+            powerOfAttorneyDate: document.getElementById('powerOfAttorneyDate').value,
+            powerOfAttorneyIssuer: document.getElementById('powerOfAttorneyIssuer').value,
+            powerOfAttorneyExpiry: document.getElementById('powerOfAttorneyExpiry').value,
+            powerOfAttorneyNotes: document.getElementById('powerOfAttorneyNotes').value
+        };
+        
+        // Handle photos
+        const memberPhotoFile = document.getElementById('memberPhoto').files[0];
+        if (memberPhotoFile) {
+            memberData.memberPhoto = await fileToBase64(memberPhotoFile);
+        }
+        
+        const memberTaxDocFile = document.getElementById('memberTaxDoc').files[0];
+        if (memberTaxDocFile) {
+            memberData.memberTaxDoc = await fileToBase64(memberTaxDocFile);
+        }
+        
+        const repPhotoFile = document.getElementById('repPhoto').files[0];
+        if (repPhotoFile) {
+            memberData.repPhoto = await fileToBase64(repPhotoFile);
+        }
+        
+        const repTaxDocFile = document.getElementById('repTaxDoc').files[0];
+        if (repTaxDocFile) {
+            memberData.repTaxDoc = await fileToBase64(repTaxDocFile);
+        }
+        
+        const hardCopyFormFile = document.getElementById('hardCopyForm').files[0];
+        if (hardCopyFormFile) {
+            memberData.hardCopyForm = await fileToBase64(hardCopyFormFile);
+        }
+        
+        const powerOfAttorneyPhotoFile = document.getElementById('powerOfAttorneyPhoto').files[0];
+        if (powerOfAttorneyPhotoFile) {
+            memberData.powerOfAttorneyPhoto = await fileToBase64(powerOfAttorneyPhotoFile);
+        }
+        
+        const hardCopyDocumentPhotoFile = document.getElementById('hardCopyDocumentPhoto').files[0];
+        if (hardCopyDocumentPhotoFile) {
+            memberData.hardCopyDocumentPhoto = await fileToBase64(hardCopyDocumentPhotoFile);
+        }
+        
+        console.log("📤 Sending member data:", {
+            fullName: memberData.fullName,
+            phone: memberData.phone,
+            shareCount: memberData.shareCount
+        });
+        
         const token = localStorage.getItem('token');
         const response = await fetch('/api/members/register', {
             method: 'POST',
@@ -2795,35 +2831,42 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(member)
+            body: JSON.stringify(memberData)
         });
         
         const result = await response.json();
-        console.log("Server response:", result);
+        console.log("📥 Server response:", result);
+        console.log("Response status:", response.status);
         
         if (response.ok) {
-            // Display credentials to the admin
-            let successMessage = '✅ አባል ተመዝግቧል!\n\n';
-            successMessage += `👤 ሙሉ ስም: ${member.fullName}\n`;
-            successMessage += `📞 ስልክ: ${member.phone}\n\n`;
+            // Build success message with credentials
+            let successMsg = `✅ አባል በሚገባ ተመዝግቧል!\n\n`;
+            successMsg += `👤 ሙሉ ስም: ${memberData.fullName}\n`;
+            successMsg += `📞 ስልክ: ${memberData.phone}\n\n`;
             
+            // Check if credentials are in the response
             if (result.credentials) {
-                successMessage += `🔐 የመግቢያ መረጃ:\n`;
-                successMessage += `━━━━━━━━━━━━━━━━━━━━\n`;
-                successMessage += `👤 የተጠቃሚ ስም: ${result.credentials.username}\n`;
-                successMessage += `🔑 የይለፍ ቃል: ${result.credentials.password}\n`;
-                successMessage += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-                successMessage += `⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!`;
+                successMsg += `🔐 የመግቢያ መረጃ:\n`;
+                successMsg += `━━━━━━━━━━━━━━━━━━━━\n`;
+                successMsg += `👤 የተጠቃሚ ስም: ${result.credentials.username}\n`;
+                successMsg += `🔑 የይለፍ ቃል: ${result.credentials.password}\n`;
+                successMsg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                successMsg += `⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!`;
+                
+                // Also show in a popup for better visibility
+                showCredentialPopup(result.credentials, memberData.fullName);
+            } else if (result.member && result.member.credentials) {
+                successMsg += `🔐 የመግቢያ መረጃ:\n`;
+                successMsg += `👤 የተጠቃሚ ስም: ${result.member.credentials.username}\n`;
+                successMsg += `🔑 የይለፍ ቃል: ${result.member.credentials.password}\n`;
+                showCredentialPopup(result.member.credentials, memberData.fullName);
+            } else {
+                successMsg += `⚠️ የተጠቃሚ መለያ ተፈጥሯል ነገር ግን መረጃው አልተገኘም።`;
             }
             
-            alert(successMessage);
+            alert(successMsg);
             
-            // Show popup with credentials
-            if (result.credentials) {
-                showCredentialPopup(result.credentials);
-            }
-            
-            // Reset form and refresh list
+            // Reset form
             document.getElementById('memberForm').reset();
             document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
             document.getElementById('shareCount').value = '0';
@@ -2833,10 +2876,12 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
             document.getElementById('otherBankDiv').style.display = 'none';
             document.getElementById('powerOfAttorneyDetails').style.display = 'none';
             
+            // Reload members and switch to list tab
             await loadMembers();
             showTab('list');
             
         } else {
+            // Show error message
             let errorMsg = `❌ ምዝገባ አልተሳካም!\n\n`;
             errorMsg += `ምክንያት: ${result.message || 'Unknown error'}\n`;
             if (result.field === 'phone') {
@@ -2846,10 +2891,86 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
         }
         
     } catch (error) {
-        console.error('Registration error:', error);
-        alert('❌ ስህተት: ' + error.message);
+        console.error('❌ Submission error:', error);
+        alert('❌ የአገልጋይ ስህተት: ' + error.message);
+        
+    } finally {
+        // Re-enable submit button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     }
 });
+
+// ==================== CREDENTIAL POPUP FUNCTION ====================
+
+function showCredentialPopup(credentials, fullName) {
+    if (!credentials) return;
+    
+    // Remove existing popup if any
+    const existingPopup = document.getElementById('credentialPopup');
+    if (existingPopup) existingPopup.remove();
+    
+    // Create popup HTML
+    const popup = document.createElement('div');
+    popup.id = 'credentialPopup';
+    popup.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        padding: 0;
+        z-index: 10001;
+        width: 400px;
+        max-width: 90%;
+        text-align: center;
+        animation: slideUp 0.3s ease;
+        border-top: 8px solid #2d6a1a;
+        overflow: hidden;
+    `;
+    
+    popup.innerHTML = `
+        <div style="background: #2d6a1a; color: white; padding: 15px; font-size: 18px; font-weight: bold;">
+            ✅ አባል ተመዝግቧል!
+        </div>
+        <div style="padding: 20px;">
+            <div style="margin-bottom: 15px; font-size: 14px; color: #555;">
+                ለአባሉ የተፈጠረው የመግቢያ መረጃ
+            </div>
+            <div style="background: #f0f7f0; padding: 20px; border-radius: 12px; margin: 10px 0;">
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">👤 የተጠቃሚ ስም</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #2d6a1a; background: white; padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                        ${credentials.username}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">🔑 የይለፍ ቃል</div>
+                    <div style="font-size: 20px; font-weight: bold; color: #2d6a1a; background: white; padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                        ${credentials.password}
+                    </div>
+                </div>
+            </div>
+            <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 12px; color: #856404;">
+                ⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!
+            </div>
+            <button onclick="this.closest('#credentialPopup').remove()" 
+                style="background: #2d6a1a; color: white; border: none; padding: 10px 30px; border-radius: 25px; cursor: pointer; font-size: 14px; margin-top: 10px;">
+                ዘጋ
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // Auto close after 15 seconds
+    setTimeout(() => {
+        const popupEl = document.getElementById('credentialPopup');
+        if (popupEl) popupEl.remove();
+    }, 15000);
+}
 
 // ==================== CREDENTIAL POPUP FUNCTION ====================
 
