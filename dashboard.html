@@ -1108,6 +1108,11 @@ body {
           <div class="form-group"><label>💰 አጠቃላይ የሚከፈል ብር (Total Amount)</label>
             <input type="text" id="totalPayable" readonly style="background:#e9ecef">
           </div>
+             <div class="form-group">
+        <label>📊 የአክሲዬን ድርሻ (%)</label>
+        <input type="text" id="sharePercentage" readonly style="background:#e9ecef; font-weight:bold; color:#2d6a1a;" class="form-control">
+        </div>
+     </div>
           <div class="form-group"><label>💵 የተከፈለ ብር (Amount Paid)</label>
             <input type="number" id="sharePricePaid" step="0.01" min="0" value="0" oninput="calculateRemainingBalance()">
           </div>
@@ -2070,6 +2075,23 @@ function calculateShareTotal() {
   const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
   const totalPayable = shareCount * SHARE_PRICE;
   document.getElementById('totalPayable').value = totalPayable.toLocaleString() + ' ብር';
+    // Calculate share percentage
+    const sharePercentage = (shareCount / TOTAL_SHARES_LIMIT) * 100;
+    const percentageDisplay = sharePercentage.toFixed(2);
+    document.getElementById('sharePercentage').value = `${percentageDisplay}% (ከ${TOTAL_SHARES_LIMIT.toLocaleString()})`;
+    
+    // Apply color based on percentage
+    const percentageField = document.getElementById('sharePercentage');
+    if (sharePercentage >= 10) {
+        percentageField.style.background = '#d4edda';
+        percentageField.style.color = '#155724';
+    } else if (sharePercentage >= 5) {
+        percentageField.style.background = '#fff3cd';
+        percentageField.style.color = '#856404';
+    } else {
+        percentageField.style.background = '#e9ecef';
+        percentageField.style.color = '#2d6a1a';
+    }
   const year1 = totalPayable * 0.3;
   const year2 = totalPayable * 0.4;
   const year3 = totalPayable * 0.3;
@@ -2089,7 +2111,12 @@ function calculateRemainingBalance() {
   else if (paid > 0) document.getElementById('paymentStatus').value = 'በከፊል ተከፍሏል';
   else document.getElementById('paymentStatus').value = 'አልተከፈለም';
 }
-
+// Update share percentage when share count changes via other methods
+function updateSharePercentage() {
+    const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
+    const sharePercentage = (shareCount / TOTAL_SHARES_LIMIT) * 100;
+    document.getElementById('sharePercentage').value = `${sharePercentage.toFixed(2)}% (ከ${TOTAL_SHARES_LIMIT.toLocaleString()})`;
+}
 function toggleOtherBank() {
   const bankSelect = document.getElementById('bankName');
   const otherDiv = document.getElementById('otherBankDiv');
@@ -2718,6 +2745,7 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     taxId: document.getElementById('taxId').value,
     role: document.getElementById('role').value,
     shareCount: shareCount,
+    sharePercentage: (shareCount / TOTAL_SHARES_LIMIT) * 100,  // Add this line
     sharePrice: SHARE_PRICE,
     totalPayable: totalPayable,
     sharePricePaid: sharePricePaid,
