@@ -2780,24 +2780,110 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
   };
   
     // Success handling...
-   const result = await apiCall('/members/register', { method: 'POST', body: JSON.stringify(member) });
-  if (result.credentials) alert(`✅ አባል ተመዝግቧል!\n\nUsername: ${result.credentials.username}\nPassword: ${result.credentials.password}`);
-  updateShareStatistics();
-  alert('✅ አባል ተመዝግቧል!');
-  e.target.reset();
-  document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
-  document.getElementById('shareCount').value = '0';
-  document.getElementById('sharePricePaid').value = '0';
-  document.getElementById('powerOfAttorneyDetails').style.display = 'none';
-  document.getElementById('beneficiariesContainer').innerHTML = '';
-  document.getElementById('beneficiaryCount').value = '0';
-  document.getElementById('otherBankDiv').style.display = 'none';
-  loadMembers();
-  showTab('list');
-    
-  
- 
+   try {
+        const response = await fetch('/api/members/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(member)
+        });
+        
+        const result = await response.json();
+        console.log("Server response:", result);
+        
+        if (response.ok) {
+            // Display credentials to the admin
+            let successMessage = '✅ አባል ተመዝግቧል!\n\n';
+            successMessage += `👤 ሙሉ ስም: ${member.fullName}\n`;
+            successMessage += `📞 ስልክ: ${member.phone}\n\n`;
+            
+            if (result.credentials) {
+                successMessage += `🔐 የመግቢያ መረጃ:\n`;
+                successMessage += `👤 የተጠቃሚ ስም: ${result.credentials.username}\n`;
+                successMessage += `🔑 የይለፍ ቃል: ${result.credentials.password}\n\n`;
+                successMessage += `⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!`;
+            }
+            
+            alert(successMessage);
+            
+            // Also show in a popup div on the page (optional)
+            showCredentialPopup(result.credentials);
+            
+            // Reset form and refresh list
+            document.getElementById('memberForm').reset();
+            document.querySelectorAll('.image-preview').forEach(el => el.innerHTML = '');
+            document.getElementById('shareCount').value = '0';
+            document.getElementById('sharePricePaid').value = '0';
+            document.getElementById('beneficiaryCount').value = '0';
+            document.getElementById('beneficiariesContainer').innerHTML = '';
+            
+            await loadMembers();
+            showTab('list');
+            
+        } else {
+            alert('❌ ምዝገባ አልተሳካም: ' + (result.message || 'Unknown error'));
+        }
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('❌ ስህተት: ' + error.message);
+    }
 });
+
+// Optional: Show credentials in a nice popup
+function showCredentialPopup(credentials) {
+    if (!credentials) return;
+    
+    // Remove existing popup if any
+    const existingPopup = document.getElementById('credentialPopup');
+    if (existingPopup) existingPopup.remove();
+    
+    // Create popup
+    const popup = document.createElement('div');
+    popup.id = 'credentialPopup';
+    popup.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        padding: 25px;
+        z-index: 10001;
+        min-width: 350px;
+        text-align: center;
+        border-top: 5px solid #2d6a1a;
+        animation: fadeInUp 0.3s ease;
+    `;
+    
+    popup.innerHTML = `
+        <h3 style="color: #2d6a1a; margin-bottom: 15px;">✅ አባል ተመዝግቧል!</h3>
+        <div style="background: #f0f7f0; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            <div style="margin-bottom: 10px;">
+                <strong>👤 የተጠቃሚ ስም:</strong><br>
+                <span style="font-size: 18px; font-weight: bold; color: #2d6a1a;">${credentials.username}</span>
+            </div>
+            <div>
+                <strong>🔑 የይለፍ ቃል:</strong><br>
+                <span style="font-size: 18px; font-weight: bold; color: #2d6a1a;">${credentials.password}</span>
+            </div>
+        </div>
+        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+            ⚠️ እባክዎ ይህን መረጃ ለአባሉ ያሳውቁ!
+        </p>
+        <button onclick="this.parentElement.remove()" class="btn-primary" style="padding: 8px 20px;">ዘጋ</button>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // Auto close after 10 seconds
+    setTimeout(() => {
+        if (popup) popup.remove();
+    }, 10000);
+}
 // ==================== MODAL FUNCTIONS - COMPLETELY FIXED ====================
 
 
