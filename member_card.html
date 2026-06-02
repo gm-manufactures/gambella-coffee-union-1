@@ -294,10 +294,11 @@ body {
 }
 .search-box input {
     padding: 10px;
-    width: 250px;
+    width: 300px;
     border: 1px solid #ccc;
     border-radius: 8px;
     margin-right: 10px;
+    font-size: 14px;
 }
 .search-box button {
     background: #2d5a3b;
@@ -306,6 +307,10 @@ body {
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 14px;
+}
+.search-box button:hover {
+    background: #1e3c2c;
 }
 .loading {
     text-align: center;
@@ -342,7 +347,8 @@ body {
 <div class="container">
     <div class="search-box">
         <h3>🪪 የአባል ካርድ ማውጫ</h3>
-        <input type="text" id="memberIdInput" placeholder="አባል መለያ ቁጥር ያስገቡ" />
+        <p style="margin-bottom: 10px; font-size: 12px; color: #666;">እባክዎ የአባሉን Member ID ያስገቡ (ለምሳሌ: GMFC/2026/5823)</p>
+        <input type="text" id="memberIdInput" placeholder="Member ID: GMFC/2026/XXXX" />
         <button onclick="loadCardByMemberId()">ካርድ አምጣ</button>
     </div>
     
@@ -364,11 +370,11 @@ body {
                 <div>
                     <div class="logo-row">
                         <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english">Gambella Majang Forest Coffee</div></div>
-                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">🌿</div>
                         <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english">Producer, Manufacturer and Exporter Share Holders Association</div></div>
                     </div>
                     <div class="photo-and-info">
-                        <div class="photo"><div class="crown"></div><div class="member-photo" id="memberPhoto">👤</div><div class="founder-stamp">⭐ FOUNDER ⭐</div></div>
+                        <div class="photo"><div class="crown">👑</div><div class="member-photo" id="memberPhoto">👤</div><div class="founder-stamp">⭐ FOUNDER ⭐</div></div>
                         <div class="info-grid">
                             <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="displayFullName">-</div></div>
                             <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
@@ -392,7 +398,7 @@ body {
                     <div style="text-align:center"><div class="motivation"> ማጃንግን የማያለማ ቡና አይሸጥ!! </div><div class="qr-placeholder"><div id="qrcode"></div></div><p style="font-size:1.3mm">Scan to verify</p></div>
                     <div class="dates-box"><span>Issue: <span id="issueDate">-</span></span><span>Expiry: <span id="expiryDate">-</span></span></div>
                     <div class="signatures-back"><div class="sign-box-back"><div>Chairperson</div><div class="sign-line-back"></div><div>ሀሰን ይመር አሊ</div><div class="stamp-back">ማህተም</div></div><div class="sign-box-back"><div>General Manager</div><div class="sign-line-back"></div><div id="managerName">-</div><div class="stamp-back">ማህተም</div></div></div>
-                    <div class="back-notes"><p><strong>Special Benefit:የአክሲዮን ድርሻውን ወደ ትንንሽ ክፍልፋይ ካርዶች መቀየር ይችላሉ።</strong>strong></p><p><strong>ይህ ካርድ በእዳ ሊያዝና ይችላል።</strong></p><p><strong>Note: ያለ ባለቤቱ ፈቃድ መጠቀም በህግ ይቀጣል።</strong></p><p><strong>ወድቆ ካገኙ:</strong> <span id="contactPhone">-</span></p></div>
+                    <div class="back-notes"><p><strong>Special Benefit:</strong> የአክሲዮን ድርሻውን ወደ ትንንሽ ክፍልፋይ ካርዶች መቀየር ይችላሉ።</p><p><strong>ይህ ካርድ በእዳ ሊያዝና ይችላል።</strong></p><p><strong>Note:</strong> ያለ ባለቤቱ ፈቃድ መጠቀም በህግ ይቀጣል።</p><p><strong>ወድቆ ካገኙ:</strong> <span id="contactPhone">-</span></p></div>
                 </div>
             </div>
         </div>
@@ -418,13 +424,10 @@ function displayPhoto(photoData, gender) {
     const photoContainer = document.getElementById('memberPhoto');
     if (!photoContainer) return;
     
-    // Check if photo exists and is a valid base64 image
     if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
-        // Display uploaded photo
         photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img" alt="Member Photo">`;
         photoContainer.style.backgroundColor = 'transparent';
     } 
-    // Check if it's a default photo emoji
     else if (photoData && (photoData === '👨' || photoData === '👩' || photoData === '👤')) {
         photoContainer.innerHTML = photoData;
         photoContainer.style.fontSize = '6mm';
@@ -434,7 +437,6 @@ function displayPhoto(photoData, gender) {
         photoContainer.style.backgroundColor = '#e2e8f0';
     } 
     else {
-        // Default emoji based on gender
         const defaultEmoji = (gender === 'ሴት') ? '👩' : '👨';
         photoContainer.innerHTML = defaultEmoji;
         photoContainer.style.fontSize = '6mm';
@@ -449,8 +451,8 @@ function updateCard(member) {
     console.log("Updating card with member data:", member);
     
     // Update front card
-    const memberId = member._id || member.id;
-    document.getElementById('displayMemberId').innerText = member.memberId || memberId || '-';
+    const displayMemberId = member.memberId || member._id;
+    document.getElementById('displayMemberId').innerText = displayMemberId || '-';
     document.getElementById('displayFullName').innerText = member.fullName || '-';
     document.getElementById('displayMotherName').innerText = member.motherName || '-';
     document.getElementById('displayAge').innerText = member.age || '-';
@@ -460,7 +462,7 @@ function updateCard(member) {
     document.getElementById('displayPosition').innerText = member.role || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
     
-    // Display photo - use memberPhoto from database
+    // Display photo
     displayPhoto(member.memberPhoto, member.gender);
     
     // Calculate voting power (1 vote per 100 shares, max 10)
@@ -488,7 +490,7 @@ function updateCard(member) {
     
     // Generate QR Code with member info
     let qrData = {
-        id: memberId,
+        id: member.memberId || member._id,
         name: member.fullName,
         phone: member.phone,
         shares: shares
@@ -506,18 +508,20 @@ function updateCard(member) {
     }
 }
 
-// Fetch member data from API by ID
-async function fetchMemberFromAPI(memberId) {
+// Fetch member data from API by custom Member ID (e.g., GMFC/2026/5823)
+async function fetchMemberByMemberId(memberId) {
     try {
         const token = getToken();
         if (!token) {
             console.error('No token found. Please login first.');
-            showError('እባክዎ በመጀመሪያ ይግቡ! Please login first.');
+            showError('እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! Please login first.');
             return null;
         }
         
-        console.log('Fetching member:', memberId);
-        const response = await fetch(`${API_BASE_URL}/api/members/${memberId}`, {
+        console.log('Fetching member by Member ID:', memberId);
+        
+        // First, try to find by memberId field
+        const response = await fetch(`${API_BASE_URL}/api/members/search/${encodeURIComponent(memberId)}`, {
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -525,17 +529,38 @@ async function fetchMemberFromAPI(memberId) {
         });
         
         if (response.ok) {
-            const member = await response.json();
-            console.log('Fetched member with photo:', member.memberPhoto ? 'Photo exists' : 'No photo');
-            return member;
-        } else if (response.status === 401) {
-            showError('እባክዎ እንደገና ይግቡ! Session expired. Please login again.');
-            return null;
-        } else {
-            console.error('Failed to fetch member:', response.status);
-            showError(`አባል ቁጥር ${memberId} አልተገኘም! Member not found.`);
-            return null;
+            const members = await response.json();
+            if (members && members.length > 0) {
+                // Find exact match by memberId
+                const exactMatch = members.find(m => m.memberId === memberId);
+                if (exactMatch) {
+                    console.log('Found member by memberId:', exactMatch);
+                    return exactMatch;
+                }
+            }
         }
+        
+        // If not found, try to get all members and search (fallback)
+        const allMembersResponse = await fetch(`${API_BASE_URL}/api/members`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (allMembersResponse.ok) {
+            const allMembers = await allMembersResponse.json();
+            const member = allMembers.find(m => m.memberId === memberId || m._id === memberId);
+            if (member) {
+                console.log('Found member from all members list:', member);
+                return member;
+            }
+        }
+        
+        console.error('Member not found with ID:', memberId);
+        showError(`አባል ቁጥር "${memberId}" አልተገኘም! እባክዎ ትክክለኛውን Member ID ያስገቡ።`);
+        return null;
+        
     } catch (error) {
         console.error('Error fetching member:', error);
         showError('የአገልጋይ ስህተት: ' + error.message);
@@ -546,11 +571,18 @@ async function fetchMemberFromAPI(memberId) {
 // Main function to load and display card
 async function loadCardByMemberId() {
     const memberIdInput = document.getElementById('memberIdInput');
-    const memberId = memberIdInput.value.trim();
+    let memberId = memberIdInput.value.trim();
     
     if (!memberId) {
-        alert('እባክዎ አባል መለያ ቁጥር ያስገቡ! Please enter member ID.');
+        alert('እባክዎ የአባል Member ID ያስገቡ! (ለምሳሌ: GMFC/2026/5823)');
         return;
+    }
+    
+    // Format the ID if user just entered the number
+    if (!memberId.includes('GMFC/')) {
+        const currentYear = new Date().getFullYear();
+        memberId = `GMFC/${currentYear}/${memberId}`;
+        memberIdInput.value = memberId;
     }
     
     // Show loading, hide card and error
@@ -560,7 +592,7 @@ async function loadCardByMemberId() {
     document.getElementById('errorMessage').classList.add('hidden');
     document.getElementById('successMessage').classList.add('hidden');
     
-    const member = await fetchMemberFromAPI(memberId);
+    const member = await fetchMemberByMemberId(memberId);
     
     document.getElementById('loadingMessage').classList.add('hidden');
     
@@ -576,10 +608,6 @@ async function loadCardByMemberId() {
         }, 3000);
     } else {
         document.getElementById('errorMessage').classList.remove('hidden');
-        // Auto-hide error after 3 seconds
-        setTimeout(() => {
-            document.getElementById('errorMessage').classList.add('hidden');
-        }, 3000);
     }
 }
 
@@ -596,7 +624,7 @@ function showError(message) {
 async function checkUrlParams() {
     const params = new URLSearchParams(window.location.search);
     if (params.has('memberId')) {
-        const memberId = params.get('memberId');
+        let memberId = params.get('memberId');
         document.getElementById('memberIdInput').value = memberId;
         await loadCardByMemberId();
     }
@@ -645,7 +673,7 @@ async function checkLogin() {
 checkLogin();
 checkUrlParams();
 
-// Make function global for button
+// Make functions global for buttons
 window.loadCardByMemberId = loadCardByMemberId;
 window.downloadAsImage = downloadAsImage;
 window.printCard = printCard;
