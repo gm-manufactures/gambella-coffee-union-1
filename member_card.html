@@ -84,18 +84,17 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
-/* Founder stamp - moved near name */
+/* Founder stamp - next to name */
 .founder-stamp {
     display: inline-block;
     background: linear-gradient(135deg, #d4af37, #f5c542);
     color: #1e3c2c;
-    padding: 0.3mm 1.5mm;
-    border-radius: 2mm;
-    font-size: 1.2mm;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 8px;
     font-weight: bold;
-    margin-left: 2mm;
+    margin-left: 6px;
     vertical-align: middle;
-    white-space: nowrap;
 }
 .photo-and-info {
     display: flex;
@@ -127,7 +126,7 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp overlay on photo only - centered circle */
+/* Stamp overlay on photo - smaller and correctly sized */
 .photo-stamp {
     position: absolute;
     top: 0;
@@ -143,7 +142,7 @@ body {
 .photo-stamp svg {
     width: 100%;
     height: 100%;
-    opacity: 0.5;
+    opacity: 0.45;
 }
 .info-grid {
     flex: 1;
@@ -176,7 +175,6 @@ body {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1mm;
 }
 .voting-box {
     background: #f1f5f9;
@@ -437,69 +435,63 @@ body {
 </div>
 
 <script>
-// ==================== CIRCULAR STAMP - INSIDE CIRCLE, READABLE ====================
+// ==================== CIRCULAR STAMP - CORRECT SIZE FOR PHOTO ====================
 
 function generatePhotoStamp() {
-    const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
-    
-    const size = 120;
+    const size = 80;
     const center = size / 2;
-    const radius = 54;
+    const radius = 36;
     
     // Get logo image
-    const logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
+    let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create SVG for stamp with text properly inside the circle
+    // Create SVG for stamp - properly sized for 11mm photo area
     const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
                 <clipPath id="logoClip">
-                    <circle cx="${center}" cy="${center}" r="14" />
+                    <circle cx="${center}" cy="${center}" r="9" />
                 </clipPath>
             </defs>
             
             <!-- Outer circle border -->
-            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2.5"/>
-            <circle cx="${center}" cy="${center}" r="${radius - 3}" fill="none" stroke="#8B4513" stroke-width="1"/>
+            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2"/>
+            <circle cx="${center}" cy="${center}" r="${radius - 2.5}" fill="none" stroke="#8B4513" stroke-width="0.8"/>
             
-            <!-- Inner circle border -->
-            <circle cx="${center}" cy="${center}" r="20" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
+            <!-- Inner circle background -->
+            <circle cx="${center}" cy="${center}" r="12" fill="#2d5a3b" stroke="#8B4513" stroke-width="1"/>
             
-            <!-- Amharic text on top arc (inside circle) -->
-            <path id="topArc" d="M 18 ${center - 5} A 42 42 0 0 1 102 ${center - 5}" fill="none"/>
-            <text font-size="3.2" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
+            <!-- Amharic text on top arc -->
+            <path id="topArc" d="M 12 ${center - 3} A 28 28 0 0 1 68 ${center - 3}" fill="none"/>
+            <text font-size="2.8" fill="#8B4513" font-weight="bold" letter-spacing="0.2">
                 <textPath href="#topArc" startOffset="50%" text-anchor="middle">
-                    የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
+                    የጋምቤላ ማጃንግ የጫካ ቡና
                 </textPath>
             </text>
             
-            <!-- English text on bottom arc (inside circle) -->
-            <path id="bottomArc" d="M 18 ${center + 5} A 42 42 0 0 0 102 ${center + 5}" fill="none"/>
-            <text font-size="1.9" fill="#8B4513" font-weight="bold">
+            <!-- English text on bottom arc (shortened) -->
+            <path id="bottomArc" d="M 12 ${center + 3} A 28 28 0 0 0 68 ${center + 3}" fill="none"/>
+            <text font-size="1.8" fill="#8B4513" font-weight="bold">
                 <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
-                    Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
+                    GMFC Share Holders Association
                 </textPath>
             </text>
             
             <!-- Logo in center -->
-            <image href="${logoImgSrc}" x="${center - 14}" y="${center - 14}" width="28" height="28" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
-            
-            <!-- Small text below logo -->
-            <text x="${center}" y="${center + 18}" font-size="3" text-anchor="middle" fill="#fbbf24" font-weight="bold">GMFC</text>
+            <image href="${logoImgSrc}" x="${center - 9}" y="${center - 9}" width="18" height="18" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
             
             <!-- Star decorations -->
-            <text x="10" y="${center}" font-size="5" fill="#8B4513">★</text>
-            <text x="110" y="${center}" font-size="5" fill="#8B4513">★</text>
-            <text x="${center}" y="12" font-size="5" fill="#8B4513">★</text>
-            <text x="${center}" y="108" font-size="5" fill="#8B4513">★</text>
+            <text x="8" y="${center}" font-size="3.5" fill="#8B4513">★</text>
+            <text x="72" y="${center}" font-size="3.5" fill="#8B4513">★</text>
+            <text x="${center}" y="8" font-size="3.5" fill="#8B4513">★</text>
+            <text x="${center}" y="72" font-size="3.5" fill="#8B4513">★</text>
         </svg>
     `;
     
     return svg;
 }
 
-// Apply stamp to photo overlay only
+// Apply stamp to photo overlay
 function applyPhotoStamp() {
     const stampContainer = document.getElementById('photoStamp');
     if (stampContainer) {
@@ -556,12 +548,13 @@ function updateCard(member) {
     document.getElementById('displayGender').innerText = member.gender || '-';
     document.getElementById('displayPhone').innerText = member.phone || '-';
     document.getElementById('displayAddress').innerText = member.address || '-';
-    document.getElementById('displayPosition').innerText = member.role || '-';
+    document.getElementById('displayPosition').innerText = member.role || member.position || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
     
-    // Show founder badge only for founder role
+    // Show founder badge for founder role
     const founderBadge = document.getElementById('founderBadge');
-    if (member.role === 'መስራች' || member.role === 'Founder' || member.position === 'መስራች') {
+    const role = (member.role || member.position || '').toLowerCase();
+    if (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') {
         founderBadge.style.display = 'inline-block';
     } else {
         founderBadge.style.display = 'none';
