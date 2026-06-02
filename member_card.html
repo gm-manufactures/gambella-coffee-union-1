@@ -41,55 +41,17 @@ body {
     overflow: hidden;
     position: relative;
 }
-/* CSS-only barcode pattern background for front card */
-.id-card.front-card {
-    position: relative;
-}
-.id-card.front-card::before {
+/* Your image as repeating background pattern */
+.id-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: repeating-linear-gradient(90deg,
-        #1E7543 0px, #1E7543 6px,
-        #111111 6px, #111111 9px,
-        #1E7543 9px, #1E7543 14px,
-        #111111 14px, #111111 17px,
-        #1E7543 17px, #1E7543 22px,
-        #111111 22px, #111111 24px,
-        #1E7543 24px, #1E7543 28px,
-        #111111 28px, #111111 31px,
-        #1E7543 31px, #1E7543 35px,
-        #111111 35px, #111111 38px,
-        #1E7543 38px, #1E7543 100%
-    );
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 0;
-}
-/* Barcode pattern for back card */
-.id-card.back-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(90deg,
-        #1E7543 0px, #1E7543 5px,
-        #111111 5px, #111111 8px,
-        #1E7543 8px, #1E7543 12px,
-        #111111 12px, #111111 15px,
-        #1E7543 15px, #1E7543 19px,
-        #111111 19px, #111111 22px,
-        #1E7543 22px, #1E7543 26px,
-        #111111 26px, #111111 29px,
-        #1E7543 29px, #1E7543 33px,
-        #111111 33px, #111111 36px,
-        #1E7543 36px, #1E7543 100%
-    );
+    background-image: url('mk.jpg');
+    background-repeat: repeat;
+    background-size: 100px 100px;
     opacity: 0.12;
     pointer-events: none;
     z-index: 0;
@@ -200,7 +162,7 @@ body {
 }
 .info-grid {
     flex: 1;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(248, 250, 252, 0.9);
     border-radius: 2.5mm;
     padding: 1.5mm;
     display: grid;
@@ -406,7 +368,7 @@ body {
 @media print {
     body { background: white; padding: 0; margin: 0; display: block; }
     .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
-    .id-card::before { opacity: 0.08; }
+    .id-card::before { opacity: 0.05; }
     .toolbar, .print-btn, .credentials-box, .search-box, .success-message { display: none; }
 }
 </style>
@@ -433,7 +395,7 @@ body {
     </div>
     
     <div id="cardContainer" class="card-container hidden">
-        <div class="id-card front-card" id="frontCard">
+        <div class="id-card" id="frontCard">
             <div class="card-side front">
                 <div>
                     <div class="logo-row">
@@ -471,7 +433,7 @@ body {
             </div>
         </div>
         
-        <div class="id-card back-card" id="backCard">
+        <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
                     <div style="text-align:center"><div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div><div class="qr-placeholder"><div id="qrcode"></div></div><p style="font-size:1.3mm">Scan to verify</p></div>
@@ -500,11 +462,6 @@ function generatePhotoStamp() {
     // Get logo image
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Full Amharic name
-    const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    // Full English name
-    const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
-    
     const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
@@ -522,7 +479,7 @@ function generatePhotoStamp() {
                 <!-- Inner circle background -->
                 <circle cx="${center}" cy="${center}" r="32" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
                 
-                <!-- Amharic text on top arc - full name -->
+                <!-- Amharic text on top arc -->
                 <path id="topArc" d="M 25 ${center - 8} A 65 65 0 0 1 155 ${center - 8}" fill="none"/>
                 <text font-size="5.8" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
                     <textPath href="#topArc" startOffset="50%" text-anchor="middle">
@@ -530,7 +487,7 @@ function generatePhotoStamp() {
                     </textPath>
                 </text>
                 
-                <!-- English text on bottom arc - full name -->
+                <!-- English text on bottom arc -->
                 <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
                 <text font-size="4.2" fill="#8B4513" font-weight="bold">
                     <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
@@ -553,7 +510,6 @@ function generatePhotoStamp() {
     return svg;
 }
 
-// Apply stamp with full association name
 function applyPhotoStamp() {
     const stampContainer = document.getElementById('photoStamp');
     if (stampContainer) {
@@ -594,7 +550,6 @@ function displayPhoto(photoData, gender) {
         photoContainer.style.backgroundColor = '#e2e8f0';
     }
     
-    // Apply stamp overlay after photo is loaded
     setTimeout(() => {
         applyPhotoStamp();
     }, 100);
@@ -613,7 +568,6 @@ function updateCard(member) {
     document.getElementById('displayPosition').innerText = member.role || member.position || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
     
-    // Show founder badge for founder role
     const founderBadge = document.getElementById('founderBadge');
     const role = (member.role || member.position || '').toLowerCase();
     if (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') {
@@ -795,7 +749,6 @@ async function checkLogin() {
     }
 }
 
-// Initialize
 checkLogin();
 checkUrlParams();
 
