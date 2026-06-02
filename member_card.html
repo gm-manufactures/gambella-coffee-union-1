@@ -41,6 +41,59 @@ body {
     overflow: hidden;
     position: relative;
 }
+/* CSS-only barcode pattern background for front card */
+.id-card.front-card {
+    position: relative;
+}
+.id-card.front-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(90deg,
+        #1E7543 0px, #1E7543 6px,
+        #111111 6px, #111111 9px,
+        #1E7543 9px, #1E7543 14px,
+        #111111 14px, #111111 17px,
+        #1E7543 17px, #1E7543 22px,
+        #111111 22px, #111111 24px,
+        #1E7543 24px, #1E7543 28px,
+        #111111 28px, #111111 31px,
+        #1E7543 31px, #1E7543 35px,
+        #111111 35px, #111111 38px,
+        #1E7543 38px, #1E7543 100%
+    );
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
+/* Barcode pattern for back card */
+.id-card.back-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(90deg,
+        #1E7543 0px, #1E7543 5px,
+        #111111 5px, #111111 8px,
+        #1E7543 8px, #1E7543 12px,
+        #111111 12px, #111111 15px,
+        #1E7543 15px, #1E7543 19px,
+        #111111 19px, #111111 22px,
+        #1E7543 22px, #1E7543 26px,
+        #111111 26px, #111111 29px,
+        #1E7543 29px, #1E7543 33px,
+        #111111 33px, #111111 36px,
+        #1E7543 36px, #1E7543 100%
+    );
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
 @media screen {
     .id-card {
         width: 450px;
@@ -51,7 +104,7 @@ body {
     width: 100%;
     height: 100%;
     padding: 3.5mm;
-    background: white;
+    background: rgba(255, 255, 255, 0.92);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -147,7 +200,7 @@ body {
 }
 .info-grid {
     flex: 1;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 2.5mm;
     padding: 1.5mm;
     display: grid;
@@ -178,7 +231,7 @@ body {
     flex-wrap: wrap;
 }
 .voting-box {
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.9);
     border-radius: 2mm;
     padding: 1mm;
     margin: 1.2mm 0;
@@ -215,7 +268,7 @@ body {
     margin: 1mm 0;
 }
 .dates-box {
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.9);
     border-radius: 1.5mm;
     padding: 0.8mm;
     margin: 0.8mm 0;
@@ -353,6 +406,7 @@ body {
 @media print {
     body { background: white; padding: 0; margin: 0; display: block; }
     .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
+    .id-card::before { opacity: 0.08; }
     .toolbar, .print-btn, .credentials-box, .search-box, .success-message { display: none; }
 }
 </style>
@@ -379,7 +433,7 @@ body {
     </div>
     
     <div id="cardContainer" class="card-container hidden">
-        <div class="id-card" id="frontCard">
+        <div class="id-card front-card" id="frontCard">
             <div class="card-side front">
                 <div>
                     <div class="logo-row">
@@ -417,7 +471,7 @@ body {
             </div>
         </div>
         
-        <div class="id-card" id="backCard">
+        <div class="id-card back-card" id="backCard">
             <div class="card-side back">
                 <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
                     <div style="text-align:center"><div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div><div class="qr-placeholder"><div id="qrcode"></div></div><p style="font-size:1.3mm">Scan to verify</p></div>
