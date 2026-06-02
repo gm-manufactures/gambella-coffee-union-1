@@ -124,7 +124,7 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp overlay on photo */
+/* Stamp overlay on photo only - centered circle */
 .photo-stamp {
     position: absolute;
     top: 0;
@@ -140,7 +140,7 @@ body {
 .photo-stamp svg {
     width: 100%;
     height: 100%;
-    opacity: 0.35;
+    opacity: 0.5;
 }
 .info-grid {
     flex: 1;
@@ -230,16 +230,6 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-.stamp-back {
-    font-size: 1mm;
-    color: #b45309;
-    border: 0.2mm solid #b45309;
-    display: inline-block;
-    padding: 0.2mm 0.8mm;
-    border-radius: 1.5mm;
-    transform: rotate(-4deg);
-    margin-top: 0.8mm;
-}
 .back-notes {
     font-size: 1.55mm;
     color: #1e293b;
@@ -254,24 +244,6 @@ body {
     border-left: 0.8mm solid #fbbf24;
 }
 .back-notes p strong { color: #b45309; }
-/* Bottom stamp on card */
-.bottom-stamp-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1mm;
-    padding-top: 1mm;
-    border-top: 0.2mm solid #e2e8f0;
-}
-.bottom-stamp {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-.bottom-stamp svg {
-    width: 35px;
-    height: 35px;
-}
 .toolbar {
     display: flex;
     gap: 10px;
@@ -426,10 +398,6 @@ body {
                     </div>
                     <div class="voting-box"><span class="tier-badge" id="tierBadge">💎 MEMBER</span><span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span></div>
                 </div>
-                <!-- Bottom stamp on card -->
-                <div class="bottom-stamp-container">
-                    <div id="bottomStamp" class="bottom-stamp"></div>
-                </div>
             </div>
         </div>
         
@@ -452,25 +420,25 @@ body {
 </div>
 
 <script>
-// ==================== CIRCULAR STAMP GENERATION WITH LOGO ====================
+// ==================== CIRCULAR STAMP - INSIDE CIRCLE, READABLE ====================
 
-function generateCircularStamp() {
+function generatePhotoStamp() {
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
     const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
     
-    const size = 100;
+    const size = 120;
     const center = size / 2;
-    const radius = 45;
+    const radius = 54;
     
-    // Get logo image (use the same logo from the card)
+    // Get logo image
     const logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create SVG for stamp with logo image
+    // Create SVG for stamp with text properly inside the circle
     const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
                 <clipPath id="logoClip">
-                    <circle cx="${center}" cy="${center - 5}" r="12" />
+                    <circle cx="${center}" cy="${center}" r="14" />
                 </clipPath>
             </defs>
             
@@ -478,83 +446,47 @@ function generateCircularStamp() {
             <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2.5"/>
             <circle cx="${center}" cy="${center}" r="${radius - 3}" fill="none" stroke="#8B4513" stroke-width="1"/>
             
-            <!-- Amharic text on top arc -->
-            <path id="topArc" d="M ${center - 38} ${center - 15} A 38 38 0 0 1 ${center + 38} ${center - 15}" fill="none"/>
-            <text font-size="4.5" fill="#8B4513" font-weight="bold" letter-spacing="0.5">
+            <!-- Inner circle border -->
+            <circle cx="${center}" cy="${center}" r="20" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
+            
+            <!-- Amharic text on top arc (inside circle) -->
+            <path id="topArc" d="M 18 ${center - 5} A 42 42 0 0 1 102 ${center - 5}" fill="none"/>
+            <text font-size="3.2" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
                 <textPath href="#topArc" startOffset="50%" text-anchor="middle">
-                    የጋምቤላ ማጃንግ የጫካ ቡና
+                    የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
                 </textPath>
             </text>
             
-            <!-- English text on bottom arc -->
-            <path id="bottomArc" d="M ${center - 38} ${center + 18} A 38 38 0 0 0 ${center + 38} ${center + 18}" fill="none"/>
-            <text font-size="2.5" fill="#8B4513" font-weight="bold">
+            <!-- English text on bottom arc (inside circle) -->
+            <path id="bottomArc" d="M 18 ${center + 5} A 42 42 0 0 0 102 ${center + 5}" fill="none"/>
+            <text font-size="1.9" fill="#8B4513" font-weight="bold">
                 <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
-                    Producer, Manufacturer & Exporter
+                    Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
                 </textPath>
             </text>
             
-            <!-- Inner text line 2 -->
-            <text x="${center}" y="${center + 8}" font-size="2.8" fill="#8B4513" text-anchor="middle" font-weight="bold">
-                Share Holders Association
-            </text>
+            <!-- Logo in center -->
+            <image href="${logoImgSrc}" x="${center - 14}" y="${center - 14}" width="28" height="28" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
             
-            <!-- Center circle background -->
-            <circle cx="${center}" cy="${center - 5}" r="13" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
-            
-            <!-- Logo in center - using image -->
-            <image href="${logoImgSrc}" x="${center - 11}" y="${center - 16}" width="22" height="22" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
-            
-            <!-- Text below logo -->
-            <text x="${center}" y="${center + 6}" font-size="3.5" text-anchor="middle" fill="#fbbf24" font-weight="bold">GMFC</text>
+            <!-- Small text below logo -->
+            <text x="${center}" y="${center + 18}" font-size="3" text-anchor="middle" fill="#fbbf24" font-weight="bold">GMFC</text>
             
             <!-- Star decorations -->
-            <text x="${center - 42}" y="${center - 20}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center + 42}" y="${center - 20}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center - 42}" y="${center + 25}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center + 42}" y="${center + 25}" font-size="4" fill="#8B4513">★</text>
+            <text x="10" y="${center}" font-size="5" fill="#8B4513">★</text>
+            <text x="110" y="${center}" font-size="5" fill="#8B4513">★</text>
+            <text x="${center}" y="12" font-size="5" fill="#8B4513">★</text>
+            <text x="${center}" y="108" font-size="5" fill="#8B4513">★</text>
         </svg>
     `;
     
     return svg;
 }
 
-function generateSmallStamp() {
-    const size = 30;
-    const center = size / 2;
-    const radius = 13;
-    const logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
-    
-    const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-            <defs>
-                <clipPath id="smallLogoClip">
-                    <circle cx="${center}" cy="${center - 2}" r="6" />
-                </clipPath>
-            </defs>
-            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="1.5"/>
-            <circle cx="${center}" cy="${center}" r="${radius - 2}" fill="none" stroke="#8B4513" stroke-width="0.5"/>
-            <image href="${logoImgSrc}" x="${center - 6}" y="${center - 8}" width="12" height="12" clip-path="url(#smallLogoClip)" preserveAspectRatio="xMidYMid slice"/>
-            <text x="${center}" y="${center + 5}" font-size="2.5" text-anchor="middle" fill="#8B4513" font-weight="bold">GMFC</text>
-        </svg>
-    `;
-    
-    return svg;
-}
-
-// Apply stamp to photo overlay
+// Apply stamp to photo overlay only
 function applyPhotoStamp() {
     const stampContainer = document.getElementById('photoStamp');
     if (stampContainer) {
-        stampContainer.innerHTML = generateSmallStamp();
-    }
-}
-
-// Apply stamp to bottom of card
-function applyBottomStamp() {
-    const bottomContainer = document.getElementById('bottomStamp');
-    if (bottomContainer) {
-        bottomContainer.innerHTML = generateCircularStamp();
+        stampContainer.innerHTML = generatePhotoStamp();
     }
 }
 
@@ -630,9 +562,6 @@ function updateCard(member) {
     expiry.setFullYear(today.getFullYear() + 5);
     document.getElementById('issueDate').innerText = today.toISOString().split('T')[0];
     document.getElementById('expiryDate').innerText = expiry.toISOString().split('T')[0];
-    
-    // Apply bottom stamp
-    applyBottomStamp();
     
     let qrData = {
         id: member.memberId || member._id,
