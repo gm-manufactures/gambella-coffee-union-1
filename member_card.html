@@ -124,12 +124,11 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp overlay on photo only */
+/* Stamp overlay on photo only - centered circle */
 .photo-stamp {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: flex;
@@ -141,7 +140,7 @@ body {
 .photo-stamp svg {
     width: 100%;
     height: 100%;
-    opacity: 0.4;
+    opacity: 0.5;
 }
 .info-grid {
     flex: 1;
@@ -230,16 +229,6 @@ body {
     width: 60%;
     margin-left: auto;
     margin-right: auto;
-}
-.stamp-back {
-    font-size: 1mm;
-    color: #b45309;
-    border: 0.2mm solid #b45309;
-    display: inline-block;
-    padding: 0.2mm 0.8mm;
-    border-radius: 1.5mm;
-    transform: rotate(-4deg);
-    margin-top: 0.8mm;
 }
 .back-notes {
     font-size: 1.55mm;
@@ -431,7 +420,7 @@ body {
 </div>
 
 <script>
-// ==================== CIRCULAR STAMP GENERATION - ONLY ON PHOTO ====================
+// ==================== CIRCULAR STAMP - INSIDE CIRCLE, READABLE ====================
 
 function generatePhotoStamp() {
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
@@ -439,51 +428,54 @@ function generatePhotoStamp() {
     
     const size = 120;
     const center = size / 2;
-    const radius = 55;
+    const radius = 54;
     
     // Get logo image
     const logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create SVG for stamp
+    // Create SVG for stamp with text properly inside the circle
     const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
                 <clipPath id="logoClip">
-                    <circle cx="${center}" cy="${center - 3}" r="14" />
+                    <circle cx="${center}" cy="${center}" r="14" />
                 </clipPath>
             </defs>
             
             <!-- Outer circle border -->
-            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2"/>
+            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2.5"/>
             <circle cx="${center}" cy="${center}" r="${radius - 3}" fill="none" stroke="#8B4513" stroke-width="1"/>
             
-            <!-- Amharic text on top arc (full text) -->
-            <path id="topArc" d="M ${center - 48} ${center - 10} A 48 48 0 0 1 ${center + 48} ${center - 10}" fill="none"/>
-            <text font-size="3.8" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
+            <!-- Inner circle border -->
+            <circle cx="${center}" cy="${center}" r="20" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
+            
+            <!-- Amharic text on top arc (inside circle) -->
+            <path id="topArc" d="M 18 ${center - 5} A 42 42 0 0 1 102 ${center - 5}" fill="none"/>
+            <text font-size="3.2" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
                 <textPath href="#topArc" startOffset="50%" text-anchor="middle">
                     የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
                 </textPath>
             </text>
             
-            <!-- English text on bottom arc (full text) -->
-            <path id="bottomArc" d="M ${center - 48} ${center + 20} A 48 48 0 0 0 ${center + 48} ${center + 20}" fill="none"/>
-            <text font-size="2.2" fill="#8B4513" font-weight="bold">
+            <!-- English text on bottom arc (inside circle) -->
+            <path id="bottomArc" d="M 18 ${center + 5} A 42 42 0 0 0 102 ${center + 5}" fill="none"/>
+            <text font-size="1.9" fill="#8B4513" font-weight="bold">
                 <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
                     Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
                 </textPath>
             </text>
             
-            <!-- Center circle background -->
-            <circle cx="${center}" cy="${center - 3}" r="16" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
-            
             <!-- Logo in center -->
-            <image href="${logoImgSrc}" x="${center - 14}" y="${center - 17}" width="28" height="28" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
+            <image href="${logoImgSrc}" x="${center - 14}" y="${center - 14}" width="28" height="28" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
+            
+            <!-- Small text below logo -->
+            <text x="${center}" y="${center + 18}" font-size="3" text-anchor="middle" fill="#fbbf24" font-weight="bold">GMFC</text>
             
             <!-- Star decorations -->
-            <text x="${center - 52}" y="${center - 15}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center + 52}" y="${center - 15}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center - 52}" y="${center + 30}" font-size="4" fill="#8B4513">★</text>
-            <text x="${center + 52}" y="${center + 30}" font-size="4" fill="#8B4513">★</text>
+            <text x="10" y="${center}" font-size="5" fill="#8B4513">★</text>
+            <text x="110" y="${center}" font-size="5" fill="#8B4513">★</text>
+            <text x="${center}" y="12" font-size="5" fill="#8B4513">★</text>
+            <text x="${center}" y="108" font-size="5" fill="#8B4513">★</text>
         </svg>
     `;
     
