@@ -375,7 +375,7 @@ body {
                 <div>
                     <div class="logo-row">
                         <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english hidden">Gambella Majang Forest Coffee</div></div>
-                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">🌿</div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
                         <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english hidden">Producer, Manufacturer and Exporter Share Holders Association</div></div>
                     </div>
                     <div class="photo-and-info">
@@ -549,9 +549,9 @@ function updateCard(member) {
     document.getElementById('displayVotingPower').innerText = votingPower;
     
     const tierBadge = document.getElementById('tierBadge');
-    if (shares >= 1000) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
-    else if (shares >= 500) tierBadge.innerHTML = '🥇 GOLD MEMBER';
-    else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
+    if (shares >= 200) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
+    else if (shares >= 100) tierBadge.innerHTML = '🥇 GOLD MEMBER';
+    else if (shares >= 50) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
     document.getElementById('managerName').innerText = member.fullName || '-';
