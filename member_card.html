@@ -84,15 +84,18 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
+/* Founder stamp - moved near name */
 .founder-stamp {
     display: inline-block;
-    background: linear-gradient(135deg,#fbbf24,#d97706);
+    background: linear-gradient(135deg, #d4af37, #f5c542);
     color: #1e3c2c;
-    padding: 0.8mm 2.5mm;
-    border-radius: 3mm;
-    font-size: 1.8mm;
+    padding: 0.3mm 1.5mm;
+    border-radius: 2mm;
+    font-size: 1.2mm;
     font-weight: bold;
-    margin-top: 2mm;
+    margin-left: 2mm;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 .photo-and-info {
     display: flex;
@@ -167,6 +170,13 @@ body {
     color: #0f172a;
     margin-top: 0.5mm;
     word-break: break-word;
+}
+/* Name row with founder stamp */
+.name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1mm;
 }
 .voting-box {
     background: #f1f5f9;
@@ -382,10 +392,17 @@ body {
                         <div class="photo">
                             <div class="member-photo" id="memberPhoto">👤</div>
                             <div id="photoStamp" class="photo-stamp"></div>
-                            <div class="founder-stamp">⭐ FOUNDER / መስራች ⭐</div>
                         </div>
                         <div class="info-grid">
-                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="displayFullName">-</div></div>
+                            <div class="info-item">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value">
+                                    <div class="name-row">
+                                        <span id="displayFullName">-</span>
+                                        <span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
                             <div class="info-item"><div class="info-label">Gender</div><div class="info-value" id="displayGender">-</div></div>
                             <div class="info-item"><div class="info-label">Age</div><div class="info-value" id="displayAge">-</div></div>
@@ -541,6 +558,14 @@ function updateCard(member) {
     document.getElementById('displayAddress').innerText = member.address || '-';
     document.getElementById('displayPosition').innerText = member.role || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
+    
+    // Show founder badge only for founder role
+    const founderBadge = document.getElementById('founderBadge');
+    if (member.role === 'መስራች' || member.role === 'Founder' || member.position === 'መስራች') {
+        founderBadge.style.display = 'inline-block';
+    } else {
+        founderBadge.style.display = 'none';
+    }
     
     displayPhoto(member.memberPhoto, member.gender);
     
