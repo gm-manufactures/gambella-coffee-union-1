@@ -45,6 +45,7 @@ const User = mongoose.model('User', UserSchema);
 
 // Member Schema
 const MemberSchema = new mongoose.Schema({
+    memberId: { type: String, unique: true, sparse: true },
     fullName: { type: String, required: true },
     gender: { type: String, required: true },
     age: { type: Number, required: true },
@@ -160,33 +161,27 @@ const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
 
 // ==================== HELPER FUNCTIONS ====================
 
+// Generate random password
 function generateRandomPassword() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
-    let password = '';
-    for (let i = 0; i < 8; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
+    return "1234";
 }
 
-async function generateUniqueUsername(fullName, phone) {
-    let base = fullName.toLowerCase().replace(/[^a-z]/g, '').substring(0, 5);
-    if (base.length < 3) base = 'mem';
+// Generate unique Member ID (GMFC/YYYY/XXXX format)
+async function generateMemberId() {
+    const currentYear = new Date().getFullYear();
+    // Generate 4-digit random number (1000 to 9999)
+    const randomNum = Math.floor(Math.random() * 9000) + 1000;
     
-    const phoneSuffix = phone.slice(-4);
-    let username = `${base}${phoneSuffix}`;
-    username = username.replace(/[^a-z0-9]/g, '');
+    const memberId = `GMFC/${currentYear}/${randomNum}`;
     
-    let counter = 1;
-    let existingUser = await User.findOne({ username: username });
-    
-    while (existingUser) {
-        username = `${base}${phoneSuffix}${counter}`;
-        existingUser = await User.findOne({ username: username });
-        counter++;
+    // Check if ID already exists (rare but possible)
+    const existing = await Member.findOne({ memberId: memberId });
+    if (existing) {
+        // Recursively generate a new one
+        return generateMemberId();
     }
     
-    return username;
+    return memberId;
 }
 
 // ==================== AUTH MIDDLEWARE ====================
@@ -347,14 +342,12 @@ app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) =
     res.json({ success: true });
 });
 
-// ==================== MEMBER REGISTRATION ROUTE (FIXED) ====================
+// ==================== MEMBER REGISTRATION ROUTE ====================
 
 app.post('/api/members/register', async (req, res) => {
     console.log("=".repeat(60));
     console.log("📝 NEW MEMBER REGISTRATION");
     console.log("=".repeat(60));
-    console.log("Full Name:", req.body.fullName);
-    console.log("Phone:", req.body.phone);
     
     try {
         // Remove any id fields
@@ -374,12 +367,29 @@ app.post('/api/members/register', async (req, res) => {
         // Check if phone already exists
         const existingMember = await Member.findOne({ phone: cleanData.phone });
         if (existingMember) {
-            console.log("❌ Phone already exists:", cleanData.phone);
             return res.status(400).json({
                 success: false,
                 message: `Phone number ${cleanData.phone} is already registered. Please use a DIFFERENT phone number.`,
                 field: 'phone'
             });
+        }
+        
+        // Generate UNIQUE Member ID (GMFC/2026/5823 format)
+        const generatedMemberId = await generateMemberId();
+        console.log("📛 Generated Member ID:", generatedMemberId);
+        
+        // Username is the FULL Member ID
+        const username = generatedMemberId;
+        const plainPassword = "1234";
+        
+        // Check if username already exists
+        let finalUsername = username;
+        let counter = 1;
+        let existingUser = await User.findOne({ username: finalUsername });
+        while (existingUser) {
+            finalUsername = `${username}-${counter}`;
+            existingUser = await User.findOne({ username: finalUsername });
+            counter++;
         }
         
         // Build address
@@ -407,8 +417,9 @@ app.post('/api/members/register', async (req, res) => {
             bankName = cleanData.otherBankName;
         }
         
-        // Create member
+        // Create member with custom memberId
         const memberData = {
+            memberId: generatedMemberId,
             fullName: cleanData.fullName,
             gender: cleanData.gender,
             age: parseInt(cleanData.age) || 0,
@@ -465,37 +476,13 @@ app.post('/api/members/register', async (req, res) => {
         
         const newMember = new Member(memberData);
         await newMember.save();
-        console.log(`✅ Member saved! ID: ${newMember._id}`);
+        console.log(`✅ Member saved! Member ID: ${newMember.memberId}`);
         
-        // ========== CREATE UNIQUE USERNAME ==========
-        // Generate username from name (remove spaces, take first 6 chars + phone suffix)
-        let baseUsername = newMember.fullName
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, '')  // Remove non-alphanumeric
-            .substring(0, 6);
-        if (baseUsername.length < 3) baseUsername = 'member';
+        // Create user account with FULL Member ID as username
+        const email = `${finalUsername.replace(/\//g, '_')}@member.gambella.com`;
         
-        const phoneSuffix = newMember.phone.slice(-4);
-        let username = `${baseUsername}${phoneSuffix}`;
-        
-        // Ensure username is unique
-        let counter = 1;
-        let existingUser = await User.findOne({ username: username });
-        while (existingUser) {
-            username = `${baseUsername}${phoneSuffix}${counter}`;
-            existingUser = await User.findOne({ username: username });
-            counter++;
-        }
-        
-        // FIXED: Set password to "1234" for all members
-        const plainPassword = "1234";
-        
-        // Create unique email
-        const email = `${newMember.phone}@member.gambella.com`;
-        
-        // Create user account
         const newUser = new User({
-            username: username,
+            username: finalUsername,
             email: email,
             password: plainPassword,
             fullName: newMember.fullName,
@@ -505,23 +492,23 @@ app.post('/api/members/register', async (req, res) => {
         });
         
         await newUser.save();
-        console.log(`✅ User account created!`);
-        console.log(`   Username: ${username}`);
-        console.log(`   Password: ${plainPassword}`);
+        console.log(`✅ User created! Username: ${finalUsername}, Password: ${plainPassword}`);
         
-        // Send response with credentials
+        // Send response
         res.status(201).json({
             success: true,
             message: 'Member registered successfully!',
             member: {
                 id: newMember._id,
+                memberId: newMember.memberId,
                 fullName: newMember.fullName,
                 phone: newMember.phone,
                 shareCount: newMember.shareCount
             },
             credentials: {
-                username: username,
-                password: plainPassword
+                username: finalUsername,
+                password: plainPassword,
+                memberId: newMember.memberId
             }
         });
         
@@ -575,16 +562,26 @@ app.get('/api/members/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// ==================== UPDATE MEMBER (COMPLETE) ====================
+// ==================== GET MEMBER BY MEMBER ID ====================
+
+app.get('/api/members/by-memberid/:memberId', authMiddleware, async (req, res) => {
+    try {
+        const member = await Member.findOne({ memberId: req.params.memberId });
+        if (!member) return res.status(404).json({ message: 'Member not found' });
+        res.json(member);
+    } catch (error) {
+        console.error('Error fetching member:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// ==================== UPDATE MEMBER ====================
 
 app.put('/api/members/:id', authMiddleware, async (req, res) => {
-    console.log("=".repeat(60));
     console.log("✏️ UPDATE MEMBER REQUEST");
-    console.log("=".repeat(60));
     console.log("Member ID:", req.params.id);
     
     try {
-        // Only admin can update members
         if (req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
@@ -592,22 +589,13 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
             });
         }
         
-        // Remove protected fields that shouldn't be updated
         const { _id, id, createdAt, __v, ...updateData } = req.body;
-        
-        // Add updated timestamp
         updateData.updatedAt = new Date();
         
-        console.log("Updating fields:", Object.keys(updateData));
-        
-        // Find and update the member
         const member = await Member.findByIdAndUpdate(
             req.params.id,
             { $set: updateData },
-            { 
-                new: true,           // Return updated document
-                runValidators: true  // Run schema validation
-            }
+            { new: true, runValidators: true }
         );
         
         if (!member) {
@@ -618,17 +606,11 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
         }
         
         console.log(`✅ Member updated: ${member.fullName}`);
-        
-        res.json({
-            success: true,
-            message: 'Member updated successfully',
-            member: member
-        });
+        res.json({ success: true, message: 'Member updated successfully', member: member });
         
     } catch (error) {
         console.error('❌ Update error:', error);
         
-        // Handle duplicate key errors
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
             return res.status(400).json({
@@ -638,20 +620,7 @@ app.put('/api/members/:id', authMiddleware, async (req, res) => {
             });
         }
         
-        // Handle validation errors
-        if (error.name === 'ValidationError') {
-            const errors = Object.values(error.errors).map(e => e.message);
-            return res.status(400).json({
-                success: false,
-                message: `Validation error: ${errors.join(', ')}`,
-                errors: errors
-            });
-        }
-        
-        res.status(500).json({
-            success: false,
-            message: 'Server error: ' + error.message
-        });
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
 });
 
@@ -685,7 +654,8 @@ app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
         const members = await Member.find({
             $or: [
                 { fullName: { $regex: q, $options: 'i' } },
-                { phone: { $regex: q, $options: 'i' } }
+                { phone: { $regex: q, $options: 'i' } },
+                { memberId: { $regex: q, $options: 'i' } }
             ]
         });
         
@@ -707,7 +677,7 @@ app.get('/api/members/count', authMiddleware, async (req, res) => {
     }
 });
 
-// ==================== GET MY PROFILE (for member login) ====================
+// ==================== GET MY PROFILE ====================
 
 app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
     try {
@@ -1035,6 +1005,10 @@ app.get('/gmfc.html', (req, res) => {
 
 app.get('/member-portal.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'member-portal.html'));
+});
+
+app.get('/member_card.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'member_card.html'));
 });
 
 app.get('/health', (req, res) => {
