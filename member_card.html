@@ -84,15 +84,17 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
+/* Founder stamp - next to name */
 .founder-stamp {
     display: inline-block;
-    background: linear-gradient(135deg,#fbbf24,#d97706);
+    background: linear-gradient(135deg, #d4af37, #f5c542);
     color: #1e3c2c;
-    padding: 0.8mm 0.8mm;
-    border-radius: 3mm;
-    font-size: 1mm;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 8px;
     font-weight: bold;
-    margin-bottom: 2mm;
+    margin-left: 6px;
+    vertical-align: middle;
 }
 .photo-and-info {
     display: flex;
@@ -115,7 +117,7 @@ body {
     justify-content: center;
     font-size: 6mm;
     margin: 0 auto;
-    border: 0.3mm solid #f3f6f4;
+    border: 0.3mm solid #2d5a3b;
     overflow: hidden;
     position: relative;
 }
@@ -124,13 +126,14 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp overlay on photo only - centered circle */
+/* Stamp overlay on photo - covers 75% of photo area */
 .photo-stamp {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
+    height: 75%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -140,7 +143,7 @@ body {
 .photo-stamp svg {
     width: 100%;
     height: 100%;
-    opacity: 0.5;
+    opacity: 0.55;
 }
 .info-grid {
     flex: 1;
@@ -167,6 +170,12 @@ body {
     color: #0f172a;
     margin-top: 0.5mm;
     word-break: break-word;
+}
+/* Name row with founder stamp */
+.name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 .voting-box {
     background: #f1f5f9;
@@ -375,17 +384,24 @@ body {
                 <div>
                     <div class="logo-row">
                         <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english hidden">Gambella Majang Forest Coffee</div></div>
-                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">🌿</div>
                         <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english hidden">Producer, Manufacturer and Exporter Share Holders Association</div></div>
                     </div>
                     <div class="photo-and-info">
                         <div class="photo">
                             <div class="member-photo" id="memberPhoto">👤</div>
                             <div id="photoStamp" class="photo-stamp"></div>
-                            <div class="founder-stamp"> FOUNDER / መስራች </div>
                         </div>
                         <div class="info-grid">
-                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="displayFullName">-</div></div>
+                            <div class="info-item">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value">
+                                    <div class="name-row">
+                                        <span id="displayFullName">-</span>
+                                        <span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
                             <div class="info-item"><div class="info-label">Gender</div><div class="info-value" id="displayGender">-</div></div>
                             <div class="info-item"><div class="info-label">Age</div><div class="info-value" id="displayAge">-</div></div>
@@ -420,25 +436,22 @@ body {
 </div>
 
 <script>
-// ==================== CIRCULAR STAMP - INSIDE CIRCLE, READABLE ====================
+// ==================== CIRCULAR STAMP - 75% OF PHOTO AREA ====================
 
 function generatePhotoStamp() {
-    const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
-    
-    const size = 120;
+    const size = 100;
     const center = size / 2;
-    const radius = 54;
+    const radius = 42;
     
     // Get logo image
-    const logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
+    let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create SVG for stamp with text properly inside the circle
+    // Create SVG for stamp - properly sized for 75% of photo
     const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
                 <clipPath id="logoClip">
-                    <circle cx="${center}" cy="${center}" r="14" />
+                    <circle cx="${center}" cy="${center}" r="11" />
                 </clipPath>
             </defs>
             
@@ -446,43 +459,40 @@ function generatePhotoStamp() {
             <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="2.5"/>
             <circle cx="${center}" cy="${center}" r="${radius - 3}" fill="none" stroke="#8B4513" stroke-width="1"/>
             
-            <!-- Inner circle border -->
-            <circle cx="${center}" cy="${center}" r="20" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
+            <!-- Inner circle background -->
+            <circle cx="${center}" cy="${center}" r="15" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.2"/>
             
-            <!-- Amharic text on top arc (inside circle) -->
-            <path id="topArc" d="M 18 ${center - 5} A 42 42 0 0 1 102 ${center - 5}" fill="none"/>
+            <!-- Amharic text on top arc -->
+            <path id="topArc" d="M 15 ${center - 4} A 35 35 0 0 1 85 ${center - 4}" fill="none"/>
             <text font-size="3.2" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
                 <textPath href="#topArc" startOffset="50%" text-anchor="middle">
-                    የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
+                    የጋምቤላ ማጃንግ የጫካ ቡና
                 </textPath>
             </text>
             
-            <!-- English text on bottom arc (inside circle) -->
-            <path id="bottomArc" d="M 18 ${center + 5} A 42 42 0 0 0 102 ${center + 5}" fill="none"/>
-            <text font-size="1.9" fill="#8B4513" font-weight="bold">
+            <!-- English text on bottom arc -->
+            <path id="bottomArc" d="M 15 ${center + 4} A 35 35 0 0 0 85 ${center + 4}" fill="none"/>
+            <text font-size="2.2" fill="#8B4513" font-weight="bold">
                 <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
-                    Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
+                    GMFC Share Holders Association
                 </textPath>
             </text>
             
             <!-- Logo in center -->
-            <image href="${logoImgSrc}" x="${center - 14}" y="${center - 14}" width="28" height="28" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
-            
-            <!-- Small text below logo -->
-            <text x="${center}" y="${center + 18}" font-size="3" text-anchor="middle" fill="#fbbf24" font-weight="bold">GMFC</text>
+            <image href="${logoImgSrc}" x="${center - 11}" y="${center - 11}" width="22" height="22" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
             
             <!-- Star decorations -->
-            <text x="10" y="${center}" font-size="5" fill="#8B4513">★</text>
-            <text x="110" y="${center}" font-size="5" fill="#8B4513">★</text>
-            <text x="${center}" y="12" font-size="5" fill="#8B4513">★</text>
-            <text x="${center}" y="108" font-size="5" fill="#8B4513">★</text>
+            <text x="10" y="${center}" font-size="4" fill="#8B4513">★</text>
+            <text x="90" y="${center}" font-size="4" fill="#8B4513">★</text>
+            <text x="${center}" y="10" font-size="4" fill="#8B4513">★</text>
+            <text x="${center}" y="90" font-size="4" fill="#8B4513">★</text>
         </svg>
     `;
     
     return svg;
 }
 
-// Apply stamp to photo overlay only
+// Apply stamp to photo overlay (covers 75% of photo)
 function applyPhotoStamp() {
     const stampContainer = document.getElementById('photoStamp');
     if (stampContainer) {
@@ -539,8 +549,17 @@ function updateCard(member) {
     document.getElementById('displayGender').innerText = member.gender || '-';
     document.getElementById('displayPhone').innerText = member.phone || '-';
     document.getElementById('displayAddress').innerText = member.address || '-';
-    document.getElementById('displayPosition').innerText = member.role || '-';
+    document.getElementById('displayPosition').innerText = member.role || member.position || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
+    
+    // Show founder badge for founder role
+    const founderBadge = document.getElementById('founderBadge');
+    const role = (member.role || member.position || '').toLowerCase();
+    if (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') {
+        founderBadge.style.display = 'inline-block';
+    } else {
+        founderBadge.style.display = 'none';
+    }
     
     displayPhoto(member.memberPhoto, member.gender);
     
@@ -549,9 +568,9 @@ function updateCard(member) {
     document.getElementById('displayVotingPower').innerText = votingPower;
     
     const tierBadge = document.getElementById('tierBadge');
-    if (shares >= 200) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
-    else if (shares >= 100) tierBadge.innerHTML = '🥇 GOLD MEMBER';
-    else if (shares >= 50) tierBadge.innerHTML = '🥈 SILVER MEMBER';
+    if (shares >= 1000) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
+    else if (shares >= 500) tierBadge.innerHTML = '🥇 GOLD MEMBER';
+    else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
     document.getElementById('managerName').innerText = member.fullName || '-';
