@@ -126,14 +126,14 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp overlay - spans from left to right at bottom of photo */
+/* Stamp positioned below chest with 4cm diameter */
 .photo-stamp {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 40%;
+    bottom: -75%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,17 +141,9 @@ body {
     z-index: 10;
 }
 .photo-stamp svg {
-    width: auto;
-    height: 100%;
-    opacity: 0.6;
-}
-/* Make stamp go across the bottom */
-.stamp-wrapper {
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    opacity: 0.7;
 }
 .info-grid {
     flex: 1;
@@ -444,61 +436,58 @@ body {
 </div>
 
 <script>
-// ==================== STAMP SPANS LEFT TO RIGHT AT BOTTOM OF PHOTO ====================
+// ==================== STAMP WITH 4cm DIAMETER ====================
 
 function generatePhotoStamp() {
-    const width = 100;
-    const height = 30;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = 14;
+    // 4cm diameter = 40mm = about 150px at 96dpi, but we'll use relative sizing
+    const size = 150;  // 4cm diameter in pixels (approx)
+    const center = size / 2;
+    const radius = 70;  // 3.5cm radius (slightly smaller for better fit)
     
     // Get logo image
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create SVG for stamp - wide and short, spanning left to right
     const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
             <defs>
                 <clipPath id="logoClip">
-                    <circle cx="${centerX}" cy="${centerY}" r="7" />
+                    <circle cx="${center}" cy="${center}" r="28" />
                 </clipPath>
             </defs>
             
-            <!-- Stamp background - semi-transparent -->
-            <rect x="0" y="0" width="${width}" height="${height}" fill="none"/>
-            
             <!-- Outer circle border -->
-            <circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="1.8"/>
-            <circle cx="${centerX}" cy="${centerY}" r="${radius - 2}" fill="none" stroke="#8B4513" stroke-width="0.6"/>
+            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="3.5"/>
+            <circle cx="${center}" cy="${center}" r="${radius - 5}" fill="none" stroke="#8B4513" stroke-width="1.5"/>
             
-            <!-- Slight rotation to look like a real stamp -->
-            <g transform="rotate(-3, ${centerX}, ${centerY})">
+            <!-- Slight rotation for authentic stamp look -->
+            <g transform="rotate(-3, ${center}, ${center})">
                 <!-- Inner circle background -->
-                <circle cx="${centerX}" cy="${centerY}" r="9" fill="#2d5a3b" stroke="#8B4513" stroke-width="0.8"/>
+                <circle cx="${center}" cy="${center}" r="32" fill="#2d5a3b" stroke="#8B4513" stroke-width="2"/>
                 
                 <!-- Amharic text on top arc -->
-                <path id="topArc" d="M 38 ${centerY - 2} A 12 12 0 0 1 62 ${centerY - 2}" fill="none"/>
-                <text font-size="3.2" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
+                <path id="topArc" d="M 40 ${center - 10} A 55 55 0 0 1 110 ${center - 10}" fill="none"/>
+                <text font-size="7.5" fill="#8B4513" font-weight="bold" letter-spacing="0.5">
                     <textPath href="#topArc" startOffset="50%" text-anchor="middle">
                         የጋምቤላ ማጃንግ
                     </textPath>
                 </text>
                 
                 <!-- English text on bottom arc -->
-                <path id="bottomArc" d="M 38 ${centerY + 2} A 12 12 0 0 0 62 ${centerY + 2}" fill="none"/>
-                <text font-size="2.2" fill="#8B4513" font-weight="bold">
+                <path id="bottomArc" d="M 40 ${center + 12} A 55 55 0 0 0 110 ${center + 12}" fill="none"/>
+                <text font-size="5.5" fill="#8B4513" font-weight="bold">
                     <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
-                        GMFC Association
+                        GMFC Share Association
                     </textPath>
                 </text>
                 
                 <!-- Logo in center -->
-                <image href="${logoImgSrc}" x="${centerX - 7}" y="${centerY - 7}" width="14" height="14" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
+                <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
                 
-                <!-- Small star decorations -->
-                <text x="34" y="${centerY}" font-size="2.5" fill="#8B4513">★</text>
-                <text x="66" y="${centerY}" font-size="2.5" fill="#8B4513">★</text>
+                <!-- Star decorations -->
+                <text x="25" y="${center}" font-size="8" fill="#8B4513">★</text>
+                <text x="125" y="${center}" font-size="8" fill="#8B4513">★</text>
+                <text x="${center}" y="20" font-size="8" fill="#8B4513">★</text>
+                <text x="${center}" y="130" font-size="8" fill="#8B4513">★</text>
             </g>
         </svg>
     `;
@@ -506,7 +495,7 @@ function generatePhotoStamp() {
     return svg;
 }
 
-// Apply stamp at bottom of photo spanning left to right
+// Apply stamp with 4cm diameter below chest
 function applyPhotoStamp() {
     const stampContainer = document.getElementById('photoStamp');
     if (stampContainer) {
