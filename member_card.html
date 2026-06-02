@@ -41,7 +41,7 @@ body {
     overflow: hidden;
     position: relative;
 }
-/* Your image as repeating background pattern */
+/* CSS pattern background - GAMJNG text pattern */
 .id-card::before {
     content: '';
     position: absolute;
@@ -49,24 +49,59 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('mk.jpg');
-    background-repeat: repeat;
-    background-size: 100px 100px;
-    opacity: 0.12;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(45, 106, 26, 0.06) 0px,
+        rgba(45, 106, 26, 0.06) 2px,
+        transparent 2px,
+        transparent 8px
+    );
     pointer-events: none;
     z-index: 0;
 }
+
+/* GAMJNG watermark text */
+.id-card::after {
+    content: "GAMJNG";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Arial Black', sans-serif;
+    color: rgba(45, 106, 26, 0.06);
+    text-align: center;
+    letter-spacing: 15px;
+    pointer-events: none;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    white-space: normal;
+    line-height: 2;
+    transform: rotate(-15deg);
+}
+
 @media screen {
     .id-card {
         width: 450px;
         height: 284px;
     }
+    .id-card::after {
+        font-size: 28px;
+        letter-spacing: 20px;
+        transform: rotate(-15deg) scale(1.2);
+    }
 }
+
 .card-side {
     width: 100%;
     height: 100%;
     padding: 3.5mm;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -368,7 +403,8 @@ body {
 @media print {
     body { background: white; padding: 0; margin: 0; display: block; }
     .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
-    .id-card::before { opacity: 0.05; }
+    .id-card::before { opacity: 0.3; }
+    .id-card::after { opacity: 0.2; }
     .toolbar, .print-btn, .credentials-box, .search-box, .success-message { display: none; }
 }
 </style>
