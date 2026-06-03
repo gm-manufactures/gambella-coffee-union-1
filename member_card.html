@@ -470,19 +470,15 @@ function updateCard(member) {
     document.getElementById('issueDate').textContent = today.toISOString().split('T')[0];
     document.getElementById('expiryDate').textContent = expiry.toISOString().split('T')[0];
     
-    // FIXED: Shortened QR code data - only essential info to avoid overflow
-    let qrData = {
-        id: member.memberId || member._id,
-        name: (member.fullName || '').substring(0, 25),
-        phone: member.phone || ''
-    };
+    // ✅ QR CODE UPDATED: Now directs to member portal with member ID
+    const portalUrl = `https://gambella-coffee-union-1.onrender.com/member-portal.html?memberId=${encodeURIComponent(member.memberId || member._id)}`;
     
     let qrContainer = document.getElementById('qrcode');
     if (qrContainer) {
         qrContainer.innerHTML = '';
         try {
             new QRCode(qrContainer, { 
-                text: JSON.stringify(qrData), 
+                text: portalUrl, 
                 width: 38, 
                 height: 38, 
                 colorDark: "#2d5a3b", 
@@ -490,7 +486,6 @@ function updateCard(member) {
             });
         } catch(e) {
             console.error("QR Error:", e);
-            // Fallback: show member ID as text
             qrContainer.innerHTML = `<div style="font-size:5px;text-align:center;word-break:break-all;">${member.memberId || ''}</div>`;
         }
     }
