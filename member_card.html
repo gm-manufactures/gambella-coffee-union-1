@@ -52,7 +52,7 @@ body {
     background-image: repeating-linear-gradient(
         0deg,
         transparent,
-        transparent 30px,
+        transparent 60px,
         rgba(45, 106, 26, 0.06) 30px,
         rgba(45, 106, 26, 0.06) 60px
     );
@@ -480,9 +480,9 @@ body {
             <div class="card-side front">
                 <div>
                     <div class="logo-row">
-                        <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english hidden">Gambella Majang Forest Coffee</div></div>
+                        <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english ">Gambella Majang Forest Coffee</div></div>
                         <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
-                        <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english hidden">Producer, Manufacturer and Exporter Share Holders Association</div></div>
+                        <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english ">Producer, Manufacturer and Exporter Share Holders Association</div></div>
                     </div>
                     <div class="photo-and-info">
                         <div class="photo">
@@ -521,13 +521,13 @@ body {
         <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
-                    <div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div>
+                    <div class="motivation">ማጃንግን የማያለማ ቡና አይሸጥ!! </div>
                     
                     <div class="qr-section">
                         <div class="qr-placeholder">
                             <div id="qrcode"></div>
                         </div>
-                        <div class="scan-text">📱 Scan to access your member portal</div>
+                        <div class="scan-text">📱 Scan here</div>
                     </div>
                     
                     <div class="dates-box">
@@ -549,7 +549,7 @@ body {
                             <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
                             <div class="signature-area">
-                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
                             </div>
                         </div>
                     </div>
@@ -587,7 +587,7 @@ function generatePhotoStamp() {
                     <textPath href="#topArc" startOffset="50%" text-anchor="middle">የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር</textPath>
                 </text>
                 <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
-                <text font-size="4.2" fill="#8B4513" font-weight="bold">
+                <text font-size="5.8" fill="#8B4513" font-weight="bold">
                     <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association</textPath>
                 </text>
                 <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
