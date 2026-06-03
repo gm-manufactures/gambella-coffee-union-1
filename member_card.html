@@ -41,7 +41,6 @@ body {
     overflow: hidden;
     position: relative;
 }
-/* CSS pattern background */
 .id-card::before {
     content: '';
     position: absolute;
@@ -49,13 +48,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: repeating-linear-gradient(
-        45deg,
-        rgba(45, 106, 26, 0.05) 0px,
-        rgba(45, 106, 26, 0.05) 2px,
-        transparent 2px,
-        transparent 8px
-    );
+    background-image: repeating-linear-gradient(45deg, rgba(45,106,26,0.05) 0px, rgba(45,106,26,0.05) 2px, transparent 2px, transparent 8px);
     pointer-events: none;
     z-index: 0;
 }
@@ -69,7 +62,7 @@ body {
     font-size: 28px;
     font-weight: bold;
     font-family: 'Arial Black', sans-serif;
-    color: rgba(45, 106, 26, 0.05);
+    color: rgba(45,106,26,0.05);
     text-align: center;
     letter-spacing: 15px;
     pointer-events: none;
@@ -89,7 +82,7 @@ body {
     width: 100%;
     height: 100%;
     padding: 3.5mm;
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255,255,255,0.94);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -133,17 +126,8 @@ body {
     margin-left: 6px;
     vertical-align: middle;
 }
-.photo-and-info {
-    display: flex;
-    gap: 2.5mm;
-    margin-bottom: 1.5mm;
-    align-items: flex-start;
-}
-.photo {
-    width: 12mm;
-    text-align: center;
-    position: relative;
-}
+.photo-and-info { display: flex; gap: 2.5mm; margin-bottom: 1.5mm; align-items: flex-start; }
+.photo { width: 12mm; text-align: center; position: relative; }
 .member-photo {
     width: 11mm;
     height: 11mm;
@@ -158,12 +142,7 @@ body {
     overflow: hidden;
     position: relative;
 }
-.member-photo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-/* Stamp overlay */
+.member-photo-img { width: 100%; height: 100%; object-fit: cover; }
 .photo-stamp {
     position: absolute;
     bottom: -75%;
@@ -177,14 +156,10 @@ body {
     pointer-events: none;
     z-index: 10;
 }
-.photo-stamp svg {
-    width: 100%;
-    height: 100%;
-    opacity: 0.7;
-}
+.photo-stamp svg { width: 100%; height: 100%; opacity: 0.7; }
 .info-grid {
     flex: 1;
-    background: rgba(248, 250, 252, 0.9);
+    background: rgba(248,250,252,0.9);
     border-radius: 2.5mm;
     padding: 1.5mm;
     display: grid;
@@ -196,25 +171,11 @@ body {
     border-radius: 1.5mm;
     padding: 0.5mm 1mm;
 }
-.info-label {
-    font-size: 1.4mm;
-    font-weight: 600;
-    color: #475569;
-}
-.info-value {
-    font-size: 1.8mm;
-    font-weight: 500;
-    color: #0f172a;
-    margin-top: 0.5mm;
-    word-break: break-word;
-}
-.name-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
+.info-label { font-size: 1.4mm; font-weight: 600; color: #475569; }
+.info-value { font-size: 1.8mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; word-break: break-word; }
+.name-row { display: flex; align-items: center; flex-wrap: wrap; }
 .voting-box {
-    background: rgba(241, 245, 249, 0.9);
+    background: rgba(241,245,249,0.9);
     border-radius: 2mm;
     padding: 1mm;
     margin: 1.2mm 0;
@@ -224,20 +185,8 @@ body {
     font-size: 1.5mm;
     flex-wrap: wrap;
 }
-.voting-power {
-    background: #fbbf24;
-    padding: 0.3mm 1.5mm;
-    border-radius: 2.5mm;
-    font-weight: bold;
-}
-.qr-placeholder {
-    width: 10mm;
-    height: 10mm;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.voting-power { background: #fbbf24; padding: 0.3mm 1.5mm; border-radius: 2.5mm; font-weight: bold; }
+.qr-placeholder { width: 10mm; height: 10mm; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
 #qrcode { width: 10mm; height: 10mm; }
 #qrcode img { width: 100% !important; height: 100% !important; }
 .motivation {
@@ -251,7 +200,7 @@ body {
     margin: 1mm 0;
 }
 .dates-box {
-    background: rgba(241, 245, 249, 0.9);
+    background: rgba(241,245,249,0.9);
     border-radius: 1.5mm;
     padding: 0.8mm;
     margin: 0.8mm 0;
@@ -268,34 +217,11 @@ body {
     text-align: center;
 }
 .sign-box-back { width: 48%; }
-.sign-line-back {
-    margin-top: 1mm;
-    border-top: 0.2mm solid #334155;
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
-}
-.back-notes {
-    font-size: 1.55mm;
-    color: #1e293b;
-    line-height: 1.35;
-    margin-top: 1mm;
-}
-.back-notes p {
-    margin: 0.8mm 0;
-    background: #fefce8;
-    padding: 0.5mm 1mm;
-    border-radius: 1.5mm;
-    border-left: 0.8mm solid #fbbf24;
-}
+.sign-line-back { margin-top: 1mm; border-top: 0.2mm solid #334155; width: 60%; margin-left: auto; margin-right: auto; }
+.back-notes { font-size: 1.55mm; color: #1e293b; line-height: 1.35; margin-top: 1mm; }
+.back-notes p { margin: 0.8mm 0; background: #fefce8; padding: 0.5mm 1mm; border-radius: 1.5mm; border-left: 0.8mm solid #fbbf24; }
 .back-notes p strong { color: #b45309; }
-.toolbar {
-    display: flex;
-    gap: 10px;
-    margin: 20px auto;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+.toolbar { display: flex; gap: 10px; margin: 20px auto; flex-wrap: wrap; justify-content: center; }
 .tool-btn {
     background: #2d5a3b;
     color: white;
@@ -359,15 +285,8 @@ body {
     cursor: pointer;
     font-size: 14px;
 }
-.search-box button:hover {
-    background: #1e3c2c;
-}
-.loading {
-    text-align: center;
-    padding: 20px;
-    color: white;
-    font-size: 18px;
-}
+.search-box button:hover { background: #1e3c2c; }
+.loading { text-align: center; padding: 20px; color: white; font-size: 18px; }
 .error-message {
     background: #f8d7da;
     color: #721c24;
@@ -402,17 +321,13 @@ body {
         <button onclick="loadCardByMemberId()">ካርድ አምጣ</button>
     </div>
     
-    <div id="successMessage" class="success-message hidden">
-        ✅ ካርድ በሚገባ ተዘጋጅቷል!
+    <div id="loginWarning" class="error-message hidden">
+        ⚠️ እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! <a href="/dashboard.html" style="color:#155724;">እዚህ ይጫኑ</a>
     </div>
     
-    <div id="loadingMessage" class="loading hidden">
-        ⏳ እባክዎ ይጠብቁ... ካርድ እየተዘጋጀ ነው
-    </div>
-    
-    <div id="errorMessage" class="error-message hidden">
-        ❌ አባል አልተገኘም
-    </div>
+    <div id="successMessage" class="success-message hidden">✅ ካርድ በሚገባ ተዘጋጅቷል!</div>
+    <div id="loadingMessage" class="loading hidden">⏳ እባክዎ ይጠብቁ... ካርድ እየተዘጋጀ ነው</div>
+    <div id="errorMessage" class="error-message hidden">❌ አባል አልተገኘም</div>
     
     <div id="cardContainer" class="card-container hidden">
         <div class="id-card" id="frontCard">
@@ -429,15 +344,7 @@ body {
                             <div id="photoStamp" class="photo-stamp"></div>
                         </div>
                         <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Full Name</div>
-                                <div class="info-value">
-                                    <div class="name-row">
-                                        <span id="displayFullName">-</span>
-                                        <span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value"><div class="name-row"><span id="displayFullName">-</span><span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span></div></div></div>
                             <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
                             <div class="info-item"><div class="info-label">Gender</div><div class="info-value" id="displayGender">-</div></div>
                             <div class="info-item"><div class="info-label">Age</div><div class="info-value" id="displayAge">-</div></div>
@@ -473,35 +380,23 @@ body {
 
 <script>
 // ==================== STAMP GENERATION ====================
-
 function generatePhotoStamp() {
-    const size = 180;
-    const center = size / 2;
-    const radius = 85;
+    const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
-    
-    const svg = `
+    return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-            <defs>
-                <clipPath id="logoClip">
-                    <circle cx="${center}" cy="${center}" r="28" />
-                </clipPath>
-            </defs>
+            <defs><clipPath id="logoClip"><circle cx="${center}" cy="${center}" r="28" /></clipPath></defs>
             <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="3"/>
             <circle cx="${center}" cy="${center}" r="${radius - 4}" fill="none" stroke="#8B4513" stroke-width="1.2"/>
             <g transform="rotate(-3, ${center}, ${center})">
                 <circle cx="${center}" cy="${center}" r="32" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
                 <path id="topArc" d="M 25 ${center - 8} A 65 65 0 0 1 155 ${center - 8}" fill="none"/>
                 <text font-size="5.8" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
-                    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
-                        የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
-                    </textPath>
+                    <textPath href="#topArc" startOffset="50%" text-anchor="middle">የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር</textPath>
                 </text>
                 <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
                 <text font-size="4.2" fill="#8B4513" font-weight="bold">
-                    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
-                        Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
-                    </textPath>
+                    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association</textPath>
                 </text>
                 <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
                 <text x="18" y="${center}" font-size="7" fill="#8B4513">★</text>
@@ -511,72 +406,54 @@ function generatePhotoStamp() {
             </g>
         </svg>
     `;
-    return svg;
 }
-
-function applyPhotoStamp() {
-    const stampContainer = document.getElementById('photoStamp');
-    if (stampContainer) {
-        stampContainer.innerHTML = generatePhotoStamp();
-    }
+function applyPhotoStamp() { 
+    const container = document.getElementById('photoStamp');
+    if (container) container.innerHTML = generatePhotoStamp();
 }
 
 // ==================== MAIN FUNCTIONS ====================
 const API_BASE_URL = window.location.origin;
 
-function getToken() {
-    return localStorage.getItem('token');
-}
+function getToken() { return localStorage.getItem('token'); }
 
 function displayPhoto(photoData, gender) {
     const photoContainer = document.getElementById('memberPhoto');
     if (!photoContainer) return;
-    
     if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
-        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img" alt="Member Photo">`;
-        photoContainer.style.backgroundColor = 'transparent';
+        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img">`;
     } else {
-        const defaultEmoji = (gender === 'ሴት') ? '👩' : '👨';
-        photoContainer.innerHTML = defaultEmoji;
+        photoContainer.innerHTML = (gender === 'ሴት') ? '👩' : '👨';
         photoContainer.style.fontSize = '6mm';
         photoContainer.style.display = 'flex';
         photoContainer.style.alignItems = 'center';
         photoContainer.style.justifyContent = 'center';
         photoContainer.style.backgroundColor = '#e2e8f0';
     }
-    
-    setTimeout(() => {
-        applyPhotoStamp();
-    }, 100);
+    setTimeout(() => applyPhotoStamp(), 100);
 }
 
 function updateCard(member) {
-    console.log("Updating card with member data:", member);
+    console.log("Updating card with member:", member.fullName);
     
-    document.getElementById('displayMemberId').innerText = member.memberId || member._id || '-';
-    document.getElementById('displayFullName').innerText = member.fullName || '-';
-    document.getElementById('displayMotherName').innerText = member.motherName || '-';
-    document.getElementById('displayAge').innerText = member.age || '-';
-    document.getElementById('displayGender').innerText = member.gender || '-';
-    document.getElementById('displayPhone').innerText = member.phone || '-';
-    document.getElementById('displayAddress').innerText = member.address || '-';
-    document.getElementById('displayPosition').innerText = member.role || member.position || '-';
-    document.getElementById('displayShares').innerText = member.shareCount || '0';
+    document.getElementById('displayMemberId').textContent = member.memberId || member._id || '-';
+    document.getElementById('displayFullName').textContent = member.fullName || '-';
+    document.getElementById('displayMotherName').textContent = member.motherName || '-';
+    document.getElementById('displayAge').textContent = member.age || '-';
+    document.getElementById('displayGender').textContent = member.gender || '-';
+    document.getElementById('displayPhone').textContent = member.phone || '-';
+    document.getElementById('displayAddress').textContent = member.address || '-';
+    document.getElementById('displayPosition').textContent = member.role || member.position || '-';
+    document.getElementById('displayShares').textContent = member.shareCount || '0';
     
-    // Show founder badge
     const founderBadge = document.getElementById('founderBadge');
     const role = (member.role || member.position || '').toLowerCase();
-    if (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') {
-        founderBadge.style.display = 'inline-block';
-    } else {
-        founderBadge.style.display = 'none';
-    }
+    founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
     
     displayPhoto(member.memberPhoto, member.gender);
     
     const shares = parseInt(member.shareCount || 0);
-    const votingPower = Math.min(Math.floor(shares / 100) + 1, 10);
-    document.getElementById('displayVotingPower').innerText = votingPower;
+    document.getElementById('displayVotingPower').textContent = Math.min(Math.floor(shares / 100) + 1, 10);
     
     const tierBadge = document.getElementById('tierBadge');
     if (shares >= 1000) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
@@ -584,56 +461,57 @@ function updateCard(member) {
     else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
-    document.getElementById('managerName').innerText = member.fullName || '-';
-    document.getElementById('contactPhone').innerText = member.phone || '-';
+    document.getElementById('managerName').textContent = member.fullName || '-';
+    document.getElementById('contactPhone').textContent = member.phone || '-';
     
     const today = new Date();
     const expiry = new Date();
     expiry.setFullYear(today.getFullYear() + 5);
-    document.getElementById('issueDate').innerText = today.toISOString().split('T')[0];
-    document.getElementById('expiryDate').innerText = expiry.toISOString().split('T')[0];
+    document.getElementById('issueDate').textContent = today.toISOString().split('T')[0];
+    document.getElementById('expiryDate').textContent = expiry.toISOString().split('T')[0];
     
+    // FIXED: Shortened QR code data - only essential info to avoid overflow
     let qrData = {
         id: member.memberId || member._id,
-        name: member.fullName,
-        phone: member.phone,
-        shares: shares
+        name: (member.fullName || '').substring(0, 25),
+        phone: member.phone || ''
     };
+    
     let qrContainer = document.getElementById('qrcode');
     if (qrContainer) {
         qrContainer.innerHTML = '';
-        new QRCode(qrContainer, {
-            text: JSON.stringify(qrData),
-            width: 38,
-            height: 38,
-            colorDark: "#2d5a3b",
-            colorLight: "#ffffff"
-        });
+        try {
+            new QRCode(qrContainer, { 
+                text: JSON.stringify(qrData), 
+                width: 38, 
+                height: 38, 
+                colorDark: "#2d5a3b", 
+                colorLight: "#ffffff"
+            });
+        } catch(e) {
+            console.error("QR Error:", e);
+            // Fallback: show member ID as text
+            qrContainer.innerHTML = `<div style="font-size:5px;text-align:center;word-break:break-all;">${member.memberId || ''}</div>`;
+        }
     }
     
-    // Show card container
     document.getElementById('cardContainer').classList.remove('hidden');
     document.getElementById('toolbar').classList.remove('hidden');
     document.getElementById('successMessage').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('successMessage').classList.add('hidden');
-    }, 3000);
+    setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
 }
 
 async function fetchMemberByMemberId(memberId) {
     try {
         const token = getToken();
         if (!token) {
-            showError('እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! Please login first.');
+            document.getElementById('loginWarning').classList.remove('hidden');
             return null;
         }
         
-        // First try to search by memberId
-        const response = await fetch(`${API_BASE_URL}/api/members/search/${encodeURIComponent(memberId)}`, {
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+        // Try search endpoint first
+        let response = await fetch(`${API_BASE_URL}/api/members/search/${encodeURIComponent(memberId)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (response.ok) {
@@ -642,22 +520,21 @@ async function fetchMemberByMemberId(memberId) {
             if (exactMatch) return exactMatch;
         }
         
-        // If not found, get all members and search
-        const allMembersResponse = await fetch(`${API_BASE_URL}/api/members`, {
+        // Then try getting all members
+        response = await fetch(`${API_BASE_URL}/api/members`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (allMembersResponse.ok) {
-            const allMembers = await allMembersResponse.json();
+        if (response.ok) {
+            const allMembers = await response.json();
             const member = allMembers.find(m => m.memberId === memberId || m._id === memberId);
             if (member) return member;
         }
         
         showError(`አባል ቁጥር "${memberId}" አልተገኘም!`);
         return null;
-        
     } catch (error) {
-        console.error('Error fetching member:', error);
+        console.error('Error:', error);
         showError('የአገልጋይ ስህተት: ' + error.message);
         return null;
     }
@@ -673,17 +550,18 @@ async function loadCardByMemberId() {
     }
     
     // Auto-format if user just entered numbers
-    if (!memberId.includes('GMFC/')) {
+    if (!memberId.includes('GMFC/') && /^\d+$/.test(memberId)) {
         const currentYear = new Date().getFullYear();
         memberId = `GMFC/${currentYear}/${memberId}`;
         memberIdInput.value = memberId;
     }
     
-    // Show loading, hide card
+    // Reset UI
     document.getElementById('loadingMessage').classList.remove('hidden');
     document.getElementById('cardContainer').classList.add('hidden');
     document.getElementById('toolbar').classList.add('hidden');
     document.getElementById('errorMessage').classList.add('hidden');
+    document.getElementById('loginWarning').classList.add('hidden');
     document.getElementById('successMessage').classList.add('hidden');
     
     const member = await fetchMemberByMemberId(memberId);
@@ -701,63 +579,52 @@ function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.innerHTML = `❌ ${message}`;
     errorDiv.classList.remove('hidden');
-    setTimeout(() => {
-        errorDiv.classList.add('hidden');
-    }, 5000);
+    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
 }
 
 async function checkUrlParams() {
     const params = new URLSearchParams(window.location.search);
     if (params.has('memberId')) {
-        let memberId = params.get('memberId');
-        document.getElementById('memberIdInput').value = memberId;
+        document.getElementById('memberIdInput').value = params.get('memberId');
         await loadCardByMemberId();
     }
 }
 
 async function downloadAsImage() {
-    const front = document.getElementById('frontCard');
-    const back = document.getElementById('backCard');
-    
+    const front = document.getElementById('frontCard'), back = document.getElementById('backCard');
     try {
         const fc = await html2canvas(front, { scale: 3 });
         const bc = await html2canvas(back, { scale: 3 });
-        
-        const a = document.createElement('a');
+        let a = document.createElement('a');
         a.download = 'card_front.png';
         a.href = fc.toDataURL();
         a.click();
-        
         setTimeout(() => {
-            const b = document.createElement('a');
+            let b = document.createElement('a');
             b.download = 'card_back.png';
             b.href = bc.toDataURL();
             b.click();
         }, 500);
-    } catch (error) {
-        console.error('Error generating image:', error);
-        alert('ምስል ማውረድ አልተሳካም');
+    } catch(e) { 
+        console.error('Download error:', e);
+        alert('ምስል ማውረድ አልተሳካም'); 
     }
 }
 
-function printCard() {
-    window.print();
-}
-
-async function checkLogin() {
-    const token = getToken();
-    if (!token) {
-        showError('እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! Please login first.');
-    } else {
-        // Check if there's a memberId in URL
-        checkUrlParams();
-    }
-}
+function printCard() { window.print(); }
 
 // Initialize
-checkLogin();
+async function init() {
+    const token = getToken();
+    if (!token) {
+        document.getElementById('loginWarning').classList.remove('hidden');
+    } else {
+        await checkUrlParams();
+    }
+}
 
-// Make functions global
+init();
+
 window.loadCardByMemberId = loadCardByMemberId;
 window.downloadAsImage = downloadAsImage;
 window.printCard = printCard;
