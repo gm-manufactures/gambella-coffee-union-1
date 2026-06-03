@@ -187,7 +187,7 @@ body {
 }
 .voting-power { background: #fbbf24; padding: 0.3mm 1.5mm; border-radius: 2.5mm; font-weight: bold; }
 
-/* ========== FIXED: LARGER QR CODE SECTION ========== */
+/* Back card - QR Code section */
 .back-content {
     display: flex;
     flex-direction: column;
@@ -199,7 +199,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 2mm 0;
+    margin: 1mm 0;
 }
 .qr-placeholder {
     width: 22mm;
@@ -222,51 +222,100 @@ body {
 }
 .scan-text {
     text-align: center;
-    font-size: 1.6mm;
+    font-size: 1.4mm;
     color: #555;
-    margin-top: 1mm;
+    margin-top: 0.5mm;
 }
 .motivation {
     text-align: center;
-    font-size: 1.7mm;
+    font-size: 1.5mm;
     font-weight: bold;
     color: #b45309;
     background: #fef9e6;
-    padding: 0.6mm;
+    padding: 0.5mm;
     border-radius: 2mm;
-    margin: 1mm 0;
+    margin: 0.5mm 0;
 }
 .dates-box {
     background: rgba(241,245,249,0.9);
     border-radius: 1.5mm;
-    padding: 0.8mm;
-    margin: 0.8mm 0;
+    padding: 0.6mm;
+    margin: 0.5mm 0;
     display: flex;
     justify-content: space-between;
-    font-size: 1.4mm;
+    font-size: 1.3mm;
     font-weight: 500;
 }
 .signatures-back {
     display: flex;
     justify-content: space-between;
-    margin: 0.8mm 0;
+    margin: 0.5mm 0;
     font-size: 1.2mm;
     text-align: center;
 }
 .sign-box-back { width: 48%; }
-.sign-line-back { margin-top: 1mm; border-top: 0.2mm solid #334155; width: 60%; margin-left: auto; margin-right: auto; }
+.sign-line-back { margin-top: 0.8mm; border-top: 0.2mm solid #334155; width: 80%; margin-left: auto; margin-right: auto; }
+/* Signature area */
+.signature-area {
+    margin-top: 0.5mm;
+    text-align: center;
+}
+.signature-img {
+    max-width: 40px;
+    max-height: 15px;
+    object-fit: contain;
+}
+.gm-name {
+    font-size: 1.1mm;
+    color: #555;
+    margin-top: 0.3mm;
+}
+.verification-seal {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1.5px solid #d4af37;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3mm;
+    font-weight: bold;
+    color: #d4af37;
+    transform: rotate(-15deg);
+    z-index: 20;
+}
+.verification-seal::before {
+    content: "✓";
+    font-size: 5mm;
+    font-weight: bold;
+}
+.verification-seal::after {
+    content: "DIGITAL VERIFICATION SEAL";
+    position: absolute;
+    font-size: 1.8mm;
+    white-space: nowrap;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d4af37;
+    font-weight: bold;
+}
 .back-notes {
-    font-size: 1.3mm;
+    font-size: 1.2mm;
     color: #1e293b;
-    line-height: 1.3;
-    margin-top: 1mm;
+    line-height: 1.2;
+    margin-top: 0.5mm;
 }
 .back-notes p {
-    margin: 0.5mm 0;
+    margin: 0.3mm 0;
     background: #fefce8;
-    padding: 0.3mm 0.8mm;
+    padding: 0.2mm 0.5mm;
     border-radius: 1.5mm;
-    border-left: 0.8mm solid #fbbf24;
+    border-left: 0.6mm solid #fbbf24;
 }
 .back-notes p strong { color: #b45309; }
 .toolbar { display: flex; gap: 10px; margin: 20px auto; flex-wrap: wrap; justify-content: center; }
@@ -291,23 +340,6 @@ body {
     cursor: pointer;
     display: block;
     margin: 20px auto;
-}
-.credentials-box {
-    background: linear-gradient(135deg, #1e3c2c, #2d5a3b);
-    color: white;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-.credentials-box h3 { margin-bottom: 10px; }
-.credential {
-    background: rgba(255,255,255,0.2);
-    padding: 8px;
-    border-radius: 8px;
-    margin: 5px 0;
-    font-family: monospace;
-    font-size: 16px;
 }
 .search-box {
     background: white;
@@ -356,7 +388,7 @@ body {
 @media print {
     body { background: white; padding: 0; margin: 0; display: block; }
     .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
-    .toolbar, .print-btn, .credentials-box, .search-box, .success-message { display: none; }
+    .toolbar, .print-btn, .search-box, .success-message { display: none; }
 }
 </style>
 </head>
@@ -378,6 +410,7 @@ body {
     <div id="errorMessage" class="error-message hidden">❌ አባል አልተገኘም</div>
     
     <div id="cardContainer" class="card-container hidden">
+        <!-- Front Card -->
         <div class="id-card" id="frontCard">
             <div class="card-side front">
                 <div>
@@ -405,15 +438,17 @@ body {
                     </div>
                     <div class="voting-box"><span class="tier-badge" id="tierBadge">💎 MEMBER</span><span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span></div>
                 </div>
+                <!-- Digital Verification Seal on front card -->
+                <div class="verification-seal"></div>
             </div>
         </div>
         
+        <!-- Back Card with QR Code and Signature -->
         <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
                     <div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div>
                     
-                    <!-- FIXED: Larger QR Code Section -->
                     <div class="qr-section">
                         <div class="qr-placeholder">
                             <div id="qrcode"></div>
@@ -434,7 +469,11 @@ body {
                         <div class="sign-box-back">
                             <div>General Manager</div>
                             <div class="sign-line-back"></div>
-                            <div id="managerName">-</div>
+                            <div id="managerName">ሰይድ ይማም አሸብር</div>
+                            <div class="signature-area">
+                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                                <div class="gm-name" id="gmNameDisplay">ሰይድ ይማም አሸብር</div>
+                            </div>
                         </div>
                     </div>
                     <div class="back-notes">
@@ -536,7 +575,8 @@ function updateCard(member) {
     else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
-    document.getElementById('managerName').textContent = member.fullName || '-';
+    document.getElementById('managerName').textContent = "ሰይድ ይማም አሸብር";
+    document.getElementById('gmNameDisplay').textContent = "ሰይድ ይማም አሸብር";
     document.getElementById('contactPhone').textContent = member.phone || '-';
     
     const today = new Date();
@@ -545,14 +585,13 @@ function updateCard(member) {
     document.getElementById('issueDate').textContent = today.toISOString().split('T')[0];
     document.getElementById('expiryDate').textContent = expiry.toISOString().split('T')[0];
     
-    // FIXED: Larger QR code with better URL
-    const portalUrl = `https://gambella-coffee-union-1.onrender.com/member-portal.html?memberId=${encodeURIComponent(member.memberId || member._id)}`;
+    // QR Code URL - points to member portal with memberId parameter
+    const portalUrl = `https://gambella-coffee-union-1.onrender.com/member-portal.html?memberId=${encodeURIComponent(member.memberId)}`;
     
     let qrContainer = document.getElementById('qrcode');
     if (qrContainer) {
         qrContainer.innerHTML = '';
         try {
-            // Larger QR code - 140x140 pixels for better scanning
             new QRCode(qrContainer, { 
                 text: portalUrl, 
                 width: 140, 
