@@ -41,7 +41,7 @@ body {
     overflow: hidden;
     position: relative;
 }
-/* CSS pattern background - GAMJNG text pattern */
+/* CSS pattern background */
 .id-card::before {
     content: '';
     position: absolute;
@@ -51,16 +51,14 @@ body {
     bottom: 0;
     background-image: repeating-linear-gradient(
         45deg,
-        rgba(45, 106, 26, 0.06) 0px,
-        rgba(45, 106, 26, 0.06) 2px,
+        rgba(45, 106, 26, 0.05) 0px,
+        rgba(45, 106, 26, 0.05) 2px,
         transparent 2px,
         transparent 8px
     );
     pointer-events: none;
     z-index: 0;
 }
-
-/* GAMJNG watermark text */
 .id-card::after {
     content: "GAMJNG";
     position: absolute;
@@ -68,10 +66,10 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     font-family: 'Arial Black', sans-serif;
-    color: rgba(45, 106, 26, 0.06);
+    color: rgba(45, 106, 26, 0.05);
     text-align: center;
     letter-spacing: 15px;
     pointer-events: none;
@@ -79,24 +77,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
-    white-space: normal;
-    line-height: 2;
     transform: rotate(-15deg);
 }
-
 @media screen {
     .id-card {
         width: 450px;
         height: 284px;
     }
-    .id-card::after {
-        font-size: 28px;
-        letter-spacing: 20px;
-        transform: rotate(-15deg) scale(1.2);
-    }
 }
-
 .card-side {
     width: 100%;
     height: 100%;
@@ -134,7 +122,6 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
-/* Founder stamp - next to name */
 .founder-stamp {
     display: inline-block;
     background: linear-gradient(135deg, #d4af37, #f5c542);
@@ -176,7 +163,7 @@ body {
     height: 100%;
     object-fit: cover;
 }
-/* Stamp with full association name */
+/* Stamp overlay */
 .photo-stamp {
     position: absolute;
     bottom: -75%;
@@ -221,7 +208,6 @@ body {
     margin-top: 0.5mm;
     word-break: break-word;
 }
-/* Name row with founder stamp */
 .name-row {
     display: flex;
     align-items: center;
@@ -403,8 +389,6 @@ body {
 @media print {
     body { background: white; padding: 0; margin: 0; display: block; }
     .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
-    .id-card::before { opacity: 0.3; }
-    .id-card::after { opacity: 0.2; }
     .toolbar, .print-btn, .credentials-box, .search-box, .success-message { display: none; }
 }
 </style>
@@ -488,14 +472,12 @@ body {
 </div>
 
 <script>
-// ==================== STAMP WITH FULL ASSOCIATION NAME ====================
+// ==================== STAMP GENERATION ====================
 
 function generatePhotoStamp() {
     const size = 180;
     const center = size / 2;
     const radius = 85;
-    
-    // Get logo image
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
     const svg = `
@@ -505,36 +487,23 @@ function generatePhotoStamp() {
                     <circle cx="${center}" cy="${center}" r="28" />
                 </clipPath>
             </defs>
-            
-            <!-- Outer circle border -->
             <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="3"/>
             <circle cx="${center}" cy="${center}" r="${radius - 4}" fill="none" stroke="#8B4513" stroke-width="1.2"/>
-            
-            <!-- Slight rotation for authentic stamp look -->
             <g transform="rotate(-3, ${center}, ${center})">
-                <!-- Inner circle background -->
                 <circle cx="${center}" cy="${center}" r="32" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
-                
-                <!-- Amharic text on top arc -->
                 <path id="topArc" d="M 25 ${center - 8} A 65 65 0 0 1 155 ${center - 8}" fill="none"/>
                 <text font-size="5.8" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
                     <textPath href="#topArc" startOffset="50%" text-anchor="middle">
                         የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር
                     </textPath>
                 </text>
-                
-                <!-- English text on bottom arc -->
                 <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
                 <text font-size="4.2" fill="#8B4513" font-weight="bold">
                     <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
                         Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association
                     </textPath>
                 </text>
-                
-                <!-- Logo in center -->
                 <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
-                
-                <!-- Star decorations -->
                 <text x="18" y="${center}" font-size="7" fill="#8B4513">★</text>
                 <text x="162" y="${center}" font-size="7" fill="#8B4513">★</text>
                 <text x="${center}" y="15" font-size="7" fill="#8B4513">★</text>
@@ -542,7 +511,6 @@ function generatePhotoStamp() {
             </g>
         </svg>
     `;
-    
     return svg;
 }
 
@@ -553,7 +521,7 @@ function applyPhotoStamp() {
     }
 }
 
-// ==================== CONFIGURATION ====================
+// ==================== MAIN FUNCTIONS ====================
 const API_BASE_URL = window.location.origin;
 
 function getToken() {
@@ -567,16 +535,7 @@ function displayPhoto(photoData, gender) {
     if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
         photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img" alt="Member Photo">`;
         photoContainer.style.backgroundColor = 'transparent';
-    } 
-    else if (photoData && (photoData === '👨' || photoData === '👩' || photoData === '👤')) {
-        photoContainer.innerHTML = photoData;
-        photoContainer.style.fontSize = '6mm';
-        photoContainer.style.display = 'flex';
-        photoContainer.style.alignItems = 'center';
-        photoContainer.style.justifyContent = 'center';
-        photoContainer.style.backgroundColor = '#e2e8f0';
-    } 
-    else {
+    } else {
         const defaultEmoji = (gender === 'ሴት') ? '👩' : '👨';
         photoContainer.innerHTML = defaultEmoji;
         photoContainer.style.fontSize = '6mm';
@@ -604,6 +563,7 @@ function updateCard(member) {
     document.getElementById('displayPosition').innerText = member.role || member.position || '-';
     document.getElementById('displayShares').innerText = member.shareCount || '0';
     
+    // Show founder badge
     const founderBadge = document.getElementById('founderBadge');
     const role = (member.role || member.position || '').toLowerCase();
     if (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') {
@@ -650,6 +610,14 @@ function updateCard(member) {
             colorLight: "#ffffff"
         });
     }
+    
+    // Show card container
+    document.getElementById('cardContainer').classList.remove('hidden');
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('successMessage').classList.remove('hidden');
+    setTimeout(() => {
+        document.getElementById('successMessage').classList.add('hidden');
+    }, 3000);
 }
 
 async function fetchMemberByMemberId(memberId) {
@@ -660,6 +628,7 @@ async function fetchMemberByMemberId(memberId) {
             return null;
         }
         
+        // First try to search by memberId
         const response = await fetch(`${API_BASE_URL}/api/members/search/${encodeURIComponent(memberId)}`, {
             headers: { 
                 'Authorization': `Bearer ${token}`,
@@ -673,6 +642,7 @@ async function fetchMemberByMemberId(memberId) {
             if (exactMatch) return exactMatch;
         }
         
+        // If not found, get all members and search
         const allMembersResponse = await fetch(`${API_BASE_URL}/api/members`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -702,12 +672,14 @@ async function loadCardByMemberId() {
         return;
     }
     
+    // Auto-format if user just entered numbers
     if (!memberId.includes('GMFC/')) {
         const currentYear = new Date().getFullYear();
         memberId = `GMFC/${currentYear}/${memberId}`;
         memberIdInput.value = memberId;
     }
     
+    // Show loading, hide card
     document.getElementById('loadingMessage').classList.remove('hidden');
     document.getElementById('cardContainer').classList.add('hidden');
     document.getElementById('toolbar').classList.add('hidden');
@@ -720,12 +692,6 @@ async function loadCardByMemberId() {
     
     if (member) {
         updateCard(member);
-        document.getElementById('cardContainer').classList.remove('hidden');
-        document.getElementById('toolbar').classList.remove('hidden');
-        document.getElementById('successMessage').classList.remove('hidden');
-        setTimeout(() => {
-            document.getElementById('successMessage').classList.add('hidden');
-        }, 3000);
     } else {
         document.getElementById('errorMessage').classList.remove('hidden');
     }
@@ -782,12 +748,16 @@ async function checkLogin() {
     const token = getToken();
     if (!token) {
         showError('እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! Please login first.');
+    } else {
+        // Check if there's a memberId in URL
+        checkUrlParams();
     }
 }
 
+// Initialize
 checkLogin();
-checkUrlParams();
 
+// Make functions global
 window.loadCardByMemberId = loadCardByMemberId;
 window.downloadAsImage = downloadAsImage;
 window.printCard = printCard;
