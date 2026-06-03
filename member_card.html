@@ -115,6 +115,14 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
+/* Golden Card Image */
+.golden-card-img {
+    display: block;
+    width: 20mm;
+    height: auto;
+    margin: 1mm auto 0;
+    object-fit: contain;
+}
 .founder-stamp {
     display: inline-block;
     background: linear-gradient(135deg, #d4af37, #f5c542);
@@ -180,12 +188,23 @@ body {
     padding: 1mm;
     margin: 1.2mm 0;
     display: flex;
-    justify-content: center;
-    gap: 3mm;
-    font-size: 1.5mm;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 1mm;
 }
-.voting-power { background: #fbbf24; padding: 0.3mm 1.5mm; border-radius: 2.5mm; font-weight: bold; }
+.voting-power { 
+    background: #fbbf24; 
+    padding: 0.3mm 1.5mm; 
+    border-radius: 2.5mm; 
+    font-weight: bold;
+    display: inline-block;
+}
+.tier-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8mm;
+}
 
 /* Back card - QR Code section */
 .back-content {
@@ -250,24 +269,43 @@ body {
     display: flex;
     justify-content: space-between;
     margin: 0.5mm 0;
-    font-size: 1.2mm;
     text-align: center;
 }
-.sign-box-back { width: 48%; }
-.sign-line-back { margin-top: 0.8mm; border-top: 0.2mm solid #334155; width: 80%; margin-left: auto; margin-right: auto; }
-/* Signature area */
+.sign-box-back { 
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.role-title {
+    font-size: 1.3mm;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5mm;
+}
+.gm-name-above {
+    font-size: 1.2mm;
+    color: #555;
+    margin-bottom: 0.5mm;
+    font-weight: 500;
+}
+.sign-line-back { 
+    width: 80%; 
+    border-top: 0.2mm solid #334155; 
+    margin: 0.5mm 0;
+}
 .signature-area {
-    margin-top: 0.5mm;
+    margin-top: 0.3mm;
     text-align: center;
 }
 .signature-img {
-    max-width: 40px;
-    max-height: 15px;
+    max-width: 35px;
+    max-height: 12px;
     object-fit: contain;
 }
-.gm-name {
-    font-size: 1.1mm;
-    color: #555;
+.gm-name-below {
+    font-size: 1mm;
+    color: #888;
     margin-top: 0.3mm;
 }
 .verification-seal {
@@ -436,7 +474,13 @@ body {
                             <div class="info-item"><div class="info-label">Shares</div><div class="info-value" id="displayShares">-</div></div>
                         </div>
                     </div>
-                    <div class="voting-box"><span class="tier-badge" id="tierBadge">💎 MEMBER</span><span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span></div>
+                    <div class="voting-box">
+                        <div class="tier-section">
+                            <span class="tier-badge" id="tierBadge">💎 MEMBER</span>
+                            <img src="golden card.jpg" alt="Golden Card" class="golden-card-img" id="goldenCardImg" onerror="this.style.display='none'">
+                        </div>
+                        <span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span>
+                    </div>
                 </div>
                 <!-- Digital Verification Seal on front card -->
                 <div class="verification-seal"></div>
@@ -460,22 +504,26 @@ body {
                         <span>Issue: <span id="issueDate">-</span></span>
                         <span>Expiry: <span id="expiryDate">-</span></span>
                     </div>
+                    
                     <div class="signatures-back">
+                        <!-- Chairperson Section -->
                         <div class="sign-box-back">
-                            <div>Chairperson</div>
+                            <div class="role-title">Chairperson</div>
                             <div class="sign-line-back"></div>
-                            <div>ሀሰን ይመር አሊ</div>
+                            <div class="gm-name-below">ሀሰን ይመር አሊ</div>
                         </div>
+                        
+                        <!-- General Manager Section -->
                         <div class="sign-box-back">
-                            <div>General Manager</div>
+                            <div class="role-title">General Manager</div>
+                            <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
-                            <div id="managerName">ሰይድ ይማም አሸብር</div>
                             <div class="signature-area">
                                 <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
-                                <div class="gm-name" id="gmNameDisplay">ሰይድ ይማም አሸብር</div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="back-notes">
                         <p><strong>Special Benefit:</strong> የአክሲዮን ድርሻውን ወደ ትንንሽ ክፍልፋይ ካርዶች መቀየር ይችላሉ።</p>
                         <p><strong>ይህ ካርድ በእዳ ሊያዝና ይችላል።</strong></p>
@@ -575,8 +623,17 @@ function updateCard(member) {
     else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
-    document.getElementById('managerName').textContent = "ሰይድ ይማም አሸብር";
-    document.getElementById('gmNameDisplay').textContent = "ሰይድ ይማም አሸብር";
+    // Show golden card image for appropriate tiers
+    const goldenCardImg = document.getElementById('goldenCardImg');
+    if (goldenCardImg) {
+        if (shares >= 500) {
+            goldenCardImg.style.display = 'block';
+        } else {
+            goldenCardImg.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('gmNameAbove').textContent = "ሰይድ ይማም አሸብር";
     document.getElementById('contactPhone').textContent = member.phone || '-';
     
     const today = new Date();
