@@ -121,15 +121,8 @@ body {
 .right-title { flex: 1; text-align: right; }
 .right-title .amharic { font-size: 2mm; font-weight: bold; color: #1e3c2c; }
 .right-title .english { font-size: 1.2mm; color: #4b5563; margin-top: 0.5mm; }
-.tier-badge {
-    display: inline-block;
-    background: linear-gradient(135deg,#00b4d8,#0077b6);
-    color: white;
-    padding: 0.8mm 2.5mm;
-    border-radius: 3mm;
-    font-weight: bold;
-    font-size: 1.9mm;
-}
+/* No leaf emoji - removed */
+
 /* Golden Card Image - at the bottom of front side */
 .golden-card-container {
     position: absolute;
@@ -211,29 +204,32 @@ body {
 .info-label { font-size: 1.4mm; font-weight: 600; color: #475569; }
 .info-value { font-size: 1.8mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; word-break: break-word; }
 .name-row { display: flex; align-items: center; flex-wrap: wrap; }
-.voting-box {
-    background: rgba(241,245,249,0.9);
-    border-radius: 2mm;
-    padding: 1.5mm;
-    margin: 1.2mm 0;
+
+/* Member Level and Voting Power - Left and Right */
+.level-voting-row {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.8mm;
+    margin: 1.2mm 0;
+    padding: 1mm 0;
 }
-.voting-power { 
-    background: #fbbf24; 
-    padding: 0.3mm 1.5mm; 
-    border-radius: 2.5mm; 
+.member-level {
+    background: linear-gradient(135deg,#00b4d8,#0077b6);
+    color: white;
+    padding: 0.8mm 2.5mm;
+    border-radius: 3mm;
     font-weight: bold;
+    font-size: 1.9mm;
     display: inline-block;
 }
-.tier-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5mm;
-    width: 100%;
+.voting-power-box {
+    background: #fbbf24;
+    padding: 0.8mm 2.5mm;
+    border-radius: 3mm;
+    font-weight: bold;
+    font-size: 1.9mm;
+    display: inline-block;
+    color: #1e3c2c;
 }
 
 /* Back card - QR Code and Signatures */
@@ -485,7 +481,7 @@ body {
                 <div>
                     <div class="logo-row">
                         <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english hidden">Gambella Majang Forest Coffee</div></div>
-                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'">🌿</div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
                         <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english hidden">Producer, Manufacturer and Exporter Share Holders Association</div></div>
                     </div>
                     <div class="photo-and-info">
@@ -506,10 +502,10 @@ body {
                         </div>
                     </div>
                     
-                        <div class="tier-section">
-                            <span class="tier-badge" id="tierBadge">💎 MEMBER</span>
-                            <span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span>
-                        
+                    <!-- Member Level and Voting Power - Left and Right -->
+                    <div class="level-voting-row">
+                        <span class="member-level" id="tierBadge">💎 MEMBER</span>
+                        <span class="voting-power-box">Voting Power: <span id="displayVotingPower">-</span></span>
                     </div>
                 </div>
                 <!-- Golden Card Image at the bottom -->
@@ -525,7 +521,7 @@ body {
         <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
-                    <div class="motivation"> ማጃንግን የማያለማ ቡና አይሸጥ!! </div>
+                    <div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div>
                     
                     <div class="qr-section">
                         <div class="qr-placeholder">
@@ -553,7 +549,7 @@ body {
                             <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
                             <div class="signature-area">
-                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
                             </div>
                         </div>
                     </div>
