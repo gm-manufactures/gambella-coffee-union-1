@@ -41,14 +41,36 @@ body {
     overflow: hidden;
     position: relative;
 }
-.id-card::before {
+/* Background image for front card */
+.id-card.front-card {
+    position: relative;
+}
+.id-card.front-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: repeating-linear-gradient(45deg, rgba(45,106,26,0.05) 0px, rgba(45,106,26,0.05) 2px, transparent 2px, transparent 8px);
+    background-image: url('mk.jpg');
+    background-repeat: repeat;
+    background-size: 60px 60px;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
+/* Background image for back card */
+.id-card.back-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('mk.jpg');
+    background-repeat: repeat;
+    background-size: 60px 60px;
+    opacity: 0.12;
     pointer-events: none;
     z-index: 0;
 }
@@ -451,7 +473,7 @@ body {
     
     <div id="cardContainer" class="card-container hidden">
         <!-- Front Card -->
-        <div class="id-card" id="frontCard">
+        <div class="id-card front-card" id="frontCard">
             <div class="card-side front">
                 <div>
                     <div class="logo-row">
@@ -490,7 +512,7 @@ body {
         </div>
         
         <!-- Back Card with QR Code and Signatures -->
-        <div class="id-card" id="backCard">
+        <div class="id-card back-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
                     <div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div>
@@ -521,7 +543,7 @@ body {
                             <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
                             <div class="signature-area">
-                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
                             </div>
                         </div>
                     </div>
