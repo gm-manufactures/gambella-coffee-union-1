@@ -41,63 +41,56 @@ body {
     overflow: hidden;
     position: relative;
 }
-/* Background image for front card */
-.id-card.front-card {
-    position: relative;
-}
-.id-card.front-card::before {
+/* CSS Pattern Background - GAMJNG text repeated */
+.id-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('mk.jpg');
-    background-repeat: repeat;
-    background-size: 60px 60px;
-    opacity: 25;
-    pointer-events: none;
-    z-index: 0;
-}
-/* Background image for back card */
-.id-card.back-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('mk.jpg');
-    background-repeat: repeat;
-    background-size: 60px 60px;
-    opacity: 25;
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 30px,
+        rgba(45, 106, 26, 0.06) 30px,
+        rgba(45, 106, 26, 0.06) 60px
+    );
     pointer-events: none;
     z-index: 0;
 }
 .id-card::after {
-    content: "GAMJNG";
+    content: "GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
-    font-family: 'Arial Black', sans-serif;
-    color: rgba(45,106,26,0.05);
+    font-family: 'Arial Black', 'Arial', sans-serif;
+    color: rgba(45, 106, 26, 0.08);
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 2.5;
     text-align: center;
-    letter-spacing: 15px;
+    letter-spacing: 8px;
     pointer-events: none;
     z-index: 0;
+    transform: rotate(-15deg) scale(1.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: rotate(-15deg);
 }
 @media screen {
     .id-card {
         width: 450px;
         height: 284px;
+    }
+    .id-card::after {
+        font-size: 20px;
+        letter-spacing: 10px;
+        transform: rotate(-15deg) scale(1.2);
     }
 }
 .card-side {
@@ -137,13 +130,22 @@ body {
     font-weight: bold;
     font-size: 1.9mm;
 }
-/* Golden Card Image - placed below tier badge */
-.golden-card-img {
-    display: block;
-    width: 14mm;
+/* Golden Card Image - at the bottom of front side */
+.golden-card-container {
+    position: absolute;
+    bottom: 3mm;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35mm;
     height: auto;
-    margin: 0.5mm auto;
+    z-index: 5;
+    text-align: center;
+}
+.golden-card-img {
+    width: 100%;
+    height: auto;
     object-fit: contain;
+    display: block;
 }
 .founder-stamp {
     display: inline-block;
@@ -156,7 +158,12 @@ body {
     margin-left: 6px;
     vertical-align: middle;
 }
-.photo-and-info { display: flex; gap: 2.5mm; margin-bottom: 1.5mm; align-items: flex-start; }
+.photo-and-info { 
+    display: flex; 
+    gap: 2.5mm; 
+    margin-bottom: 1.5mm; 
+    align-items: flex-start;
+}
 .photo { width: 12mm; text-align: center; position: relative; }
 .member-photo {
     width: 11mm;
@@ -473,7 +480,7 @@ body {
     
     <div id="cardContainer" class="card-container hidden">
         <!-- Front Card -->
-        <div class="id-card front-card" id="frontCard">
+        <div class="id-card" id="frontCard">
             <div class="card-side front">
                 <div>
                     <div class="logo-row">
@@ -501,10 +508,13 @@ body {
                     <div class="voting-box">
                         <div class="tier-section">
                             <span class="tier-badge" id="tierBadge">💎 MEMBER</span>
-                            <img src="golden card.jpg" alt="Golden Card" class="golden-card-img" id="goldenCardImg" onerror="this.style.display='none'">
                             <span>Voting Power: <span class="voting-power" id="displayVotingPower">-</span></span>
                         </div>
                     </div>
+                </div>
+                <!-- Golden Card Image at the bottom -->
+                <div class="golden-card-container">
+                    <img src="golden card.jpg" alt="Golden Card" class="golden-card-img" id="goldenCardImg" onerror="this.style.display='none'">
                 </div>
                 <!-- Digital Verification Seal on front card -->
                 <div class="verification-seal"></div>
@@ -512,7 +522,7 @@ body {
         </div>
         
         <!-- Back Card with QR Code and Signatures -->
-        <div class="id-card back-card" id="backCard">
+        <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
                     <div class="motivation">🌟 ማጃንግን የማያለማ ቡና አይሸጥ!! 🌟</div>
@@ -646,16 +656,6 @@ function updateCard(member) {
     else if (shares >= 500) tierBadge.innerHTML = '🥇 GOLD MEMBER';
     else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
-    
-    // Show golden card image for GOLD and PLATINUM members (500+ shares)
-    const goldenCardImg = document.getElementById('goldenCardImg');
-    if (goldenCardImg) {
-        if (shares >= 500) {
-            goldenCardImg.style.display = 'block';
-        } else {
-            goldenCardImg.style.display = 'none';
-        }
-    }
     
     document.getElementById('gmNameAbove').textContent = "ሰይድ ይማም አሸብር";
     document.getElementById('contactPhone').textContent = member.phone || '-';
