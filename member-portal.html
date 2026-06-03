@@ -460,7 +460,7 @@ async function loadMemberProfile() {
         if (currentMember.memberPhoto) {
             document.getElementById('memberPhoto').src = currentMember.memberPhoto;
         }
-        
+        /*
         const countResponse = await fetch('/api/members/count', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -471,7 +471,7 @@ async function loadMemberProfile() {
         console.error('Error loading profile:', error); 
     }
 }
-
+*/
 async function loadAllMembersList() {
     try {
         const response = await fetch('/api/members', {
