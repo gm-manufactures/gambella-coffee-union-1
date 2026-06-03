@@ -28,7 +28,6 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e
 .error-message{background:#f8d7da;color:#721c24;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
 .success-message{background:#d4edda;color:#155724;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
 .info-message{background:#d1ecf1;color:#0c5460;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
-.loading-message{background:#e2e3e5;color:#383d41;padding:12px;border-radius:8px;margin-bottom:20px;display:none;text-align:center}
 .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid #ddd;padding-bottom:10px}
 .tab-btn{padding:10px 20px;background:#f0f2f5;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
 .tab-btn.active{background:#2d6a1a;color:white}
@@ -55,7 +54,6 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e
 .trading-form{background:#f9f9f9;padding:20px;border-radius:10px;margin-top:20px}
 .trading-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
 .footer-note{text-align:center;padding:20px;color:#666;font-size:0.85em;border-top:1px solid #ddd;margin-top:30px}
-.no-data{text-align:center;padding:20px;color:#666}
 @media(max-width:768px){.profile-header{flex-direction:column;text-align:center}.trading-form .form-row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -71,12 +69,11 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e
         </div>
         <div class="login-form">
             <div id="loginError" class="error-message"></div>
-            <div id="autoLoginInfo" class="info-message"></div>
-            <div id="loadingIndicator" class="loading-message">⏳ እባክዎ ይጠብቁ... እየገቡ ነው</div>
+            <div id="qrInfo" class="info-message"></div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" required placeholder="Enter your username">
+                    <label>Username (Member ID)</label>
+                    <input type="text" id="username" required placeholder="ለምሳሌ: GMFC/2026/5823">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -102,11 +99,13 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e
     </nav>
 
     <div class="container">
+        <!-- Member Count Stat -->
         <div class="stat-card">
             <div>👥 ጠቅላላ የአባላት ብዛት</div>
             <div class="stat-value" id="totalMembers">0</div>
         </div>
 
+        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('profile')">👤 የኔ መረጃ</button>
             <button class="tab-btn" onclick="showTab('trading')">📊 አክሲዬን ግብይት</button>
@@ -211,7 +210,7 @@ body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e
         <div id="membersTab" class="tab-content">
             <div class="profile-card">
                 <h3 class="section-title">📋 የአባላት ዝርዝር</h3>
-                <div style="margin-bottom:15px">
+                <div class="search-bar" style="margin-bottom:15px">
                     <input type="text" id="memberSearch" placeholder="🔍 በስም ይፈልጉ..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px" onkeyup="loadMembersList()">
                 </div>
                 <div id="membersListContainer"></div>
@@ -258,125 +257,116 @@ const SHARE_PRICE = 10000;
 
 // ==================== AUTO LOGIN FROM QR CODE ====================
 
-// Get memberId from URL parameters
-function getMemberIdFromUrl() {
+function getUsernameFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('memberId');
 }
 
-// Auto login using memberId (for QR code access)
-async function autoLoginWithMemberId(memberId) {
-    console.log('🔄 Auto-login attempt with memberId:', memberId);
+function showQRInfo(username) {
+    const qrInfo = document.getElementById('qrInfo');
+    if (qrInfo && username) {
+        qrInfo.innerHTML = `✅ ከካርድዎ በቀጥታ ደርሰዋል!<br>👤 Username: <strong>${username}</strong><br>🔑 Password: <strong>1234</strong>`;
+        qrInfo.style.display = 'block';
+        setTimeout(() => {
+            qrInfo.style.display = 'none';
+        }, 8000);
+    }
+}
+
+async function autoLoginFromQR() {
+    const username = getUsernameFromUrl();
     
-    // Hide login form, show loading
-    document.getElementById('loginForm').style.display = 'none';
-    const loadingDiv = document.getElementById('loadingIndicator');
-    loadingDiv.style.display = 'block';
-    loadingDiv.innerHTML = '⏳ እባክዎ ይጠብቁ... ካርድዎን እያገናኘን ነው...';
+    if (!username) return false;
+    
+    console.log('🔄 Auto-login with username:', username);
+    showQRInfo(username);
+    
+    const loginErrorDiv = document.getElementById('loginError');
+    loginErrorDiv.style.display = 'block';
+    loginErrorDiv.style.background = '#d1ecf1';
+    loginErrorDiv.style.color = '#0c5460';
+    loginErrorDiv.innerHTML = '⏳ እባክዎ ይጠብቁ... ከካርድዎ በቀጥታ እየገቡ ነው...';
     
     try {
-        // Method 1: Try to get member by memberId from the members list
-        console.log('📡 Fetching members list...');
-        const membersResponse = await fetch('/api/members', {
-            headers: { 'Content-Type': 'application/json' }
+        // Auto-fill the form
+        document.getElementById('username').value = username;
+        document.getElementById('password').value = '1234';
+        
+        const loginResponse = await fetch('/api/auth/member-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, password: '1234' })
         });
         
-        if (membersResponse.ok) {
-            const membersList = await membersResponse.json();
-            const members = membersList.members || membersList;
+        const loginData = await loginResponse.json();
+        
+        if (loginResponse.ok) {
+            localStorage.setItem('gmfc_token', loginData.token);
+            localStorage.setItem('gmfc_user', JSON.stringify(loginData.user));
+            token = loginData.token;
             
-            // Find member by memberId field
-            const member = members.find(m => m.memberId === memberId);
+            loginErrorDiv.style.background = '#d4edda';
+            loginErrorDiv.style.color = '#155724';
+            loginErrorDiv.innerHTML = '✅ በተሳካ ሁኔታ ገብተዋል! እየዘወተሩ ነው...';
             
-            if (member && member.phone) {
-                console.log('✅ Member found:', member.fullName);
-                
-                // Username is the memberId itself
-                const username = memberId;
-                const password = "1234";
-                
-                console.log('🔑 Attempting login with username:', username);
-                
-                // Submit login
-                const loginResponse = await fetch('/api/auth/member-login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const loginData = await loginResponse.json();
-                
-                if (loginResponse.ok) {
-                    console.log('✅ Login successful!');
-                    localStorage.setItem('gmfc_token', loginData.token);
-                    localStorage.setItem('gmfc_user', JSON.stringify(loginData.user));
-                    token = loginData.token;
-                    
-                    loadingDiv.innerHTML = '✅ በተሳካ ሁኔታ ገብተዋል! ወደ ገጽ እየወሰዱ ነው...';
-                    setTimeout(() => {
-                        loadDashboard();
-                    }, 1000);
-                    return true;
-                } else {
-                    console.log('❌ Login failed:', loginData.message);
-                    showAutoLoginError(loginData.message || 'Login failed');
-                }
-            } else {
-                console.log('❌ Member not found with memberId:', memberId);
-                showAutoLoginError(`አባል ቁጥር "${memberId}" አልተገኘም!`);
-            }
+            // Clear URL parameter
+            const url = new URL(window.location.href);
+            url.searchParams.delete('memberId');
+            window.history.replaceState({}, document.title, url.pathname);
+            
+            setTimeout(() => {
+                loadDashboard();
+            }, 1000);
+            return true;
         } else {
-            console.log('❌ Failed to fetch members list');
-            showAutoLoginError('የአገልጋይ ግንኙነት አልተሳካም');
+            loginErrorDiv.style.background = '#f8d7da';
+            loginErrorDiv.style.color = '#721c24';
+            loginErrorDiv.innerHTML = `❌ መግቢያ አልተሳካም። እባክዎ በእጅ ይግቡ።`;
+            return false;
         }
+        
     } catch (error) {
-        console.error('❌ Auto-login error:', error);
-        showAutoLoginError('የግንኙነት ስህተት: ' + error.message);
+        console.error('Auto-login error:', error);
+        loginErrorDiv.style.background = '#f8d7da';
+        loginErrorDiv.style.color = '#721c24';
+        loginErrorDiv.innerHTML = '❌ የአውቶማቲክ መግቢያ ስህተት። እባክዎ በእጅ ይግቡ።';
+        return false;
     }
-    return false;
 }
 
-function showAutoLoginError(message) {
-    const loadingDiv = document.getElementById('loadingIndicator');
-    loadingDiv.style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    const errorDiv = document.getElementById('loginError');
-    errorDiv.textContent = 'አውቶማቲክ መግቢያ አልተሳካም። እባክዎ በእጅ ይግቡ።\n' + message;
-    errorDiv.style.display = 'block';
-}
+// ==================== MAIN FUNCTIONS ====================
 
-// ==================== LOGIN FUNCTIONS ====================
-
-// Check if already logged in
 async function checkAuth() {
-    if (!token) {
-        // Check for QR code auto-login
-        const memberIdFromUrl = getMemberIdFromUrl();
-        if (memberIdFromUrl) {
-            autoLoginWithMemberId(memberIdFromUrl);
-        }
-        return;
+    const username = getUsernameFromUrl();
+    
+    if (username) {
+        const success = await autoLoginFromQR();
+        if (success) return;
     }
     
-    try {
-        const response = await fetch('/api/auth/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) { 
-            loadDashboard(); 
-        } else { 
+    if (token) {
+        try {
+            const response = await fetch('/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) { 
+                loadDashboard(); 
+            } else { 
+                showLogin(); 
+            }
+        } catch(error) { 
             showLogin(); 
         }
-    } catch(error) { 
-        showLogin(); 
+    } else {
+        showLogin();
     }
 }
 
 function showLogin() {
     document.getElementById('loginSection').style.display = 'block';
     document.getElementById('dashboardSection').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('loadingIndicator').style.display = 'none';
+    localStorage.removeItem('gmfc_token');
+    localStorage.removeItem('gmfc_user');
 }
 
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
@@ -407,8 +397,6 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         errorDiv.style.display = 'block';
     }
 });
-
-// ==================== DASHBOARD FUNCTIONS ====================
 
 async function loadDashboard() {
     document.getElementById('loginSection').style.display = 'none';
@@ -508,8 +496,8 @@ function loadMembersList() {
         return; 
     }
     container.innerHTML = filtered.map(m => `
-        <div class="member-list-item ${m._id === currentMember?._id ? 'own-profile' : ''}"
-            onclick="${m._id === currentMember?._id ? 'viewMyProfile()' : 'alert(\"የሌሎች አባላት ሙሉ መረጃ ማየት አይችሉም!\")'}">
+        <div class="member-list-item ${m.id === currentMember?.id ? 'own-profile' : ''}"
+            onclick="${m.id === currentMember?.id ? 'viewMyProfile()' : 'alert(\"የሌሎች አባላት ሙሉ መረጃ ማየት አይችሉም!\")'}">
             <div style="display:flex; justify-content:space-between; align-items:center">
                 <div><strong>${escapeHtml(m.fullName)}</strong></div>
                 <div style="font-size:0.85em; color:#666">${escapeHtml(m.role)}</div>
@@ -657,6 +645,9 @@ async function changePassword() {
         messageDiv.textContent = 'Connection error!';
         messageDiv.style.display = 'block';
     }
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
 }
 
 function showTab(tabName) {
@@ -686,9 +677,6 @@ function escapeHtml(str) {
     return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); 
 }
 
-// Initialize
-checkAuth();
-
 // Make functions global
 window.showTab = showTab;
 window.calculateTotalValue = calculateTotalValue;
@@ -698,6 +686,9 @@ window.changePassword = changePassword;
 window.viewMyProfile = viewMyProfile;
 window.loadMembersList = loadMembersList;
 window.logout = logout;
+
+// Start the application
+checkAuth();
 </script>
 </body>
 </html>
