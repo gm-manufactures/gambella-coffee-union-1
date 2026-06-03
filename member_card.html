@@ -486,49 +486,16 @@ body {
                             <div class="member-photo" id="memberPhoto">👤</div>
                             <div id="photoStamp" class="photo-stamp"></div>
                         </div>
-                      <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">ሙሉ ስም / Full Name</div>
-                                <div class="info-value-am" id="displayFullName">-</div>
-                                <div class="info-value-en" id="displayFullNameEn">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Member ID</div>
-                                <div class="info-value-am" id="displayMemberId">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">ፆታ / Gender</div>
-                                <div class="info-value-am" id="displayGender">-</div>
-                                <div class="info-value-en" id="displayGenderEn">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Age</div>
-                                <div class="info-value-am" id="displayAge">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Phone</div>
-                                <div class="info-value-am" id="displayPhone">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">የእናት ስም / Mother's Name</div>
-                                <div class="info-value-am" id="displayMotherName">-</div>
-                                <div class="info-value-en" id="displayMotherNameEn">-</div>
-                            </div>
-                           
-                            <div class="info-item full-width">
-                                <div class="info-label">አድራሻ / Address</div>
-                                <div class="info-value-am" id="displayAddress">-</div>
-                                <div class="info-value-en" id="displayAddressEn">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">ኃላፊነት / Position</div>
-                                <div class="info-value-am" id="displayPosition">-</div>
-                                <div class="info-value-en" id="displayPositionEn">-</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">የአክሲዬን ብዛት / Shares</div>
-                                <div class="info-value-am" id="displayShares">-</div>
-                            </div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value"><div class="name-row"><span id="displayFullName">-</span><span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span></div></div></div>
+                            <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
+                            <div class="info-item"><div class="info-label">Gender</div><div class="info-value" id="displayGender">-</div></div>
+                            <div class="info-item"><div class="info-label">Age</div><div class="info-value" id="displayAge">-</div></div>
+                            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="displayPhone">-</div></div>
+                            <div class="info-item"><div class="info-label">Mother</div><div class="info-value" id="displayMotherName">-</div></div>
+                            <div class="info-item"><div class="info-label">Address</div><div class="info-value" id="displayAddress">-</div></div>
+                            <div class="info-item"><div class="info-label">Position</div><div class="info-value" id="displayPosition">-</div></div>
+                            <div class="info-item"><div class="info-label">Shares</div><div class="info-value" id="displayShares">-</div></div>
                         </div>
                     </div>
                     
@@ -633,54 +600,6 @@ function applyPhotoStamp() {
     const container = document.getElementById('photoStamp');
     if (container) container.innerHTML = generatePhotoStamp();
 }
-function transliterateAmharicToEnglish(text) {
-    if (!text) return '';
-    
-    const translitMap = {
-        'ሀ': 'ha', 'ሁ': 'hu', 'ሂ': 'hi', 'ሃ': 'ha', 'ሄ': 'he', 'ህ': 'h', 'ሆ': 'ho',
-        'ለ': 'le', 'ሉ': 'lu', 'ሊ': 'li', 'ላ': 'la', 'ሌ': 'le', 'ል': 'l', 'ሎ': 'lo', 'ሏ': 'la',
-        'ሐ': 'ha', 'ሑ': 'hu', 'ሒ': 'hi', 'ሓ': 'ha', 'ሔ': 'he', 'ሕ': 'h', 'ሖ': 'ho',
-        'መ': 'me', 'ሙ': 'mu', 'ሚ': 'mi', 'ማ': 'ma', 'ሜ': 'me', 'ም': 'm', 'ሞ': 'mo', 'ሟ': 'ma',
-        'ሠ': 'se', 'ሡ': 'su', 'ሢ': 'si', 'ሣ': 'sa', 'ሤ': 'se', 'ሥ': 's', 'ሦ': 'so',
-        'ረ': 're', 'ሩ': 'ru', 'ሪ': 'ri', 'ራ': 'ra', 'ሬ': 're', 'ር': 'r', 'ሮ': 'ro', 'ሯ': 'ra',
-        'ሰ': 'se', 'ሱ': 'su', 'ሲ': 'si', 'ሳ': 'sa', 'ሴ': 'se', 'ስ': 's', 'ሶ': 'so', 'ሷ': 'sa',
-        'ሸ': 'she', 'ሹ': 'shu', 'ሺ': 'shi', 'ሻ': 'sha', 'ሼ': 'she', 'ሽ': 'sh', 'ሾ': 'sho', 'ሿ': 'sha',
-        'ቀ': 'qe', 'ቁ': 'qu', 'ቂ': 'qi', 'ቃ': 'qa', 'ቄ': 'qe', 'ቅ': 'q', 'ቆ': 'qo',
-        'በ': 'be', 'ቡ': 'bu', 'ቢ': 'bi', 'ባ': 'ba', 'ቤ': 'be', 'ብ': 'b', 'ቦ': 'bo', 'ቧ': 'ba',
-        'ተ': 'te', 'ቱ': 'tu', 'ቲ': 'ti', 'ታ': 'ta', 'ቴ': 'te', 'ት': 't', 'ቶ': 'to', 'ቷ': 'ta',
-        'ቸ': 'che', 'ቹ': 'chu', 'ቺ': 'chi', 'ቻ': 'cha', 'ቼ': 'che', 'ች': 'ch', 'ቾ': 'cho', 'ቿ': 'cha',
-        'ነ': 'ne', 'ኑ': 'nu', 'ኒ': 'ni', 'ና': 'na', 'ኔ': 'ne', 'ን': 'n', 'ኖ': 'no', 'ኗ': 'na',
-        'ኘ': 'nye', 'ኙ': 'nyu', 'ኚ': 'nyi', 'ኛ': 'nya', 'ኜ': 'nye', 'ኝ': 'ny', 'ኞ': 'nyo', 'ኟ': 'nya',
-        'አ': 'a', 'ኡ': 'u', 'ኢ': 'i', 'ኣ': 'a', 'ኤ': 'e', 'እ': 'e', 'ኦ': 'o', 'ኧ': 'a',
-        'ከ': 'ke', 'ኩ': 'ku', 'ኪ': 'ki', 'ካ': 'ka', 'ኬ': 'ke', 'ክ': 'k', 'ኮ': 'ko', 'ኰ': 'ke',
-        'ወ': 'we', 'ዉ': 'wu', 'ዊ': 'wi', 'ዋ': 'wa', 'ዌ': 'we', 'ው': 'w', 'ዎ': 'wo', 'ዏ': 'wa',
-        'ዘ': 'ze', 'ዙ': 'zu', 'ዚ': 'zi', 'ዛ': 'za', 'ዜ': 'ze', 'ዝ': 'z', 'ዞ': 'zo', 'ዟ': 'za',
-        'የ': 'ye', 'ዩ': 'yu', 'ዪ': 'yi', 'ያ': 'ya', 'ዬ': 'ye', 'ይ': 'y', 'ዮ': 'yo', 'ዯ': 'ya',
-        'ደ': 'de', 'ዱ': 'du', 'ዲ': 'di', 'ዳ': 'da', 'ዴ': 'de', 'ድ': 'd', 'ዶ': 'do', 'ዷ': 'da',
-        'ጀ': 'je', 'ጁ': 'ju', 'ጂ': 'ji', 'ጃ': 'ja', 'ጄ': 'je', 'ጅ': 'j', 'ጆ': 'jo', 'ጇ': 'ja',
-        'ገ': 'ge', 'ጉ': 'gu', 'ጊ': 'gi', 'ጋ': 'ga', 'ጌ': 'ge', 'ግ': 'g', 'ጎ': 'go',
-        'ጠ': 'te', 'ጡ': 'tu', 'ጢ': 'ti', 'ጣ': 'ta', 'ጤ': 'te', 'ጥ': 't', 'ጦ': 'to',
-        'ጨ': 'che', 'ጩ': 'chu', 'ጪ': 'chi', 'ጫ': 'cha', 'ጬ': 'che', 'ጭ': 'ch', 'ጮ': 'cho',
-        'ጰ': 'pe', 'ጱ': 'pu', 'ጲ': 'pi', 'ጳ': 'pa', 'ጴ': 'pe', 'ጵ': 'p', 'ጶ': 'po',
-        'ጸ': 'tse', 'ጹ': 'tsu', 'ጺ': 'tsi', 'ጻ': 'tsa', 'ጼ': 'tse', 'ጽ': 'ts', 'ጾ': 'tso',
-        'ፀ': 'tse', 'ፁ': 'tsu', 'ፂ': 'tsi', 'ፃ': 'tsa', 'ፄ': 'tse', 'ፅ': 'ts', 'ፆ': 'tso',
-        'ፈ': 'fe', 'ፉ': 'fu', 'ፊ': 'fi', 'ፋ': 'fa', 'ፌ': 'fe', 'ፍ': 'f', 'ፎ': 'fo',
-        'ፐ': 'pe', 'ፑ': 'pu', 'ፒ': 'pi', 'ፓ': 'pa', 'ፔ': 'pe', 'ፕ': 'p', 'ፖ': 'po',
-        ' ': ' ', '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9'
-    };
-    
-    let result = '';
-    for (let char of text) {
-        if (translitMap[char]) {
-            result += translitMap[char];
-        } else if (/[a-zA-Z0-9]/.test(char)) {
-            result += char;
-        } else {
-            result += char;
-        }
-    }
-    return result;
-}
 
 // ==================== MAIN FUNCTIONS ====================
 const API_BASE_URL = window.location.origin;
@@ -717,16 +636,10 @@ function updateCard(member) {
     document.getElementById('displayShares').textContent = member.shareCount || '0';
 
     //multi lingual
-     document.getElementById('displayFullNameEn').textContent = transliterateAmharicToEnglish(member.fullName);
-    document.getElementById('displayMotherNameEn').textContent = transliterateAmharicToEnglish(member.motherName);
-    document.getElementById('displayAddressEn').textContent = transliterateAmharicToEnglish(member.address);
-
-
     
-    
-    // const founderBadge = document.getElementById('founderBadge');
-    // const role = (member.role || member.position || '').toLowerCase();
-    // founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
+    const founderBadge = document.getElementById('founderBadge');
+    const role = (member.role || member.position || '').toLowerCase();
+    founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
     
     displayPhoto(member.memberPhoto, member.gender);
     
@@ -734,9 +647,9 @@ function updateCard(member) {
     document.getElementById('displayVotingPower').textContent = Math.min(Math.floor(shares / 100) + 1, 10);
     
     const tierBadge = document.getElementById('tierBadge');
-    if (shares >= 1000) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
-    else if (shares >= 500) tierBadge.innerHTML = '🥇 GOLD MEMBER';
-    else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
+    if (shares >= 200) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
+    else if (shares >= 100) tierBadge.innerHTML = '🥇 GOLD MEMBER';
+    else if (shares >= 50) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
     document.getElementById('gmNameAbove').textContent = "ሰይድ ይማም አሸብር";
