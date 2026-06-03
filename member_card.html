@@ -250,24 +250,43 @@ body {
     display: flex;
     justify-content: space-between;
     margin: 0.5mm 0;
-    font-size: 1.2mm;
     text-align: center;
 }
-.sign-box-back { width: 48%; }
-.sign-line-back { margin-top: 0.8mm; border-top: 0.2mm solid #334155; width: 80%; margin-left: auto; margin-right: auto; }
-/* Signature area */
+.sign-box-back { 
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.role-title {
+    font-size: 1.3mm;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5mm;
+}
+.gm-name-above {
+    font-size: 1.2mm;
+    color: #555;
+    margin-bottom: 0.5mm;
+    font-weight: 500;
+}
+.sign-line-back { 
+    width: 80%; 
+    border-top: 0.2mm solid #334155; 
+    margin: 0.5mm 0;
+}
 .signature-area {
-    margin-top: 0.5mm;
+    margin-top: 0.3mm;
     text-align: center;
 }
 .signature-img {
-    max-width: 40px;
-    max-height: 15px;
+    max-width: 35px;
+    max-height: 12px;
     object-fit: contain;
 }
-.gm-name {
-    font-size: 1.1mm;
-    color: #555;
+.gm-name-below {
+    font-size: 1mm;
+    color: #888;
     margin-top: 0.3mm;
 }
 .verification-seal {
@@ -460,23 +479,26 @@ body {
                         <span>Issue: <span id="issueDate">-</span></span>
                         <span>Expiry: <span id="expiryDate">-</span></span>
                     </div>
+                    
                     <div class="signatures-back">
+                        <!-- Chairperson Section -->
                         <div class="sign-box-back">
-                            <div>Chairperson</div>
+                            <div class="role-title">Chairperson</div>
                             <div class="sign-line-back"></div>
-                            <div>ሀሰን ይመር አሊ</div>
+                            <div class="gm-name-below">ሀሰን ይመር አሊ</div>
                         </div>
+                        
+                        <!-- General Manager Section -->
                         <div class="sign-box-back">
-                            <div>General Manager</div>
-                            <div id="managerName">ሰይድ ይማም አሸብር</div>
+                            <div class="role-title">General Manager</div>
+                            <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
-                            
                             <div class="signature-area">
-                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
-                              
+                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
                             </div>
                         </div>
                     </div>
+                    
                     <div class="back-notes">
                         <p><strong>Special Benefit:</strong> የአክሲዮን ድርሻውን ወደ ትንንሽ ክፍልፋይ ካርዶች መቀየር ይችላሉ።</p>
                         <p><strong>ይህ ካርድ በእዳ ሊያዝና ይችላል።</strong></p>
@@ -576,8 +598,8 @@ function updateCard(member) {
     else if (shares >= 100) tierBadge.innerHTML = '🥈 SILVER MEMBER';
     else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
     
-    document.getElementById('managerName').textContent = "ሰይድ ይማም አሸብር";
-    document.getElementById('gmNameDisplay').textContent = "ሰይድ ይማም አሸብር";
+    // Set GM name above the signature line
+    document.getElementById('gmNameAbove').textContent = "ሰይድ ይማም አሸብር";
     document.getElementById('contactPhone').textContent = member.phone || '-';
     
     const today = new Date();
