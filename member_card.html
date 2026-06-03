@@ -118,9 +118,9 @@ body {
 /* Golden Card Image - placed below tier badge */
 .golden-card-img {
     display: block;
-    width: 16mm;
+    width: 14mm;
     height: auto;
-    margin: 1mm auto;
+    margin: 0.5mm auto;
     object-fit: contain;
 }
 .founder-stamp {
@@ -190,7 +190,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1mm;
+    gap: 0.8mm;
 }
 .voting-power { 
     background: #fbbf24; 
@@ -207,7 +207,7 @@ body {
     width: 100%;
 }
 
-/* Back card - QR Code section */
+/* Back card - QR Code and Signatures */
 .back-content {
     display: flex;
     flex-direction: column;
@@ -293,16 +293,17 @@ body {
 .sign-line-back { 
     width: 80%; 
     border-top: 0.2mm solid #334155; 
-    margin: 0.5mm 0;
+    margin: 0.8mm 0;
 }
 .signature-area {
     margin-top: 0.3mm;
     text-align: center;
 }
 .signature-img {
-    max-width: 35px;
-    max-height: 12px;
+    max-width: 45px;
+    max-height: 20px;
     object-fit: contain;
+    margin: 0 auto;
 }
 .gm-name-below {
     font-size: 1mm;
@@ -488,7 +489,7 @@ body {
             </div>
         </div>
         
-        <!-- Back Card with QR Code and Signature -->
+        <!-- Back Card with QR Code and Signatures -->
         <div class="id-card" id="backCard">
             <div class="card-side back">
                 <div class="back-content">
@@ -520,7 +521,7 @@ body {
                             <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
                             <div class="sign-line-back"></div>
                             <div class="signature-area">
-                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                                <img src="signature.png" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
                             </div>
                         </div>
                     </div>
