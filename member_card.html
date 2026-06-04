@@ -601,23 +601,29 @@ body {
 function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
     if (!text || text.length === 0) return;
     
-    // Calculate total angle sweep
-    let angleSweep = endAngle - startAngle;
-    let angleStep = angleSweep / (text.length - 1);
+    // Calculate the angle range
+    let angleRange = Math.abs(endAngle - startAngle);
+    let angleStep = angleRange / (text.length - 1);
     
     for (let i = 0; i < text.length; i++) {
-        // Calculate angle for this character
-        let angle = startAngle + (i * angleStep);
+        // Calculate angle based on direction
+        let angle;
+        if (startAngle < endAngle) {
+            // Normal left-to-right progression
+            angle = startAngle + (i * angleStep);
+        } else {
+            // Reverse direction (for text that should go right-to-left)
+            angle = startAngle - (i * angleStep);
+        }
         
-        // Calculate position
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
         
         ctx.save();
         ctx.translate(x, y);
         
-        // Calculate rotation - tangent to the circle
-        let rotation = angle;
+        // Rotate text to follow the curve
+        let rotation;
         if (isTop) {
             rotation = angle + Math.PI / 2;
         } else {
@@ -625,24 +631,17 @@ function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngl
         }
         ctx.rotate(rotation);
         
-        // Set text style
         ctx.fillStyle = '#8B4513';
-        ctx.font = isTop ? 'bold 10px Arial' : 'bold 8px Arial';
+        ctx.font = isTop ? 'bold 5.8px Arial' : 'bold 4.2px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        
-        // Draw the character
         ctx.fillText(text[i], 0, 0);
         ctx.restore();
     }
 }
 
 async function generatePhotoStamp() {
-    // Canvas size
-    const size = 300;
-    const center = size / 2;
-    const radius = 140;
-    
+    const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
     // Create canvas
@@ -651,11 +650,9 @@ async function generatePhotoStamp() {
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     
-    // Texts
+    // Texts (keeping original full text)
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
     const englishText = "GAMBELLA MAJANG FOREST COFFEE PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
-    
-    console.log("Text lengths:", amharicText.length, englishText.length);
     
     return new Promise((resolve) => {
         const logo = new Image();
@@ -663,141 +660,139 @@ async function generatePhotoStamp() {
         logo.src = logoImgSrc;
         
         logo.onload = function() {
-            console.log("Logo loaded successfully");
-            
-            // Clear canvas with white background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, size, size);
-            
-            // Outer circle
-            ctx.beginPath();
-            ctx.arc(center, center, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            
-            // Inner circle
-            ctx.beginPath();
-            ctx.arc(center, center, radius - 8, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Draw Amharic text on TOP (left to right)
-            const topRadius = radius - 25;
-            const topStartAngle = Math.PI * 1.2;  // 216°
-            const topEndAngle = Math.PI * 1.8;    // 324°
-            drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
-            
-            // Draw English text on BOTTOM (left to right)
-            const bottomRadius = radius - 20;
-            const bottomStartAngle = Math.PI * 1.85;  // 333°
-            const bottomEndAngle = Math.PI * 0.15;    // 27° (wraps around)
-            drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
-            
-            // Center circle
-            ctx.beginPath();
-            ctx.arc(center, center, 50, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d5a3b';
-            ctx.fill();
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Draw logo (clipped to circle)
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(center, center, 46, 0, 2 * Math.PI);
-            ctx.clip();
-            ctx.drawImage(logo, center - 44, center - 44, 88, 88);
-            ctx.restore();
-            
-            // Draw stars at 4 corners
-            ctx.font = 'bold 12px Arial';
-            ctx.fillStyle = '#8B4513';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('★', 25, center);
-            ctx.fillText('★', size - 25, center);
-            ctx.fillText('★', center, 25);
-            ctx.fillText('★', center, size - 25);
-            
+            drawStampWithLogo(ctx, size, center, radius, amharicText, englishText, logo);
             resolve(canvas.toDataURL());
         };
         
         logo.onerror = function() {
-            console.log("Logo failed to load, using fallback");
-            
-            // Clear canvas with white background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, size, size);
-            
-            // Outer and inner circles
-            ctx.beginPath();
-            ctx.arc(center, center, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.arc(center, center, radius - 8, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Draw texts
-            const topRadius = radius - 25;
-            const topStartAngle = Math.PI * 1.2;
-            const topEndAngle = Math.PI * 1.8;
-            drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
-            
-            const bottomRadius = radius - 20;
-            const bottomStartAngle = Math.PI * 1.85;
-            const bottomEndAngle = Math.PI * 0.15;
-            drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
-            
-            // Center circle
-            ctx.beginPath();
-            ctx.arc(center, center, 50, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d5a3b';
-            ctx.fill();
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Fallback icon
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = '#fbbf24';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🌿', center, center + 3);
-            
-            // Stars
-            ctx.font = 'bold 12px Arial';
-            ctx.fillStyle = '#8B4513';
-            ctx.fillText('★', 25, center);
-            ctx.fillText('★', size - 25, center);
-            ctx.fillText('★', center, 25);
-            ctx.fillText('★', center, size - 25);
-            
+            console.log('Logo failed to load, using fallback');
+            drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishText);
             resolve(canvas.toDataURL());
         };
     });
 }
 
+function drawStampWithLogo(ctx, size, center, radius, amharicText, englishText, logo) {
+    // Clear canvas
+    ctx.clearRect(0, 0, size, size);
+    
+    // Outer circle
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    
+    // Draw Amharic text on TOP - increased radius to maximum
+    const topRadius = radius - 18; // 67px (almost at the inner circle)
+    const topStartAngle = Math.PI * 1.2;  // 216°
+    const topEndAngle = Math.PI * 1.8;    // 324°
+    
+    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
+    
+    // Draw English text on BOTTOM - maximum radius possible
+    const bottomRadius = radius - 10; // 75px (very close to outer edge)
+    // Use the full bottom arc from left to right
+    const bottomStartAngle = Math.PI * 1.95;   // 351° (almost full circle)
+    const bottomEndAngle = Math.PI * 1.05;     // 189° (wrapping around the bottom)
+    
+    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
+    
+    // Center circle
+    ctx.beginPath();
+    ctx.arc(center, center, 32, 0, 2 * Math.PI);
+    ctx.fillStyle = '#2d5a3b';
+    ctx.fill();
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Draw logo (clipped to circle)
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center, center, 30, 0, 2 * Math.PI);
+    ctx.clip();
+    ctx.drawImage(logo, center - 28, center - 28, 56, 56);
+    ctx.restore();
+    
+    // Draw decorative elements
+    drawDecorations(ctx, size, center);
+}
+
+function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishText) {
+    ctx.clearRect(0, 0, size, size);
+    
+    // Outer circle
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    
+    // Draw Amharic text on TOP
+    const topRadius = radius - 18; // 67px
+    const topStartAngle = Math.PI * 1.2;
+    const topEndAngle = Math.PI * 1.8;
+    
+    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
+    
+    // Draw English text on BOTTOM
+    const bottomRadius = radius - 10; // 75px
+    const bottomStartAngle = Math.PI * 1.95;
+    const bottomEndAngle = Math.PI * 1.05;
+    
+    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
+    
+    // Center circle
+    ctx.beginPath();
+    ctx.arc(center, center, 32, 0, 2 * Math.PI);
+    ctx.fillStyle = '#2d5a3b';
+    ctx.fill();
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Fallback icon
+    ctx.font = 'bold 22px Arial';
+    ctx.fillStyle = '#fbbf24';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🌿', center, center + 2);
+    
+    // Draw decorative elements
+    drawDecorations(ctx, size, center);
+}
+
+function drawDecorations(ctx, size, center) {
+    ctx.font = 'bold 7px Arial';
+    ctx.fillStyle = '#8B4513';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('★', 18, center);
+    ctx.fillText('★', size - 18, center);
+    ctx.fillText('★', center, 16);
+    ctx.fillText('★', center, size - 16);
+}
+
 async function applyPhotoStamp() { 
     const container = document.getElementById('photoStamp');
     if (container) {
-        try {
-            const stampDataUrl = await generatePhotoStamp();
-            container.innerHTML = `<img src="${stampDataUrl}" style="width:100%; height:100%; object-fit:contain;">`;
-            console.log("Stamp applied successfully");
-        } catch (error) {
-            console.error("Error generating stamp:", error);
-            container.innerHTML = '<div style="color:red;">Error generating stamp</div>';
-        }
-    } else {
-        console.error("Container 'photoStamp' not found");
+        const stampDataUrl = await generatePhotoStamp();
+        container.innerHTML = `<img src="${stampDataUrl}" style="width:100%; height:100%; object-fit:contain;">`;
     }
 }
 // ==================== MAIN FUNCTIONS ====================
