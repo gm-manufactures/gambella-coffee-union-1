@@ -602,16 +602,19 @@ body {
 function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
     if (!text || text.length === 0) return;
     
-    const angleRange = Math.abs(endAngle - startAngle);
-    const angleStep = angleRange / (text.length - 1);
+    // Calculate the angle range
+    let angleRange = Math.abs(endAngle - startAngle);
+    let angleStep = angleRange / (text.length - 1);
     
     for (let i = 0; i < text.length; i++) {
-        // For bottom text, we need to go in reverse order if angle decreases
+        // Calculate angle based on direction
         let angle;
-        if (endAngle < startAngle && !isTop) {
-            angle = startAngle - (i * angleStep);
-        } else {
+        if (startAngle < endAngle) {
+            // Normal left-to-right progression
             angle = startAngle + (i * angleStep);
+        } else {
+            // Reverse direction (for text that should go right-to-left)
+            angle = startAngle - (i * angleStep);
         }
         
         const x = centerX + radius * Math.cos(angle);
@@ -648,9 +651,13 @@ async function generatePhotoStamp() {
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     
-    // Texts - Consider shortening the English text
+    // Texts (keeping original full text)
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    const englishText = "GAMBELLA MAJANG FOREST COFFEE"; // Shortened version
+    const englishText = "GAMBELLA MAJANG FOREST COFFEE PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
+    
+    // Check text lengths
+    console.log(`Amharic text length: ${amharicText.length}`);
+    console.log(`English text length: ${englishText.length}`);
     
     return new Promise((resolve) => {
         const logo = new Image();
@@ -688,11 +695,22 @@ function drawStampWithLogo(ctx, size, center, radius, amharicText, englishText, 
     ctx.lineWidth = 1.2;
     ctx.stroke();
     
-    // Draw curved text on top (Amharic) - from top-left to top-right
-    drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
+    // Draw Amharic text on TOP (curving from left to right)
+    // Using a larger radius for top text to fit better
+    const topRadius = 62;
+    const topStartAngle = Math.PI * 1.15;  // ~207° (left side)
+    const topEndAngle = Math.PI * 1.85;    // ~333° (right side)
     
-    // Draw curved text on bottom (English) - from bottom-left to bottom-right
-    drawCurvedText(ctx, englishText, center, center, 70, Math.PI * 1.8, Math.PI * 2.2, false);
+    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
+    
+    // Draw English text on BOTTOM (curving from left to right)
+    // Using a larger radius to fit the long English text
+    const bottomRadius = 74;
+    // Start from bottom-left and go to bottom-right
+    const bottomStartAngle = Math.PI * 1.9;   // ~342° (right side)
+    const bottomEndAngle = Math.PI * 1.1;     // ~198° (left side) - going backwards
+    
+    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
     
     // Center circle
     ctx.beginPath();
@@ -732,13 +750,23 @@ function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishTex
     ctx.lineWidth = 1.2;
     ctx.stroke();
     
-    // Draw curved text
-    drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
-    drawCurvedText(ctx, englishText, center, center, 70, Math.PI * 1.8, Math.PI * 2.2, false);
+    // Draw Amharic text on TOP
+    const topRadius = 62;
+    const topStartAngle = Math.PI * 1.15;
+    const topEndAngle = Math.PI * 1.85;
+    
+    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
+    
+    // Draw English text on BOTTOM
+    const bottomRadius = 74;
+    const bottomStartAngle = Math.PI * 1.9;
+    const bottomEndAngle = Math.PI * 1.1;
+    
+    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
     
     // Center circle
     ctx.beginPath();
-    ctx.arc(center, center,32, 0, 2 * Math.PI);
+    ctx.arc(center, center, 32, 0, 2 * Math.PI);
     ctx.fillStyle = '#2d5a3b';
     ctx.fill();
     ctx.strokeStyle = '#8B4513';
@@ -757,7 +785,6 @@ function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishTex
 }
 
 function drawDecorations(ctx, size, center) {
-    // Draw stars at 4 corners
     ctx.font = 'bold 7px Arial';
     ctx.fillStyle = '#8B4513';
     ctx.textAlign = 'center';
