@@ -589,12 +589,7 @@ function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngl
     }
 }
 
-// Then in your onload function, after drawing stars:
-const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
 
-drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 0.6, Math.PI * 1.4, true);
-drawCurvedText(ctx, englishText, center, center + 8, 70, Math.PI * 0.7, Math.PI * 1.3, false);
 
 async function generatePhotoStamp() {
     const size = 180, center = size / 2, radius = 85;
