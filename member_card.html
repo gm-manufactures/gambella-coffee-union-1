@@ -710,7 +710,7 @@ async function generatePhotoStamp() {
             const bottomAngleStep = (bottomEndAngle - bottomStartAngle) / (englishChars.length - 1);
             
             for (let i = 0; i < englishChars.length; i++) {
-                const angle = bottomStartAngle + (i * bottomAngleStep);
+                const angle = bottomStartAngle - (i * bottomAngleStep);
                 const x = center + bottomRadius * Math.cos(angle);
                 const y = center + bottomRadius * Math.sin(angle);
                 
