@@ -603,14 +603,23 @@ function generatePhotoStamp() {
     `;
 }
 
-async function applyPhotoStamp() { 
+function applyPhotoStamp() { 
     const container = document.getElementById('photoStamp');
     if (container) {
+        // Clear container and add SVG
+        container.innerHTML = '';
         const svgString = generatePhotoStamp();
-        // Convert SVG to data URL for better download compatibility
-        //const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        //const url = URL.createObjectURL(blob);
-        //container.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;" onload="URL.revokeObjectURL('${url}')">`;
+        
+        // Create SVG element properly
+        const wrapper = document.createElement('div');
+        wrapper.style.width = '100%';
+        wrapper.style.height = '100%';
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.justifyContent = 'center';
+        wrapper.innerHTML = svgString;
+        
+        container.appendChild(wrapper);
     }
 }
 // ==================== MAIN FUNCTIONS ====================
