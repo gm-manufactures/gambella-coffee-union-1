@@ -244,9 +244,22 @@ body {
     margin: 1mm 0;
 }
     /* Black and white photo filter */
-.member-photo-img {
-    filter: grayscale(100%);
+    .qr-side-image {
+    width: 18mm;
+    height: 18mm;
+    object-fit: contain;
+    border-radius: 2mm;
+}
+    .qr-side-image-left {
+         filter: grayscale(100%);
     transition: filter 0.3s ease;
+    transform: rotate(-5deg);
+}
+
+.qr-side-image-right {
+     filter: grayscale(100%);
+    transition: filter 0.3s ease;
+    transform: rotate(5deg);
 }
 .qr-placeholder {
     width: 22mm;
