@@ -570,12 +570,17 @@ body {
 
 <script>
 // ==================== STAMP GENERATION ====================
+// Original SVG function (preserved but with download fix)
 function generatePhotoStamp() {
     const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-            <defs><clipPath id="logoClip"><circle cx="${center}" cy="${center}" r="28" /></clipPath></defs>
+            <defs>
+                <clipPath id="logoClip">
+                    <circle cx="${center}" cy="${center}" r="28" />
+                </clipPath>
+            </defs>
             <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="3"/>
             <circle cx="${center}" cy="${center}" r="${radius - 4}" fill="none" stroke="#8B4513" stroke-width="1.2"/>
             <g transform="rotate(-3, ${center}, ${center})">
@@ -585,7 +590,7 @@ function generatePhotoStamp() {
                     <textPath href="#topArc" startOffset="50%" text-anchor="middle">የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር</textPath>
                 </text>
                 <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
-                <text font-size="5.8" fill="#8B4513" font-weight="bold">
+                <text font-size="4.2" fill="#8B4513" font-weight="bold">
                     <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association</textPath>
                 </text>
                 <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
@@ -597,9 +602,16 @@ function generatePhotoStamp() {
         </svg>
     `;
 }
-function applyPhotoStamp() { 
+
+async function applyPhotoStamp() { 
     const container = document.getElementById('photoStamp');
-    if (container) container.innerHTML = generatePhotoStamp();
+    if (container) {
+        const svgString = generatePhotoStamp();
+        // Convert SVG to data URL for better download compatibility
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        container.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;" onload="URL.revokeObjectURL('${url}')">`;
+    }
 }
 
 // ==================== MAIN FUNCTIONS ====================
