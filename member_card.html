@@ -632,11 +632,9 @@ async function generatePhotoStamp() {
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     
-    // Texts - FIXED versions
+    // Texts
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    const englishText = "GAMBELLA MAJANG FOREST COFFEE";
-    const englishText2 = "PRODUCER, MANUFACTURER AND";
-    const englishText3 = "EXPORTER SHARE HOLDERS ASSOCIATION";
+    const englishText = "GAMBELLA MAJANG FOREST COFFEE PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
     
     return new Promise((resolve) => {
         const logo = new Image();
@@ -661,79 +659,62 @@ async function generatePhotoStamp() {
             ctx.lineWidth = 1.2;
             ctx.stroke();
             
-            // Draw Amharic text on top (curved along the circle)
+            // Draw Amharic text on TOP (curving from left to right)
+            // Top arc goes from angle: -120° to -60° (or 240° to 300° in radians)
+            const topRadius = 58;
+            const topStartAngle = Math.PI * 1.2;  // ~216° (left side)
+            const topEndAngle = Math.PI * 1.8;    // ~324° (right side)
+            
             ctx.save();
             ctx.font = 'bold 5.8px Arial';
             ctx.fillStyle = '#8B4513';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             
-            // Draw each character of Amharic along the top arc
+            // Draw Amharic text along top arc
             const amharicChars = amharicText.split('');
-            const topArcRadius = 58;
-            const topStartAngle = Math.PI * 0.7;
-            const topEndAngle = Math.PI * 1.3;
             const topAngleStep = (topEndAngle - topStartAngle) / (amharicChars.length - 1);
             
             for (let i = 0; i < amharicChars.length; i++) {
                 const angle = topStartAngle + (i * topAngleStep);
-                const x = center + topArcRadius * Math.cos(angle);
-                const y = center + topArcRadius * Math.sin(angle);
+                const x = center + topRadius * Math.cos(angle);
+                const y = center + topRadius * Math.sin(angle);
                 
                 ctx.save();
                 ctx.translate(x, y);
+                // Rotate to follow the curve
                 ctx.rotate(angle + Math.PI/2);
                 ctx.fillText(amharicChars[i], 0, 0);
                 ctx.restore();
             }
             ctx.restore();
             
-            // Draw English text on bottom (split into 3 lines for better fit)
-            const bottomArcRadius = 72;
-            const bottomStartAngle = Math.PI * 0.75;
-            const bottomEndAngle = Math.PI * 1.25;
+            // Draw English text on BOTTOM (curving from left to right)
+            // Bottom arc goes from angle: 60° to 120° (in radians)
+            const bottomRadius = 72;
+            const bottomStartAngle = Math.PI * 0.8;   // ~144° (left side)
+            const bottomEndAngle = Math.PI * 1.2;     // ~216° (right side)
             
-            // Line 1
             ctx.save();
-            ctx.font = 'bold 4.5px Arial';
+            ctx.font = 'bold 4.2px Arial';
             ctx.fillStyle = '#8B4513';
-            const chars1 = englishText.split('');
-            const angleStep1 = (bottomEndAngle - bottomStartAngle) / (chars1.length - 1);
-            for (let i = 0; i < chars1.length; i++) {
-                const angle = bottomStartAngle + (i * angleStep1);
-                const x = center + bottomArcRadius * Math.cos(angle);
-                const y = center + bottomArcRadius * Math.sin(angle) + 2;
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(angle - Math.PI/2);
-                ctx.fillText(chars1[i], 0, 0);
-                ctx.restore();
-            }
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             
-            // Line 2
-            const chars2 = englishText2.split('');
-            const angleStep2 = (bottomEndAngle - bottomStartAngle) / (chars2.length - 1);
-            for (let i = 0; i < chars2.length; i++) {
-                const angle = bottomStartAngle + (i * angleStep2);
-                const x = center + (bottomArcRadius - 9) * Math.cos(angle);
-                const y = center + (bottomArcRadius - 9) * Math.sin(angle) + 2;
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(angle - Math.PI/2);
-                ctx.fillText(chars2[i], 0, 0);
-                ctx.restore();
-            }
+            // Draw English text along bottom arc
+            const englishChars = englishText.split('');
+            const bottomAngleStep = (bottomEndAngle - bottomStartAngle) / (englishChars.length - 1);
             
-            // Line 3
-            const chars3 = englishText3.split('');
-            const angleStep3 = (bottomEndAngle - bottomStartAngle) / (chars3.length - 1);
-            for (let i = 0; i < chars3.length; i++) {
-                const angle = bottomStartAngle + (i * angleStep3);
-                const x = center + (bottomArcRadius - 18) * Math.cos(angle);
-                const y = center + (bottomArcRadius - 18) * Math.sin(angle) + 2;
+            for (let i = 0; i < englishChars.length; i++) {
+                const angle = bottomStartAngle + (i * bottomAngleStep);
+                const x = center + bottomRadius * Math.cos(angle);
+                const y = center + bottomRadius * Math.sin(angle);
+                
                 ctx.save();
                 ctx.translate(x, y);
+                // Rotate to follow the curve (flipped for bottom text to read left-to-right)
                 ctx.rotate(angle - Math.PI/2);
-                ctx.fillText(chars3[i], 0, 0);
+                ctx.fillText(englishChars[i], 0, 0);
                 ctx.restore();
             }
             ctx.restore();
@@ -755,12 +736,13 @@ async function generatePhotoStamp() {
             ctx.drawImage(logo, center - 28, center - 28, 56, 56);
             ctx.restore();
             
-            // Draw stars
+            // Draw stars at 4 corners
             ctx.font = 'bold 7px Arial';
             ctx.fillStyle = '#8B4513';
             ctx.textAlign = 'center';
-            ctx.fillText('★', 18, center + 2);
-            ctx.fillText('★', 162, center + 2);
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', 18, center);
+            ctx.fillText('★', 162, center);
             ctx.fillText('★', center, 16);
             ctx.fillText('★', center, 165);
             
@@ -768,8 +750,102 @@ async function generatePhotoStamp() {
         };
         
         logo.onerror = function() {
-            // Fallback (similar structure without logo)
-            console.log('Logo failed to load');
+            // Fallback without logo
+            console.log('Logo failed to load, using fallback');
+            
+            // Clear and redraw everything except logo
+            ctx.clearRect(0, 0, size, size);
+            
+            // Outer and inner circles
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            
+            // Draw Amharic text on TOP
+            const topRadius = 58;
+            const topStartAngle = Math.PI * 1.2;
+            const topEndAngle = Math.PI * 1.8;
+            
+            ctx.save();
+            ctx.font = 'bold 5.8px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const amharicChars = amharicText.split('');
+            const topAngleStep = (topEndAngle - topStartAngle) / (amharicChars.length - 1);
+            
+            for (let i = 0; i < amharicChars.length; i++) {
+                const angle = topStartAngle + (i * topAngleStep);
+                const x = center + topRadius * Math.cos(angle);
+                const y = center + topRadius * Math.sin(angle);
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle + Math.PI/2);
+                ctx.fillText(amharicChars[i], 0, 0);
+                ctx.restore();
+            }
+            ctx.restore();
+            
+            // Draw English text on BOTTOM
+            const bottomRadius = 72;
+            const bottomStartAngle = Math.PI * 0.8;
+            const bottomEndAngle = Math.PI * 1.2;
+            
+            ctx.save();
+            ctx.font = 'bold 4.2px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const englishChars = englishText.split('');
+            const bottomAngleStep = (bottomEndAngle - bottomStartAngle) / (englishChars.length - 1);
+            
+            for (let i = 0; i < englishChars.length; i++) {
+                const angle = bottomStartAngle + (i * bottomAngleStep);
+                const x = center + bottomRadius * Math.cos(angle);
+                const y = center + bottomRadius * Math.sin(angle);
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle - Math.PI/2);
+                ctx.fillText(englishChars[i], 0, 0);
+                ctx.restore();
+            }
+            ctx.restore();
+            
+            // Center circle with fallback icon
+            ctx.beginPath();
+            ctx.arc(center, center, 32, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2d5a3b';
+            ctx.fill();
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#fbbf24';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🌿', center, center);
+            
+            // Stars
+            ctx.font = 'bold 7px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.fillText('★', 18, center);
+            ctx.fillText('★', 162, center);
+            ctx.fillText('★', center, 16);
+            ctx.fillText('★', center, 165);
+            
             resolve(canvas.toDataURL());
         };
     });
