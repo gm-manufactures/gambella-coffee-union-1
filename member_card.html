@@ -665,16 +665,9 @@ async function generatePhotoStamp() {
             }
             ctx.restore();
             
-            // === DRAW ENGLISH TEXT ON BOTTOM ===
-            // Bottom arc: from left side to right side (passing through bottom)
-            const bottomRadius = 70;
-            const bottomStartAngle = Math.PI * 0.2;   // ~36° (bottom-right area)
-            const bottomEndAngle = Math.PI * 1.8;     // ~324° (wraps around bottom)
-            
-            // Better approach: span across the bottom from left to right
-            // Using angles: 0.6π to 1.4π (108° to 252°) - this spans the bottom arc
-            const bottomStartAngleFixed = Math.PI * 0.65;   // ~117° (bottom-left)
-            const bottomEndAngleFixed = Math.PI * 1.35;     // ~243° (bottom-right)
+             const bottomRadius = 70;
+            const bottomStartAngle = Math.PI * 0.65;   // Bottom-left
+            const bottomEndAngle = Math.PI * 1.35;     // Bottom-right
             
             ctx.save();
             ctx.font = 'bold 4.2px Arial';
@@ -683,17 +676,16 @@ async function generatePhotoStamp() {
             ctx.textBaseline = 'middle';
             
             const englishChars = englishText.split('');
-            const bottomAngleStep = (bottomEndAngleFixed - bottomStartAngleFixed) / (englishChars.length - 1);
+            const bottomAngleStep = (bottomEndAngle - bottomStartAngle) / (englishChars.length - 1);
             
             for (let i = 0; i < englishChars.length; i++) {
-                const angle = bottomStartAngleFixed + (i * bottomAngleStep);
+                const angle = bottomStartAngle + (i * bottomAngleStep);
                 const x = center + bottomRadius * Math.cos(angle);
                 const y = center + bottomRadius * Math.sin(angle);
                 
                 ctx.save();
                 ctx.translate(x, y);
-                // For bottom text, rotate to read left-to-right
-                ctx.rotate(angle + Math.PI/2);
+                ctx.rotate(angle - Math.PI/2);  // FIXED: Points downward along bottom arc
                 ctx.fillText(englishChars[i], 0, 0);
                 ctx.restore();
             }
@@ -890,7 +882,7 @@ function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishTex
     
     // Draw curved text
     drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 0.7, Math.PI * 1.3, true);
-    drawCurvedText(ctx, englishText, center, center + 8, 72, Math.PI * 0.75, Math.PI * 1.25, true);
+    drawCurvedText(ctx, englishText, center, center + 8, 72, Math.PI * 0.75, Math.PI * 1.25, false);
     
     // Center circle
     ctx.beginPath();
