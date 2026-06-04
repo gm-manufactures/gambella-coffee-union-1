@@ -641,8 +641,51 @@ function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngl
     }
 }
 
+function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
+    if (!text || text.length === 0) return;
+    
+    // Calculate the angle range
+    let angleRange = Math.abs(endAngle - startAngle);
+    let angleStep = angleRange / (text.length - 1);
+    
+    for (let i = 0; i < text.length; i++) {
+        // Calculate angle based on direction
+        let angle;
+        if (startAngle < endAngle) {
+            // Normal left-to-right progression
+            angle = startAngle + (i * angleStep);
+        } else {
+            // Reverse direction (for text that should go right-to-left)
+            angle = startAngle - (i * angleStep);
+        }
+        
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        // Rotate text to follow the curve
+        let rotation;
+        if (isTop) {
+            rotation = angle + Math.PI / 2;
+        } else {
+            rotation = angle - Math.PI / 2;
+        }
+        ctx.rotate(rotation);
+        
+        ctx.fillStyle = '#8B4513';
+        ctx.font = isTop ? 'bold 6.5px Arial' : 'bold 5px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+    }
+}
+
 async function generatePhotoStamp() {
-    const size = 180, center = size / 2, radius = 85;
+    // INCREASED CANVAS SIZE from 180 to 220
+    const size = 220, center = size / 2, radius = 105;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
     // Create canvas
@@ -653,11 +696,7 @@ async function generatePhotoStamp() {
     
     // Texts (keeping original full text)
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
-    const englishText = "GMFCPRODUCER,MANUFACTURERANDEXPORTERSHAREHOLDERSASSOCIATION";
-    
-    // Check text lengths
-    console.log(`Amharic text length: ${amharicText.length}`);
-    console.log(`English text length: ${englishText.length}`);
+    const englishText = "GAMBELLA MAJANG FOREST COFFEE PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
     
     return new Promise((resolve) => {
         const logo = new Image();
@@ -685,48 +724,46 @@ function drawStampWithLogo(ctx, size, center, radius, amharicText, englishText, 
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, 2 * Math.PI);
     ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.stroke();
     
     // Inner circle
     ctx.beginPath();
-    ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
-    
-    // Draw Amharic text on TOP (curving from left to right)
-    // Using a larger radius for top text to fit better
-    const topRadius = 62;
-    const topStartAngle = Math.PI * 1.15;  // ~207° (left side)
-    const topEndAngle = Math.PI * 1.85;    // ~333° (right side)
-    
-    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
-    
-    // Draw English text on BOTTOM (curving from left to right)
-    // Using a larger radius to fit the long English text
-    const bottomRadius = 74;
-    // Start from bottom-left and go to bottom-right
-    const bottomStartAngle = Math.PI * 1.9;   // ~342° (right side)
-    const bottomEndAngle = Math.PI * 1.1;     // ~198° (left side) - going backwards
-    
-    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
-    
-    // Center circle
-    ctx.beginPath();
-    ctx.arc(center, center, 32, 0, 2 * Math.PI);
-    ctx.fillStyle = '#2d5a3b';
-    ctx.fill();
+    ctx.arc(center, center, radius - 5, 0, 2 * Math.PI);
     ctx.strokeStyle = '#8B4513';
     ctx.lineWidth = 1.5;
     ctx.stroke();
     
-    // Draw logo (clipped to circle)
+    // Draw Amharic text on TOP
+    const topRadius = radius - 25; // 80px
+    const topStartAngle = Math.PI * 1.2;  // 216°
+    const topEndAngle = Math.PI * 1.8;    // 324°
+    
+    drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
+    
+    // Draw English text on BOTTOM - more space now
+    const bottomRadius = radius - 15; // 90px
+    // Extended arc for the long English text
+    const bottomStartAngle = Math.PI * 2.0;   // 360° (right side)
+    const bottomEndAngle = Math.PI * 1.0;     // 180° (left side) - wrapping entire bottom
+    
+    drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
+    
+    // Center circle - increased size proportionally
+    ctx.beginPath();
+    ctx.arc(center, center, 40, 0, 2 * Math.PI);
+    ctx.fillStyle = '#2d5a3b';
+    ctx.fill();
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    
+    // Draw logo (clipped to circle) - increased size
     ctx.save();
     ctx.beginPath();
-    ctx.arc(center, center, 30, 0, 2 * Math.PI);
+    ctx.arc(center, center, 37, 0, 2 * Math.PI);
     ctx.clip();
-    ctx.drawImage(logo, center - 28, center - 28, 56, 56);
+    ctx.drawImage(logo, center - 35, center - 35, 70, 70);
     ctx.restore();
     
     // Draw decorative elements
@@ -740,41 +777,41 @@ function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishTex
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, 2 * Math.PI);
     ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.stroke();
     
     // Inner circle
     ctx.beginPath();
-    ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+    ctx.arc(center, center, radius - 5, 0, 2 * Math.PI);
     ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
     
     // Draw Amharic text on TOP
-    const topRadius = 62;
-    const topStartAngle = Math.PI * 1.15;
-    const topEndAngle = Math.PI * 1.85;
+    const topRadius = radius - 25; // 80px
+    const topStartAngle = Math.PI * 1.2;
+    const topEndAngle = Math.PI * 1.8;
     
     drawCurvedText(ctx, amharicText, center, center, topRadius, topStartAngle, topEndAngle, true);
     
     // Draw English text on BOTTOM
-    const bottomRadius = 74;
-    const bottomStartAngle = Math.PI * 1.9;
-    const bottomEndAngle = Math.PI * 1.1;
+    const bottomRadius = radius - 15; // 90px
+    const bottomStartAngle = Math.PI * 2.0;
+    const bottomEndAngle = Math.PI * 1.0;
     
     drawCurvedText(ctx, englishText, center, center, bottomRadius, bottomStartAngle, bottomEndAngle, false);
     
     // Center circle
     ctx.beginPath();
-    ctx.arc(center, center, 32, 0, 2 * Math.PI);
+    ctx.arc(center, center, 40, 0, 2 * Math.PI);
     ctx.fillStyle = '#2d5a3b';
     ctx.fill();
     ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.8;
     ctx.stroke();
     
-    // Fallback icon
-    ctx.font = 'bold 22px Arial';
+    // Fallback icon - increased size
+    ctx.font = 'bold 28px Arial';
     ctx.fillStyle = '#fbbf24';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -785,14 +822,14 @@ function drawStampWithoutLogo(ctx, size, center, radius, amharicText, englishTex
 }
 
 function drawDecorations(ctx, size, center) {
-    ctx.font = 'bold 7px Arial';
+    ctx.font = 'bold 9px Arial';
     ctx.fillStyle = '#8B4513';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('★', 18, center);
-    ctx.fillText('★', size - 18, center);
-    ctx.fillText('★', center, 16);
-    ctx.fillText('★', center, size - 16);
+    ctx.fillText('★', 22, center);
+    ctx.fillText('★', size - 22, center);
+    ctx.fillText('★', center, 20);
+    ctx.fillText('★', center, size - 20);
 }
 
 async function applyPhotoStamp() { 
@@ -802,7 +839,6 @@ async function applyPhotoStamp() {
         container.innerHTML = `<img src="${stampDataUrl}" style="width:100%; height:100%; object-fit:contain;">`;
     }
 }
-
 // ==================== MAIN FUNCTIONS ====================
 const API_BASE_URL = window.location.origin;
 
