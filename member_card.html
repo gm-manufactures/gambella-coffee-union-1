@@ -695,9 +695,9 @@ async function generatePhotoStamp() {
             
             // Draw English text on BOTTOM (curving from left to right)
             // Bottom arc goes from angle: 60° to 120° (in radians)
-            const bottomRadius = 58;
+            const bottomRadius = 72;
             const bottomStartAngle = Math.PI * 0.8;   // ~144° (left side)
-            const bottomEndAngle = Math.PI * 0.5;     // ~216° (right side)
+            const bottomEndAngle = Math.PI * 0.9;     // ~216° (right side)
             
             ctx.save();
             ctx.font = 'bold 4.2px Arial';
@@ -801,9 +801,9 @@ async function generatePhotoStamp() {
             ctx.restore();
             
             // Draw English text on BOTTOM
-            const bottomRadius = 58;
+            const bottomRadius = 72;
             const bottomStartAngle = Math.PI * 0.8;
-            const bottomEndAngle = Math.PI * 1.2;
+            const bottomEndAngle = Math.PI * 0.9;
             
             ctx.save();
             ctx.font = 'bold 4.2px Arial';
@@ -976,8 +976,9 @@ function updateCard(member) {
     const role = (member.role || member.position || '').toLowerCase();
     founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
     
-    displayPhoto(member.memberPhoto, member.gender);
+    
     setQRSideMemberPhotos(member.memberPhoto);
+    displayPhoto(member.memberPhoto, member.gender);
     
     const shares = parseInt(member.shareCount || 0);
     document.getElementById('displayVotingPower').textContent = Math.min(Math.floor(shares / 100) + 1, 10);
