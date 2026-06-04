@@ -175,8 +175,8 @@ body {
     bottom: -75%;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -569,47 +569,79 @@ body {
 </div>
 
 <script>
-// ==================== FIXED STAMP FUNCTION ====================
+// Helper function to draw curved text on canvas
+function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
+    if (!text || text.length === 0) return;
+    
+    const angleRange = Math.abs(endAngle - startAngle);
+    const angleStep = angleRange / (text.length - 1);
+    
+    for (let i = 0; i < text.length; i++) {
+        const angle = startAngle + (i * angleStep);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        // Rotate text to follow the curve
+        let rotation = angle + Math.PI / 2;
+        if (!isTop) rotation = angle - Math.PI / 2;
+        ctx.rotate(rotation);
+        
+        ctx.fillStyle = '#8B4513';
+        ctx.font = isTop ? 'bold 5.8px Arial' : 'bold 4.2px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+    }
+}
 
-function generatePhotoStamp() {
-    const size = 180, center = size /2, radius = 85;
+async function generatePhotoStamp() {
+    const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
-    // Create canvas instead of SVG for better download compatibility
+    // Create canvas
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d');
     
-    // Draw stamp on canvas
+    // Texts
+    const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
+    const englishText = "Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association";
+    
     return new Promise((resolve) => {
         const logo = new Image();
         logo.crossOrigin = 'Anonymous';
         logo.src = logoImgSrc;
         
         logo.onload = function() {
+            // Clear canvas
             ctx.clearRect(0, 0, size, size);
             
-            // Outer circle border
+            // Outer circle
             ctx.beginPath();
             ctx.arc(center, center, radius, 0, 2 * Math.PI);
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 3;
             ctx.stroke();
             
-            // Inner circle border
+            // Inner circle
             ctx.beginPath();
             ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 1.2;
             ctx.stroke();
             
-            ctx.save();
-            ctx.translate(center, center);
-            ctx.rotate(-3 * Math.PI / 180);
-            ctx.translate(-center, -center);
+            // Draw curved text on top (Amharic)
+            drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 0.65, Math.PI * 1.35, true);
             
-            // Inner circle background
+            // Draw curved text on bottom (English)
+            drawCurvedText(ctx, englishText, center, center + 10, 72, Math.PI * 0.7, Math.PI * 1.3, false);
+            
+            // Center circle
             ctx.beginPath();
             ctx.arc(center, center, 32, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d5a3b';
@@ -618,61 +650,73 @@ function generatePhotoStamp() {
             ctx.lineWidth = 1.5;
             ctx.stroke();
             
-            // Draw logo
+            // Draw logo (clipped to circle)
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(center, center, 30, 0, 2 * Math.PI);
+            ctx.clip();
             ctx.drawImage(logo, center - 28, center - 28, 56, 56);
-            
-            // Draw stars
-            ctx.font = '7px Arial';
-            ctx.fillStyle = '#8B4513';
-            ctx.fillText('★', 18, center);
-            ctx.fillText('★', 162, center);
-            ctx.fillText('★', center, 15);
-            ctx.fillText('★', center, 165);
-            
             ctx.restore();
             
-            // Return as data URL
+            // Draw stars
+            ctx.font = 'bold 7px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.textAlign = 'center';
+            ctx.fillText('★', 18, center + 2);
+            ctx.fillText('★', 162, center + 2);
+            ctx.fillText('★', center, 16);
+            ctx.fillText('★', center, 165);
+            
             resolve(canvas.toDataURL());
         };
         
         logo.onerror = function() {
-            // Draw without logo
+            // Fallback - draw without logo
             ctx.clearRect(0, 0, size, size);
             
+            // Outer circle
             ctx.beginPath();
             ctx.arc(center, center, radius, 0, 2 * Math.PI);
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 3;
             ctx.stroke();
             
+            // Inner circle
             ctx.beginPath();
             ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
             ctx.strokeStyle = '#8B4513';
             ctx.lineWidth = 1.2;
             ctx.stroke();
             
-            ctx.save();
-            ctx.translate(center, center);
-            ctx.rotate(-3 * Math.PI / 180);
-            ctx.translate(-center, -center);
+            // Draw curved text on top (Amharic)
+            drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 0.65, Math.PI * 1.35, true);
             
+            // Draw curved text on bottom (English)
+            drawCurvedText(ctx, englishText, center, center + 10, 72, Math.PI * 0.7, Math.PI * 1.3, false);
+            
+            // Center circle
             ctx.beginPath();
             ctx.arc(center, center, 32, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d5a3b';
             ctx.fill();
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
             
-            ctx.font = '14px Arial';
+            // Fallback icon
+            ctx.font = 'bold 24px Arial';
             ctx.fillStyle = '#fbbf24';
-            ctx.fillText('🌿', center - 7, center + 5);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🌿', center, center + 2);
             
-            ctx.font = '7px Arial';
+            // Draw stars
+            ctx.font = 'bold 7px Arial';
             ctx.fillStyle = '#8B4513';
-            ctx.fillText('★', 18, center);
-            ctx.fillText('★', 162, center);
-            ctx.fillText('★', center, 15);
+            ctx.fillText('★', 18, center + 2);
+            ctx.fillText('★', 162, center + 2);
+            ctx.fillText('★', center, 16);
             ctx.fillText('★', center, 165);
-            
-            ctx.restore();
             
             resolve(canvas.toDataURL());
         };
