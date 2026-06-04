@@ -685,7 +685,7 @@ async function generatePhotoStamp() {
                 
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(angle + Math.PI/2);  // FIXED: Points downward along bottom arc
+                ctx.rotate(angle - Math.PI/2);  // FIXED: Points downward along bottom arc
                 ctx.fillText(englishChars[i], 0, 0);
                 ctx.restore();
             }
