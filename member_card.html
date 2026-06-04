@@ -243,6 +243,11 @@ body {
     justify-content: center;
     margin: 1mm 0;
 }
+    /* Black and white photo filter */
+.member-photo-img {
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+}
 .qr-placeholder {
     width: 22mm;
     height: 22mm;
@@ -521,9 +526,14 @@ body {
                     <div class="motivation">ማጃንግን የማያለማ ቡና አይሸጥ!! </div>
                     
                     <div class="qr-section">
+                        <div class="qr-wrapper">
+        <!-- Left Image -->
+        <img src="left-image.jpg" alt="Left" class="qr-side-image qr-side-image-left" id="qrLeftImage" onerror="this.style.display='none'">
                         <div class="qr-placeholder">
                             <div id="qrcode"></div>
                         </div>
+                            <img src="right-image.jpg" alt="Right" class="qr-side-image qr-side-image-right" id="qrRightImage" onerror="this.style.display='none'">
+    </div>
                         <div class="scan-text">📱 Scan here</div>
                     </div>
                     
@@ -1006,6 +1016,22 @@ function updateCard(member) {
     document.getElementById('toolbar').classList.remove('hidden');
     document.getElementById('successMessage').classList.remove('hidden');
     setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
+}
+    function displayPhoto(photoData, gender) {
+    const photoContainer = document.getElementById('memberPhoto');
+    if (!photoContainer) return;
+    if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
+        // Add grayscale filter class
+        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img" style="filter: grayscale(100%);">`;
+    } else {
+        photoContainer.innerHTML = (gender === 'ሴት') ? '👩' : '👨';
+        photoContainer.style.fontSize = '6mm';
+        photoContainer.style.display = 'flex';
+        photoContainer.style.alignItems = 'center';
+        photoContainer.style.justifyContent = 'center';
+        photoContainer.style.backgroundColor = '#e2e8f0';
+    }
+    setTimeout(() => applyPhotoStamp(), 100);
 }
 
 async function fetchMemberByMemberId(memberId) {
