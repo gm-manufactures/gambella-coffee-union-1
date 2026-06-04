@@ -697,7 +697,7 @@ async function generatePhotoStamp() {
             // Bottom arc goes from angle: 60° to 120° (in radians)
             const bottomRadius = 72;
             const bottomStartAngle = Math.PI * 0.8;   // ~144° (left side)
-            const bottomEndAngle = Math.PI * 0.9;     // ~216° (right side)
+            const bottomEndAngle = Math.PI * 1.5;     // ~216° (right side)
             
             ctx.save();
             ctx.font = 'bold 4.2px Arial';
@@ -803,7 +803,7 @@ async function generatePhotoStamp() {
             // Draw English text on BOTTOM
             const bottomRadius = 72;
             const bottomStartAngle = Math.PI * 0.8;
-            const bottomEndAngle = Math.PI * 0.9;
+            const bottomEndAngle = Math.PI * 1.5;
             
             ctx.save();
             ctx.font = 'bold 4.2px Arial';
@@ -1024,12 +1024,11 @@ function updateCard(member) {
     document.getElementById('successMessage').classList.remove('hidden');
     setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
 }
-    function displayPhoto(photoData, gender) {
+   function displayPhoto(photoData, gender) {
     const photoContainer = document.getElementById('memberPhoto');
     if (!photoContainer) return;
     if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
-        // Add grayscale filter class
-        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img" style="filter: grayscale(100%);">`;
+        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img">`;
     } else {
         photoContainer.innerHTML = (gender === 'ሴት') ? '👩' : '👨';
         photoContainer.style.fontSize = '6mm';
