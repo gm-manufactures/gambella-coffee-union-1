@@ -244,22 +244,27 @@ body {
     margin: 1mm 0;
 }
     /* Black and white photo filter */
-    .qr-side-image {
+    .qr-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+  .qr-side-member-photo {
     width: 18mm;
     height: 18mm;
-    object-fit: contain;
-    border-radius: 2mm;
+    object-fit: cover;
+    border-radius: 50%;
+    filter: grayscale(100%);
+    opacity: 0.3;  /* Less opacity */
 }
     .qr-side-image-left {
-         filter: grayscale(100%);
-    transition: filter 0.3s ease;
     transform: rotate(-5deg);
 }
 
 .qr-side-image-right {
-     filter: grayscale(100%);
-    transition: filter 0.3s ease;
-    transform: rotate(5deg);
+      transform: rotate(-5deg);
 }
 .qr-placeholder {
     width: 22mm;
@@ -540,13 +545,14 @@ body {
                     
                     <div class="qr-section">
                         <div class="qr-wrapper">
-        <!-- Left Image -->
-        <img src="left-image.jpg" alt="Left" class="qr-side-image qr-side-image-left" id="qrLeftImage" onerror="this.style.display='none'">
+        <!-- Left Member Photo -->
+        <img src="" alt="Member" class="qr-side-member-photo qr-side-member-photo-left" id="qrLeftMemberPhoto">
                         <div class="qr-placeholder">
                             <div id="qrcode"></div>
                         </div>
-                            <img src="right-image.jpg" alt="Right" class="qr-side-image qr-side-image-right" id="qrRightImage" onerror="this.style.display='none'">
-    </div>
+                           <!-- Right Member Photo -->
+        <img src="" alt="Member" class="qr-side-member-photo qr-side-member-photo-right" id="qrRightMemberPhoto">
+               </div>
                         <div class="scan-text">📱 Scan here</div>
                     </div>
                     
@@ -689,7 +695,7 @@ async function generatePhotoStamp() {
             
             // Draw English text on BOTTOM (curving from left to right)
             // Bottom arc goes from angle: 60° to 120° (in radians)
-            const bottomRadius = 72;
+            const bottomRadius = 80;
             const bottomStartAngle = Math.PI * 0.8;   // ~144° (left side)
             const bottomEndAngle = Math.PI * 0.5;     // ~216° (right side)
             
@@ -795,7 +801,7 @@ async function generatePhotoStamp() {
             ctx.restore();
             
             // Draw English text on BOTTOM
-            const bottomRadius = 72;
+            const bottomRadius = 80;
             const bottomStartAngle = Math.PI * 0.8;
             const bottomEndAngle = Math.PI * 1.2;
             
@@ -949,21 +955,7 @@ const API_BASE_URL = window.location.origin;
 
 function getToken() { return localStorage.getItem('token'); }
 
-function displayPhoto(photoData, gender) {
-    const photoContainer = document.getElementById('memberPhoto');
-    if (!photoContainer) return;
-    if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
-        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img">`;
-    } else {
-        photoContainer.innerHTML = (gender === 'ሴት') ? '👩' : '👨';
-        photoContainer.style.fontSize = '6mm';
-        photoContainer.style.display = 'flex';
-        photoContainer.style.alignItems = 'center';
-        photoContainer.style.justifyContent = 'center';
-        photoContainer.style.backgroundColor = '#e2e8f0';
-    }
-    setTimeout(() => applyPhotoStamp(), 100);
-}
+
 
 function updateCard(member) {
     console.log("Updating card with member:", member.fullName);
@@ -985,6 +977,7 @@ function updateCard(member) {
     founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
     
     displayPhoto(member.memberPhoto, member.gender);
+    setQRSideMemberPhotos(member.memberPhoto);
     
     const shares = parseInt(member.shareCount || 0);
     document.getElementById('displayVotingPower').textContent = Math.min(Math.floor(shares / 100) + 1, 10);
@@ -1045,6 +1038,22 @@ function updateCard(member) {
         photoContainer.style.backgroundColor = '#e2e8f0';
     }
     setTimeout(() => applyPhotoStamp(), 100);
+}
+    function setQRSideMemberPhotos(photoData) {
+    const leftImg = document.getElementById('qrLeftMemberPhoto');
+    const rightImg = document.getElementById('qrRightMemberPhoto');
+    
+    if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
+        // Set same member photo on both sides
+        leftImg.src = photoData;
+        rightImg.src = photoData;
+        leftImg.style.display = 'block';
+        rightImg.style.display = 'block';
+    } else {
+        // Hide if no photo
+        leftImg.style.display = 'none';
+        rightImg.style.display = 'none';
+    }
 }
 
 async function fetchMemberByMemberId(memberId) {
