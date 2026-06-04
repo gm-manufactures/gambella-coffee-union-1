@@ -625,6 +625,50 @@ function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngl
     }
 }
 
+function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
+    if (!text || text.length === 0) return;
+    
+    const angleRange = Math.abs(endAngle - startAngle);
+    const angleStep = angleRange / (text.length - 1);
+    
+    for (let i = 0; i < text.length; i++) {
+        const angle = startAngle + (i * angleStep);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        let rotation = angle + Math.PI / 2;
+        if (!isTop) rotation = angle - Math.PI / 2;
+        ctx.rotate(rotation);
+        
+        ctx.fillStyle = '#8B4513';
+        ctx.font = isTop ? 'bold 5.8px Arial' : 'bold 4.2px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+    }
+}
+
+function drawStraightText(ctx, text, centerX, centerY, isTopText = true) {
+    if (!text || text.length === 0) return;
+    
+    ctx.save();
+    ctx.fillStyle = '#8B4513';
+    ctx.font = 'bold 4.5px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (isTopText) {
+        ctx.fillText(text, centerX, centerY - 8);
+    } else {
+        ctx.fillText(text, centerX, centerY + 8);
+    }
+    ctx.restore();
+}
+
 async function generatePhotoStamp() {
     const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
@@ -637,9 +681,8 @@ async function generatePhotoStamp() {
     const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
     
     // Split English text into two parts
-    const englishTextFull = "GAMBELLA MAJANG FOREST COFFEE PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
-    const englishTextPart1 = "GAMBELLA MAJANG FOREST COFFEE PRODUCER,";
-    const englishTextPart2 = "MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
+    const englishTextPart1 = "GAMBELLA MAJANG FOREST COFFEE";
+    const englishTextPart2 = "PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
     
     return new Promise((resolve) => {
         const logo = new Image();
@@ -663,14 +706,14 @@ async function generatePhotoStamp() {
             ctx.lineWidth = 1.2;
             ctx.stroke();
             
-            // Amharic text on TOP
+            // Amharic text on TOP (curved)
             drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
             
-            // English text PART 1 (top part of bottom section)
-            drawCurvedText(ctx, englishTextPart1, center, center + 5, 68, Math.PI * 1.85, Math.PI * 1.15, false);
+            // English text PART 1 (straight, above center)
+            drawStraightText(ctx, englishTextPart1, center, center + 55, true);
             
-            // English text PART 2 (bottom part of bottom section)
-            drawCurvedText(ctx, englishTextPart2, center, center + 12, 76, Math.PI * 1.85, Math.PI * 1.15, false);
+            // English text PART 2 (straight, below center)
+            drawStraightText(ctx, englishTextPart2, center, center + 65, false);
             
             // Center circle
             ctx.beginPath();
@@ -719,8 +762,8 @@ async function generatePhotoStamp() {
             ctx.stroke();
             
             drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
-            drawCurvedText(ctx, englishTextPart1, center, center + 5, 68, Math.PI * 1.85, Math.PI * 1.15, false);
-            drawCurvedText(ctx, englishTextPart2, center, center + 12, 76, Math.PI * 1.85, Math.PI * 1.15, false);
+            drawStraightText(ctx, englishTextPart1, center, center + 55, true);
+            drawStraightText(ctx, englishTextPart2, center, center + 65, false);
             
             ctx.beginPath();
             ctx.arc(center, center, 32, 0, 2 * Math.PI);
