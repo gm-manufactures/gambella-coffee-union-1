@@ -608,9 +608,9 @@ async function applyPhotoStamp() {
     if (container) {
         const svgString = generatePhotoStamp();
         // Convert SVG to data URL for better download compatibility
-        const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-        container.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;" onload="URL.revokeObjectURL('${url}')">`;
+        //const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        //const url = URL.createObjectURL(blob);
+        //container.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;" onload="URL.revokeObjectURL('${url}')">`;
     }
 }
 // ==================== MAIN FUNCTIONS ====================
@@ -786,23 +786,44 @@ async function checkUrlParams() {
 }
 
 async function downloadAsImage() {
-    const front = document.getElementById('frontCard'), back = document.getElementById('backCard');
+    const front = document.getElementById('frontCard');
+    const back = document.getElementById('backCard');
+    
     try {
-        const fc = await html2canvas(front, { scale: 3 });
-        const bc = await html2canvas(back, { scale: 3 });
+        // Ensure stamp is rendered before capture
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const fc = await html2canvas(front, { 
+            scale: 4,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            allowTaint: false
+        });
+        
+        const bc = await html2canvas(back, { 
+            scale: 4,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            allowTaint: false
+        });
+        
         let a = document.createElement('a');
         a.download = 'card_front.png';
         a.href = fc.toDataURL();
         a.click();
+        
         setTimeout(() => {
             let b = document.createElement('a');
             b.download = 'card_back.png';
             b.href = bc.toDataURL();
             b.click();
         }, 500);
+        
     } catch(e) { 
         console.error('Download error:', e);
-        alert('ምስል ማውረድ አልተሳካም'); 
+        alert('ምስል ማውረድ አልተሳካም: ' + e.message); 
     }
 }
 
