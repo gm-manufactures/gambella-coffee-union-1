@@ -570,121 +570,47 @@ body {
 
 <script>
 // ==================== STAMP GENERATION ====================
-// ==================== FIXED STAMP FUNCTION ====================
-
+// Original SVG function (preserved but with download fix)
 function generatePhotoStamp() {
-    const size = 180, center = size /  ㈠, radius = 85;
+    const size = 180, center = size / 2, radius = 85;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
-    
-    // Create canvas instead of SVG for better download compatibility
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    
-    // Draw stamp on canvas
-    return new Promise((resolve) => {
-        const logo = new Image();
-        logo.crossOrigin = 'Anonymous';
-        logo.src = logoImgSrc;
-        
-        logo.onload = function() {
-            ctx.clearRect(0, 0, size, size);
-            
-            // Outer circle border
-            ctx.beginPath();
-            ctx.arc(center, center, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            // Inner circle border
-            ctx.beginPath();
-            ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-            
-            ctx.save();
-            ctx.translate(center, center);
-            ctx.rotate(-3 * Math.PI / 180);
-            ctx.translate(-center, -center);
-            
-            // Inner circle background
-            ctx.beginPath();
-            ctx.arc(center, center, 32, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d5a3b';
-            ctx.fill();
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            
-            // Draw logo
-            ctx.drawImage(logo, center - 28, center - 28, 56, 56);
-            
-            // Draw stars
-            ctx.font = '7px Arial';
-            ctx.fillStyle = '#8B4513';
-            ctx.fillText('★', 18, center);
-            ctx.fillText('★', 162, center);
-            ctx.fillText('★', center, 15);
-            ctx.fillText('★', center, 165);
-            
-            ctx.restore();
-            
-            // Return as data URL
-            resolve(canvas.toDataURL());
-        };
-        
-        logo.onerror = function() {
-            // Draw without logo
-            ctx.clearRect(0, 0, size, size);
-            
-            ctx.beginPath();
-            ctx.arc(center, center, radius, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#8B4513';
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-            
-            ctx.save();
-            ctx.translate(center, center);
-            ctx.rotate(-3 * Math.PI / 180);
-            ctx.translate(-center, -center);
-            
-            ctx.beginPath();
-            ctx.arc(center, center, 32, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d5a3b';
-            ctx.fill();
-            
-            ctx.font = '14px Arial';
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillText('🌿', center - 7, center + 5);
-            
-            ctx.font = '7px Arial';
-            ctx.fillStyle = '#8B4513';
-            ctx.fillText('★', 18, center);
-            ctx.fillText('★', 162, center);
-            ctx.fillText('★', center, 15);
-            ctx.fillText('★', center, 165);
-            
-            ctx.restore();
-            
-            resolve(canvas.toDataURL());
-        };
-    });
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+            <defs>
+                <clipPath id="logoClip">
+                    <circle cx="${center}" cy="${center}" r="28" />
+                </clipPath>
+            </defs>
+            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#8B4513" stroke-width="3"/>
+            <circle cx="${center}" cy="${center}" r="${radius - 4}" fill="none" stroke="#8B4513" stroke-width="1.2"/>
+            <g transform="rotate(-3, ${center}, ${center})">
+                <circle cx="${center}" cy="${center}" r="32" fill="#2d5a3b" stroke="#8B4513" stroke-width="1.5"/>
+                <path id="topArc" d="M 25 ${center - 8} A 65 65 0 0 1 155 ${center - 8}" fill="none"/>
+                <text font-size="5.8" fill="#8B4513" font-weight="bold" letter-spacing="0.3">
+                    <textPath href="#topArc" startOffset="50%" text-anchor="middle">የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር</textPath>
+                </text>
+                <path id="bottomArc" d="M 25 ${center + 12} A 65 65 0 0 0 155 ${center + 12}" fill="none"/>
+                <text font-size="4.2" fill="#8B4513" font-weight="bold">
+                    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Gambella Majang Forest Coffee Producer, Manufacturer and Exporter Share Holders Association</textPath>
+                </text>
+                <image href="${logoImgSrc}" x="${center - 28}" y="${center - 28}" width="56" height="56" clip-path="url(#logoClip)" preserveAspectRatio="xMidYMid slice"/>
+                <text x="18" y="${center}" font-size="7" fill="#8B4513">★</text>
+                <text x="162" y="${center}" font-size="7" fill="#8B4513">★</text>
+                <text x="${center}" y="15" font-size="7" fill="#8B4513">★</text>
+                <text x="${center}" y="165" font-size="7" fill="#8B4513">★</text>
+            </g>
+        </svg>
+    `;
 }
 
 async function applyPhotoStamp() { 
     const container = document.getElementById('photoStamp');
     if (container) {
-        const stampDataUrl = await generatePhotoStamp();
-        container.innerHTML = `<img src="${stampDataUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+        const svgString = generatePhotoStamp();
+        // Convert SVG to data URL for better download compatibility
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        container.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:contain;" onload="URL.revokeObjectURL('${url}')">`;
     }
 }
 // ==================== MAIN FUNCTIONS ====================
