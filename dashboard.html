@@ -456,15 +456,11 @@ body {
 
 /* ==================== MEMBER CARD ==================== */
 .member-card {
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 20px;
-    margin-bottom: 16px;
-    border-radius: var(--border-radius-lg);
-    background: var(--white);
-    border-left: 5px solid var(--primary);
-    transition: all var(--transition-normal);
-    position: relative;
-    overflow: hidden;
+    min-height: 180px;
+    max-height: 260px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .member-card::before {
@@ -2321,11 +2317,11 @@ async function loadMembers() {
       return;
     }
     
-    container.innerHTML = filtered.map((m, index) => `
+    container.innerHTML = filtered.map((m) => `
       <div class="member-card">
         <div class="member-header">
           <div class="member-name">
-            <span class="serial-number">#${index + 1}</span>
+           <span class="serial-number">🆔 ${escapeHtml(m.memberId || 'Pending')}</span>
             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
             <strong style="cursor:pointer; color:#2d6a1a; font-size:1.1em;" onclick="showMemberDetails('${m._id || m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
