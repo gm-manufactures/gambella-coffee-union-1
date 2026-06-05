@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>ማጃንግ አባል ካርድ - የተሟላ ስርዓት</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: linear-gradient(135deg, #1e3c2c 0%, #2d5a3b 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 35px;
+    margin-bottom: 25px;
+}
+.id-card {
+    width: 105mm;
+    height: 67mm;
+    background: white;
+    border-radius: 6mm;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+}
+/* CSS Pattern Background - GAMJNG text repeated */
+.id-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('mk.jpg');
+    background-repeat: repeat;
+    background-size: 200px 200px;  
+    opacity: 150%;  
+    pointer-events: none;
+    z-index: 0;
+}
+.id-card::after {
+    content: "GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG GAMJNG";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Arial Black', 'Arial', sans-serif;
+    color: rgba(45, 106, 26, 0.08);
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 2.5;
+    text-align: center;
+    letter-spacing: 8px;
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(-15deg) scale(1.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+@media screen {
+    .id-card {
+        width: 560px;
+        height: 358px;
+         box-shadow: 0 20px 35px rgba(0,0,0,0.35);
+        margin: 0 auto;
+    }
+    .id-card::after {
+        font-size: 20px;
+        letter-spacing: 10px;
+        transform: rotate(-15deg) scale(1.2);
+    }
+}
+.card-side {
+    width: 100%;
+    height: 100%;
+    padding: 5.5mm;
+    background: rgba(255,255,255,0.94);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+    backdrop-filter:blur(0px)
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4mm;
+    margin-bottom: 2.8mm;
+    border-bottom: 0.4mm solid #e2e8f0;
+    padding-bottom: 2mm;
+}
+.left-title { flex: 1; text-align: left; }
+.left-title .amharic { font-size: 4mm; font-weight: bold; color: #1e3c2c;letter-spacing: 0.1px; }
+.left-title .english { font-size: 3mm; color: #4b5563; margin-top: 0.6mm; }
+.logo-center { flex-shrink: 0; text-align: center; }
+.logo-img { width: 15mm; height: 15mm; object-fit: cover; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
+.right-title { flex: 1; text-align: right; }
+.right-title .amharic { font-size: 3.5mm; font-weight: bold; color: #1e3c2c; }
+.right-title .english { font-size: 3mm; color: #4b5563; margin-top: 0.5mm; }
+/* No leaf emoji - removed */
+
+/* Golden Card Image - at the bottom of front side */
+.golden-card-container {
+    position: absolute;
+    bottom: 4.5mm;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45mm;
+    height: auto;
+    z-index: 5;
+    text-align: center;
+}
+.golden-card-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+.founder-stamp {
+    display: inline-block;
+    background: linear-gradient(135deg, #d4af37, #f5c542);
+    color: #1e3c2c;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 8px;
+    font-weight: bold;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+.photo-and-info { 
+    display: flex; 
+    gap: 2.5mm; 
+    margin-bottom: 1.5mm; 
+    align-items: flex-start;
+}
+.photo { width: 30mm; text-align: center; position: relative; }
+.member-photo {
+    width: 25mm;      
+    height: 28mm;     
+    background: #e2e8f0;
+    border-radius: 4mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8mm;
+    margin: 0 auto;
+    border: 0.5mm solid #FFFF;  
+    overflow: hidden;
+    position: relative;
+}
+.member-photo-img { width: 100%; height: 100%; object-fit: cover; }
+.photo-stamp {
+    position: absolute;
+    bottom: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+}
+.photo-stamp svg { width: 100%; height: 100%; opacity: 0.9; }
+.info-grid {
+    flex: 1;
+    background: rgba(248,250,252,0.9);
+    border-radius: 2.5mm;
+    padding: 3mm;
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 1.5mm 2.5mm;
+}
+.info-item {
+    background: #ffffffcc;
+    border-radius: 1mm;      /* Reduced from 1.5mm */
+    padding: 0.2mm 0.6mm;    /* Reduced from 0.5mm 1mm */
+}
+.info-label { font-size: 2mm; font-weight: 600; color: #475569; }
+.info-value { font-size: 3mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; word-break: break-word; }
+.name-row { display: flex; align-items: center; flex-wrap: wrap; }
+
+/* Member Level and Voting Power - Left and Right */
+.level-voting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.2mm 0;
+    padding: 1mm 0;
+}
+.member-level {
+    background: linear-gradient(135deg,#00b4d8,#0077b6);
+    color: white;
+    padding: 0.8mm 2.5mm;
+    border-radius: 3mm;
+    font-weight: bold;
+    font-size: 3.6mm;
+    display: inline-block;
+}
+.voting-power-box {
+    background: #fbbf24;
+    padding: 1.5mm 3.5mm;
+    border-radius: 3mm;
+    font-weight: bold;
+    font-size: 4mm;
+    display: inline-block;
+    color: #1e3c2c;
+}
+
+/* Back card - QR Code and Signatures */
+.back-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.qr-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1mm 0;
+}
+    /* Black and white photo filter */
+    .qr-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+  .qr-side-member-photo {
+    width: 24mm;
+    height: 24mm;
+    object-fit: cover;
+    border-radius: 50%;
+    filter: grayscale(100%);
+    opacity: 0.3;  /* Less opacity */
+}
+    .qr-side-image-left {
+    transform: rotate(-5deg);
+}
+
+.qr-side-image-right {
+      transform: rotate(-5deg);
+}
+.qr-placeholder {
+    width: 30mm;
+    height: 30mm;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 1mm;
+    border-radius: 2mm;
+}
+#qrcode {
+    width: 100%;
+    height: 100%;
+}
+#qrcode img {
+    width: 100% !important;
+    height: 100% !important;
+}
+.scan-text {
+    text-align: center;
+    font-size: 2mm;
+    color: #555;
+    margin-top: 0.5mm;
+}
+.motivation {
+    text-align: center;
+    font-size: 7mm;
+    font-weight: bold;
+    color: #b45309;
+    background: #fef9e6;
+    padding: 1.2mm;
+    border-radius: 2mm;
+    margin: 0.5mm 0;
+}
+.dates-box {
+    background: rgba(241,245,249,0.9);
+    border-radius: 1.5mm;
+    padding: 1.2mm;
+    margin: 0.5mm 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 2mm;
+    font-weight: 500;
+}
+.signatures-back {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5mm 0;
+    text-align: center;
+}
+.sign-box-back { 
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.role-title {
+    font-size: 2mm;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5mm;
+}
+.gm-name-above {
+    font-size: 1.2mm;
+    color: #555;
+    margin-bottom: 0.5mm;
+    font-weight: 500;
+}
+.sign-line-back { 
+    width: 80%; 
+    border-top: 0.2mm solid #334155; 
+    margin: 0.8mm 0;
+}
+.signature-area {
+    margin-top: 0.3mm;
+    text-align: center;
+}
+.signature-img {
+    max-width: 45px;
+    max-height: 20px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+.gm-name-below {
+    font-size: 1mm;
+    color: #888;
+    margin-top: 0.3mm;
+}
+.verification-seal {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 42px;
+    height: 42px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1.5px solid #d4af37;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3mm;
+    font-weight: bold;
+    color: #d4af37;
+    transform: rotate(-15deg);
+    z-index: 20;
+}
+.verification-seal::before {
+    content: "✓";
+    font-size: 7mm;
+    font-weight: bold;
+}
+.verification-seal::after {
+    content: "DIGITAL VERIFICATION SEAL";
+    position: absolute;
+    font-size: 2.4mm;
+    white-space: nowrap;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d4af37;
+    font-weight: bold;
+}
+.back-notes {
+    font-size: 2mm;
+    color: black;
+    line-height: 1.2;
+    margin-top: 0.5mm;
+}
+.back-notes p {
+    margin: 0.3mm 0;
+    background: #FFF;
+    padding: 0.3mm 0.6;
+    border-radius: 1.5mm;
+    border-left: 0.6mm solid #fbbf24;
+}
+.back-notes p strong { color: #1a1916; }
+.toolbar { display: flex; gap: 10px; margin: 20px auto; flex-wrap: wrap; justify-content: center; }
+.tool-btn {
+    background: #2d5a3b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.print-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto;
+}
+.search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.search-box input {
+    padding: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+.search-box button {
+    background: #2d5a3b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.search-box button:hover { background: #1e3c2c; }
+.loading { text-align: center; padding: 20px; color: white; font-size: 18px; }
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    border-left: 4px solid #28a745;
+}
+.hidden { display: none; }
+@media print {
+    body { background: white; padding: 0; margin: 0; display: block; }
+    .id-card { box-shadow: none; margin: 0 auto; width: 85.6mm; height: 54mm; }
+    .toolbar, .print-btn, .search-box, .success-message { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="search-box">
+        <h3> የአባል ካርድ ማውጫ</h3>
+        <p style="margin-bottom: 10px; font-size: 12px; color: #666;">እባክዎ የአባሉን Member ID ያስገቡ (ለምሳሌ: GMFC/2026/5823)</p>
+        <input type="text" id="memberIdInput" placeholder="Member ID: GMFC/2026/XXXX" />
+        <button onclick="loadCardByMemberId()">ካርድ አምጣ</button>
+    </div>
+    
+    <div id="loginWarning" class="error-message hidden">
+        ⚠️ እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! <a href="/dashboard.html" style="color:#155724;">እዚህ ይጫኑ</a>
+    </div>
+    
+    <div id="successMessage" class="success-message hidden">✅ ካርድ በሚገባ ተዘጋጅቷል!</div>
+    <div id="loadingMessage" class="loading hidden">⏳ እባክዎ ይጠብቁ... ካርድ እየተዘጋጀ ነው</div>
+    <div id="errorMessage" class="error-message hidden">❌ አባል አልተገኘም</div>
+    
+    <div id="cardContainer" class="card-container hidden">
+        <!-- Front Card -->
+        <div class="id-card" id="frontCard">
+            <div class="card-side front">
+                <div>
+                    <div class="logo-row">
+                        <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english ">Gambella Majang Forest Coffee Producer</div></div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img" onerror="this.style.display='none'"></div>
+                        <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div><div class="english ">, Manufacturer and Exporter Share Holders Association</div></div>
+                    </div>
+                    <div class="photo-and-info">
+                        <div class="photo">
+                            <div class="member-photo" id="memberPhoto">👤</div>
+                            <div id="photoStamp" class="photo-stamp"></div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value"><div class="name-row"><span id="displayFullName">-</span><span id="founderBadge" class="founder-stamp" style="display:none;">⭐ FOUNDER / መስራች ⭐</span></div></div></div>
+                            <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
+                            <div class="info-item"><div class="info-label">Gender</div><div class="info-value" id="displayGender">-</div></div>
+                            <div class="info-item"><div class="info-label">Age</div><div class="info-value" id="displayAge">-</div></div>
+                            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="displayPhone">-</div></div>
+                            <div class="info-item"><div class="info-label">Mother</div><div class="info-value" id="displayMotherName">-</div></div>
+                            <div class="info-item"><div class="info-label">Address</div><div class="info-value" id="displayAddress">-</div></div>
+                            <div class="info-item"><div class="info-label">Position</div><div class="info-value" id="displayPosition">-</div></div>
+                            <div class="info-item"><div class="info-label">Shares</div><div class="info-value" id="displayShares">-</div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Member Level and Voting Power - Left and Right -->
+                    <div class="level-voting-row">
+                        <span class="member-level" id="tierBadge">MEMBER</span>
+                        <span class="voting-power-box">Voting Power: <span id="displayVotingPower">-</span></span>
+                    </div>
+                </div>
+                <!-- Golden Card Image at the bottom -->
+                <div class="golden-card-container">
+                    <img src="golden card.jpg" alt="Golden Card" class="golden-card-img" id="goldenCardImg" onerror="this.style.display='none'">
+                </div>
+                <!-- Digital Verification Seal on front card -->
+                <div class="verification-seal"></div>
+            </div>
+        </div>
+        
+        <!-- Back Card with QR Code and Signatures -->
+        <div class="id-card" id="backCard">
+            <div class="card-side back">
+                <div class="back-content">
+                    <div class="motivation">ማጃንግን የማያለማ ቡና አይሸጥ!! </div>
+                    
+                    <div class="qr-section">
+                        <div class="qr-wrapper">
+        <!-- Left Member Photo -->
+        <img src="" alt="Member" class="qr-side-member-photo qr-side-member-photo-left" id="qrLeftMemberPhoto">
+                        <div class="qr-placeholder">
+                            <div id="qrcode"></div>
+                        </div>
+                           <!-- Right Member Photo -->
+        <img src="" alt="Member" class="qr-side-member-photo qr-side-member-photo-right" id="qrRightMemberPhoto">
+               </div>
+                        <div class="scan-text">📱 Scan here</div>
+                    </div>
+                    
+                    <div class="dates-box">
+                        <span>Issue: <span id="issueDate">-</span></span>
+                        <span>Expiry: <span id="expiryDate">-</span></span>
+                    </div>
+                    
+                    <div class="signatures-back">
+                        <!-- Chairperson Section -->
+                        <div class="sign-box-back">
+                            <div class="role-title">Chairperson</div>
+                            <div class="sign-line-back"></div>
+                            <div class="gm-name-below">ሀሰን ይመር አሊ</div>
+                        </div>
+                        
+                        <!-- General Manager Section -->
+                        <div class="sign-box-back">
+                            <div class="role-title">General Manager</div>
+                            <div class="gm-name-above" id="gmNameAbove">ሰይድ ይማም አሸብር</div>
+                            <div class="sign-line-back"></div>
+                            <div class="signature-area">
+                                <img src="signature.jpg" alt="Signature" class="signature-img" id="gmSignature" onerror="this.style.display='none'">
+                            </div>
+                        </div>
+                    </div> 
+                    
+                    <div class="back-notes">
+                        <p>ዋስትና 1:- በህግና በማህበሩ ስምምነት መሰረት ይህ MAJANG GOLDEN CARD በእዳ ሊያዝና እንደ ገንዘብ ሊያገለግል ይችላል ።</p>
+                         <p>ዋስትና 2:-  ይሄንን የአክሲዬን ድርሻ ካርድ ወደ ትንንሽ አክሲዬን ክፍልፋዬች መቀየር ይቻላል። ይህም ካርዶቹ በቀላሉ እንደ ካርድ ኖቶች ያገለግላሉ።</p>
+                        <p>ይህን ካርድ ከባለቤቱ ውጪ ይዞ መገኘትና ለግብይት ለመጠቀም መሞከር በህግ ያስቀጣል። </p>
+                        <p>መታወቂያውን ወድቆ ካገኙ በላዩ ላይ ባለው የግለሰቡ ስልክ ቁጥር <span id="contactPhone">-</span> ወይም በማህበሩ ስልክ ቁጥር 0911097124 ,0911991614  ይደውሉ። </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toolbar hidden" id="toolbar">
+        <button class="tool-btn" onclick="downloadAsImage()">📸 እንደ ምስል አውርድ</button>
+        <button class="tool-btn" onclick="printCard()">🖨️ ካርድ ማተም</button>
+    </div>
+</div>
+
+<script>
+function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
+    if (!text || text.length === 0) return;
+    
+    const angleRange = Math.abs(endAngle - startAngle);
+    const angleStep = angleRange / (text.length - 1);
+    
+    for (let i = 0; i < text.length; i++) {
+        const angle = startAngle + (i * angleStep);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        let rotation = angle + Math.PI / 2;
+        if (!isTop) rotation = angle - Math.PI / 2;
+        ctx.rotate(rotation);
+        
+        ctx.fillStyle = '#8B4513';
+        ctx.font = isTop ? 'bold 5.8px Arial' : 'bold 4.2px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+    }
+}
+
+function drawCurvedText(ctx, text, centerX, centerY, radius, startAngle, endAngle, isTop = true) {
+    if (!text || text.length === 0) return;
+    
+    const angleRange = Math.abs(endAngle - startAngle);
+    const angleStep = angleRange / (text.length - 1);
+    
+    for (let i = 0; i < text.length; i++) {
+        const angle = startAngle + (i * angleStep);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        
+        let rotation = angle + Math.PI / 2;
+        if (!isTop) rotation = angle - Math.PI / 2;
+        ctx.rotate(rotation);
+        
+        ctx.fillStyle = '#8B4513';
+        ctx.font = isTop ? 'bold 5.8px Arial' : 'bold 4.2px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+    }
+}
+
+function drawStraightText(ctx, text, centerX, centerY, isTopText = true) {
+    if (!text || text.length === 0) return;
+    
+    ctx.save();
+    ctx.fillStyle = '#8B4513';
+    ctx.font = 'bold 4.5px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (isTopText) {
+        ctx.fillText(text, centerX, centerY - 8);
+    } else {
+        ctx.fillText(text, centerX, centerY + 8);
+    }
+    ctx.restore();
+}
+
+async function generatePhotoStamp() {
+    const size = 180, center = size / 2, radius = 85;
+    let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    
+    const amharicText = "የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ኤክስፖርተር አክሲዬን ማህበር";
+    
+    // Split English text into two parts
+    const englishTextPart1 = "GAMBELLA MAJANG FOREST COFFEE";
+    const englishTextPart2 = "PRODUCER, MANUFACTURER AND EXPORTER SHARE HOLDERS ASSOCIATION";
+    
+    return new Promise((resolve) => {
+        const logo = new Image();
+        logo.crossOrigin = 'Anonymous';
+        logo.src = logoImgSrc;
+        
+        logo.onload = function() {
+            ctx.clearRect(0, 0, size, size);
+            
+            // Outer circle
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            
+            // Amharic text on TOP (curved)
+            drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
+            
+            // English text PART 1 (straight, above center)
+            drawStraightText(ctx, englishTextPart1, center, center + 55, true);
+            
+            // English text PART 2 (straight, below center)
+            drawCurvedText(ctx, englishTextPart2, center, center + 65, false);
+            
+            // Center circle
+            ctx.beginPath();
+            ctx.arc(center, center, 32, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2d5a3b';
+            ctx.fill();
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            // Logo
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(center, center, 30, 0, 2 * Math.PI);
+            ctx.clip();
+            ctx.drawImage(logo, center - 28, center - 28, 56, 56);
+            ctx.restore();
+            
+            // Stars
+            ctx.font = 'bold 7px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', 18, center);
+            ctx.fillText('★', 162, center);
+            ctx.fillText('★', center, 16);
+            ctx.fillText('★', center, 165);
+            
+            resolve(canvas.toDataURL());
+        };
+        
+        logo.onerror = function() {
+            // Fallback without logo
+            ctx.clearRect(0, 0, size, size);
+            
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(center, center, radius - 4, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            
+            drawCurvedText(ctx, amharicText, center, center, 58, Math.PI * 1.2, Math.PI * 1.8, true);
+            drawStraightText(ctx, englishTextPart1, center, center + 55, true);
+            drawStraightText(ctx, englishTextPart2, center, center + 65, false);
+            
+            ctx.beginPath();
+            ctx.arc(center, center, 32, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2d5a3b';
+            ctx.fill();
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#fbbf24';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🌿', center, center);
+            
+            ctx.font = 'bold 7px Arial';
+            ctx.fillStyle = '#8B4513';
+            ctx.fillText('★', 18, center);
+            ctx.fillText('★', 162, center);
+            ctx.fillText('★', center, 16);
+            ctx.fillText('★', center, 165);
+            
+            resolve(canvas.toDataURL());
+        };
+    });
+}
+
+async function applyPhotoStamp() { 
+    const container = document.getElementById('photoStamp');
+    if (container) {
+        const stampDataUrl = await generatePhotoStamp();
+        container.innerHTML = `<img src="${stampDataUrl}" style="width:100%; height:100%; object-fit:contain;">`;
+    }
+}
+// ==================== MAIN FUNCTIONS ====================
+const API_BASE_URL = window.location.origin;
+
+function getToken() { return localStorage.getItem('token'); }
+
+
+
+function updateCard(member) {
+    console.log("Updating card with member:", member.fullName);
+    
+    document.getElementById('displayMemberId').textContent = member.memberId || member._id || '-';
+    document.getElementById('displayFullName').textContent = member.fullName || '-';
+    document.getElementById('displayMotherName').textContent = member.motherName || '-';
+    document.getElementById('displayAge').textContent = member.age || '-';
+    document.getElementById('displayGender').textContent = member.gender || '-';
+    document.getElementById('displayPhone').textContent = member.phone || '-';
+    document.getElementById('displayAddress').textContent = member.address || '-';
+    document.getElementById('displayPosition').textContent = member.role || member.position || '-';
+    document.getElementById('displayShares').textContent = member.shareCount || '0';
+
+    //multi lingual
+    
+    const founderBadge = document.getElementById('founderBadge');
+    const role = (member.role || member.position || '').toLowerCase();
+    founderBadge.style.display = (role === 'መስራች' || role === 'founder' || role === 'ፋውንደር') ? 'inline-block' : 'none';
+    
+    
+    setQRSideMemberPhotos(member.memberPhoto);
+    displayPhoto(member.memberPhoto, member.gender);
+    
+    const shares = parseInt(member.shareCount || 0);
+    document.getElementById('displayVotingPower').textContent = Math.min(Math.floor(shares / 100) + 1, 10);
+    
+    const tierBadge = document.getElementById('tierBadge');
+    if (shares >= 200) tierBadge.innerHTML = '💎 PLATINUM MEMBER';
+    else if (shares >= 100) tierBadge.innerHTML = '🥇 GOLD MEMBER';
+    else if (shares >= 50) tierBadge.innerHTML = '🥈 SILVER MEMBER';
+    else tierBadge.innerHTML = '🥉 BRONZE MEMBER';
+    
+    document.getElementById('gmNameAbove').textContent = "ሰይድ ይማም አሸብር";
+    document.getElementById('contactPhone').textContent = member.phone || '-';
+    
+    const today = new Date();
+    const expiry = new Date();
+    expiry.setFullYear(today.getFullYear() + 5);
+    document.getElementById('issueDate').textContent = today.toISOString().split('T')[0];
+    document.getElementById('expiryDate').textContent = expiry.toISOString().split('T')[0];
+    
+    // QR Code URL - points to member portal with memberId parameter
+    const portalUrl = `https://gambella-coffee-union-1.onrender.com/member-portal.html?memberId=${encodeURIComponent(member.memberId)}`;
+    
+    let qrContainer = document.getElementById('qrcode');
+    if (qrContainer) {
+        qrContainer.innerHTML = '';
+        try {
+            new QRCode(qrContainer, { 
+                text: portalUrl, 
+                width: 140, 
+                height: 140, 
+                colorDark: "#1a3c0e", 
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } catch(e) {
+            console.error("QR Error:", e);
+            qrContainer.innerHTML = `<div style="font-size:8px;text-align:center;word-break:break-all;">${member.memberId || ''}</div>`;
+        }
+    }
+    
+    document.getElementById('cardContainer').classList.remove('hidden');
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('successMessage').classList.remove('hidden');
+    setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
+}
+   function displayPhoto(photoData, gender) {
+    const photoContainer = document.getElementById('memberPhoto');
+    if (!photoContainer) return;
+    if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
+        photoContainer.innerHTML = `<img src="${photoData}" class="member-photo-img">`;
+    } else {
+        photoContainer.innerHTML = (gender === 'ሴት') ? '👩' : '👨';
+        photoContainer.style.fontSize = '6mm';
+        photoContainer.style.display = 'flex';
+        photoContainer.style.alignItems = 'center';
+        photoContainer.style.justifyContent = 'center';
+        photoContainer.style.backgroundColor = '#e2e8f0';
+    }
+    setTimeout(() => applyPhotoStamp(), 100);
+}
+    function setQRSideMemberPhotos(photoData) {
+    const leftImg = document.getElementById('qrLeftMemberPhoto');
+    const rightImg = document.getElementById('qrRightMemberPhoto');
+    
+    if (photoData && photoData.startsWith && photoData.startsWith('data:image')) {
+        // Set same member photo on both sides
+        leftImg.src = photoData;
+        rightImg.src = photoData;
+        leftImg.style.display = 'block';
+        rightImg.style.display = 'block';
+    } else {
+        // Hide if no photo
+        leftImg.style.display = 'none';
+        rightImg.style.display = 'none';
+    }
+}
+
+async function fetchMemberByMemberId(memberId) {
+    try {
+        const token = getToken();
+        if (!token) {
+            document.getElementById('loginWarning').classList.remove('hidden');
+            return null;
+        }
+        
+        let response = await fetch(`${API_BASE_URL}/api/members/search/${encodeURIComponent(memberId)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const members = await response.json();
+            const exactMatch = members.find(m => m.memberId === memberId);
+            if (exactMatch) return exactMatch;
+        }
+        
+        response = await fetch(`${API_BASE_URL}/api/members`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const allMembers = await response.json();
+            const member = allMembers.find(m => m.memberId === memberId || m._id === memberId);
+            if (member) return member;
+        }
+        
+        showError(`አባል ቁጥር "${memberId}" አልተገኘም!`);
+        return null;
+    } catch (error) {
+        console.error('Error:', error);
+        showError('የአገልጋይ ስህተት: ' + error.message);
+        return null;
+    }
+}
+
+async function loadCardByMemberId() {
+    const memberIdInput = document.getElementById('memberIdInput');
+    let memberId = memberIdInput.value.trim();
+    
+    if (!memberId) {
+        alert('እባክዎ የአባል Member ID ያስገቡ!');
+        return;
+    }
+    
+    if (!memberId.includes('GMFC/') && /^\d+$/.test(memberId)) {
+        const currentYear = new Date().getFullYear();
+        memberId = `GMFC/${currentYear}/${memberId}`;
+        memberIdInput.value = memberId;
+    }
+    
+    document.getElementById('loadingMessage').classList.remove('hidden');
+    document.getElementById('cardContainer').classList.add('hidden');
+    document.getElementById('toolbar').classList.add('hidden');
+    document.getElementById('errorMessage').classList.add('hidden');
+    document.getElementById('loginWarning').classList.add('hidden');
+    document.getElementById('successMessage').classList.add('hidden');
+    
+    const member = await fetchMemberByMemberId(memberId);
+    
+    document.getElementById('loadingMessage').classList.add('hidden');
+    
+    if (member) {
+        updateCard(member);
+    } else {
+        document.getElementById('errorMessage').classList.remove('hidden');
+    }
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `❌ ${message}`;
+    errorDiv.classList.remove('hidden');
+    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+}
+
+async function checkUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('memberId')) {
+        document.getElementById('memberIdInput').value = params.get('memberId');
+        await loadCardByMemberId();
+    }
+}
+
+async function downloadAsImage() {
+    const front = document.getElementById('frontCard');
+    const back = document.getElementById('backCard');
+    
+    try {
+        // Ensure stamp is rendered before capture
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const fc = await html2canvas(front, { 
+            scale: 4,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            allowTaint: false
+        });
+        
+        const bc = await html2canvas(back, { 
+            scale: 4,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            allowTaint: false
+        });
+        
+        let a = document.createElement('a');
+        a.download = 'card_front.png';
+        a.href = fc.toDataURL();
+        a.click();
+        
+        setTimeout(() => {
+            let b = document.createElement('a');
+            b.download = 'card_back.png';
+            b.href = bc.toDataURL();
+            b.click();
+        }, 500);
+        
+    } catch(e) { 
+        console.error('Download error:', e);
+        alert('ምስል ማውረድ አልተሳካም: ' + e.message); 
+    }
+}
+
+function printCard() { window.print(); }
+
+async function init() {
+    const token = getToken();
+    if (!token) {
+        document.getElementById('loginWarning').classList.remove('hidden');
+    } else {
+        await checkUrlParams();
+    }
+}
+
+init();
+
+window.loadCardByMemberId = loadCardByMemberId;
+window.downloadAsImage = downloadAsImage;
+window.printCard = printCard;
+</script>
+</body>
+</html>
