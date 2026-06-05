@@ -4225,7 +4225,7 @@ async function loadAllUsers() {
   if (!users.length) { container.innerHTML = '<p>No users found</p>'; return; }
   container.innerHTML = users.map(u => `
     <div class="member-card">
-      <div class="member-header"><div class="member-name">👤 ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="share-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div>
+      <div class="member-header"><div class="member-name"> ${escapeHtml(u.fullName)} ${u.role === 'admin' ? '<span class="share-badge">Admin</span>' : ''}</div><div class="member-role">${escapeHtml(u.role)}</div></div>
       <div>Username: ${escapeHtml(u.username)} | Email: ${escapeHtml(u.email)}</div>
       ${u.id !== currentUser.id ? `<div class="member-actions"><button class="btn-danger" onclick="deleteUser('${u.id}')">🗑️ Delete</button><button class="btn-edit" onclick="resetUserPassword('${u.id}')">🔑 Reset Password</button></div>` : ''}
     </div>
