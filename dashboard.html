@@ -2317,11 +2317,11 @@ async function loadMembers() {
       return;
     }
     
-    container.innerHTML = filtered.map((m) => `
+    filtered.map((m, index) => `
       <div class="member-card">
         <div class="member-header">
           <div class="member-name">
-           <span class="serial-number">🆔 ${escapeHtml(m.memberId || 'Pending')}</span>
+         <span class="serial-number">#${index + 1}</span>
             ${m.memberPhoto ? `<img src="${m.memberPhoto}" class="member-thumb" onclick="event.stopPropagation(); openLightbox('${m.memberPhoto}')">` : '👤'}
             <strong style="cursor:pointer; color:#2d6a1a; font-size:1.1em;" onclick="showMemberDetails('${m._id || m.id}')">${escapeHtml(m.fullName || 'No Name')}</strong>
             ${m.shareCount > 0 ? `<span class="share-badge">📊 ${m.shareCount} አክሲዬን</span>` : ''}
