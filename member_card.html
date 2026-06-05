@@ -673,7 +673,7 @@ function drawStraightText(ctx, text, centerX, centerY, isTopText = true) {
 }
 
 async function generatePhotoStamp() {
-    const size = 180, center = size / 2, radius = 85;
+    const size = 120, center = size / 2, radius = 55;
     let logoImgSrc = document.querySelector('.logo-img')?.src || 'logo.jpg';
     
     const canvas = document.createElement('canvas');
@@ -875,6 +875,18 @@ function updateCard(member) {
     document.getElementById('successMessage').classList.remove('hidden');
     setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
 }
+    function cleanupQR() {
+    const qrContainer = document.getElementById('qrcode');
+    if (qrContainer && qrContainer.firstChild) {
+        // Remove old QR to free memory
+        while (qrContainer.firstChild) {
+            qrContainer.removeChild(qrContainer.firstChild);
+        }
+    }
+}
+
+// Call this before generating new QR
+cleanupQR();
    function displayPhoto(photoData, gender) {
     const photoContainer = document.getElementById('memberPhoto');
     if (!photoContainer) return;
@@ -1001,7 +1013,7 @@ async function downloadAsImage() {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         const fc = await html2canvas(front, { 
-            scale: 4,
+            scale: 2,
             backgroundColor: '#ffffff',
             useCORS: true,
             logging: false,
@@ -1009,7 +1021,7 @@ async function downloadAsImage() {
         });
         
         const bc = await html2canvas(back, { 
-            scale: 4,
+            scale: 2,
             backgroundColor: '#ffffff',
             useCORS: true,
             logging: false,
@@ -1026,7 +1038,11 @@ async function downloadAsImage() {
             b.download = 'card_back.png';
             b.href = bc.toDataURL();
             b.click();
-        }, 500);
+              URL.revokeObjectURL(fc);
+            URL.revokeObjectURL(bc);
+        }, 1000);
+       
+        
         
     } catch(e) { 
         console.error('Download error:', e);
