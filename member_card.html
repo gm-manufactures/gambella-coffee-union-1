@@ -22,22 +22,22 @@ body {
     align-items: center;
 }
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 .card-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    gap: 35px;
+    margin-bottom: 25px;
 }
 .id-card {
-    width: 85.6mm;
-    height: 54mm;
+    width: 105mm;
+    height: 67mm;
     background: white;
-    border-radius: 4mm;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    border-radius: 6mm;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     overflow: hidden;
     position: relative;
 }
@@ -63,7 +63,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
     font-family: 'Arial Black', 'Arial', sans-serif;
     color: rgba(45, 106, 26, 0.08);
@@ -81,8 +81,10 @@ body {
 }
 @media screen {
     .id-card {
-        width: 450px;
-        height: 284px;
+        width: 560px;
+        height: 358px;
+         box-shadow: 0 20px 35px rgba(0,0,0,0.35);
+        margin: 0 auto;
     }
     .id-card::after {
         font-size: 20px;
@@ -93,7 +95,7 @@ body {
 .card-side {
     width: 100%;
     height: 100%;
-    padding: 3.5mm;
+    padding: 5.5mm;
     background: rgba(255,255,255,0.94);
     display: flex;
     flex-direction: column;
@@ -105,28 +107,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2mm;
-    margin-bottom: 2mm;
+    gap: 4mm;
+    margin-bottom: 3.5mm;
     border-bottom: 0.3mm solid #e2e8f0;
-    padding-bottom: 1.5mm;
+    padding-bottom: 2.5mm;
 }
 .left-title { flex: 1; text-align: left; }
-.left-title .amharic { font-size: 2.2mm; font-weight: bold; color: #1e3c2c; }
-.left-title .english { font-size: 1.3mm; color: #4b5563; margin-top: 0.5mm; }
+.left-title .amharic { font-size: 3.5mm; font-weight: bold; color: #1e3c2c; }
+.left-title .english { font-size: 2.5mm; color: #4b5563; margin-top: 0.5mm; }
 .logo-center { flex-shrink: 0; text-align: center; }
-.logo-img { width: 8mm; height: 8mm; object-fit: cover; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
+.logo-img { width: 12mm; height: 12mm; object-fit: cover; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
 .right-title { flex: 1; text-align: right; }
-.right-title .amharic { font-size: 2mm; font-weight: bold; color: #1e3c2c; }
-.right-title .english { font-size: 1.2mm; color: #4b5563; margin-top: 0.5mm; }
+.right-title .amharic { font-size: 3.1mm; font-weight: bold; color: #1e3c2c; }
+.right-title .english { font-size: 2.1mm; color: #4b5563; margin-top: 0.5mm; }
 /* No leaf emoji - removed */
 
 /* Golden Card Image - at the bottom of front side */
 .golden-card-container {
     position: absolute;
-    bottom: 3mm;
+    bottom: 4.5mm;
     left: 50%;
     transform: translateX(-50%);
-    width: 35mm;
+    width: 45mm;
     height: auto;
     z-index: 5;
     text-align: center;
@@ -154,10 +156,10 @@ body {
     margin-bottom: 1.5mm; 
     align-items: flex-start;
 }
-.photo { width: 12mm; text-align: center; position: relative; }
+.photo { width: 17mm; text-align: center; position: relative; }
 .member-photo {
-    width: 11mm;
-    height: 14mm;
+    width: 16mm;
+    height: 20mm;
     background: #e2e8f0;
     border-radius: 2mm;
     display: flex;
@@ -188,18 +190,18 @@ body {
     flex: 1;
     background: rgba(248,250,252,0.9);
     border-radius: 2.5mm;
-    padding: 1.5mm;
+    padding: 3mm;
     display: grid;
     grid-template-columns: repeat(2,1fr);
-    gap: 0.8mm 1.5mm;
+    gap: 1.5mm 2.5mm;
 }
 .info-item {
     background: #ffffffcc;
     border-radius: 1.5mm;
     padding: 0.5mm 1mm;
 }
-.info-label { font-size: 1.4mm; font-weight: 600; color: #475569; }
-.info-value { font-size: 1.8mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; word-break: break-word; }
+.info-label { font-size: 2.1mm; font-weight: 600; color: #475569; }
+.info-value { font-size: 2.5mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; word-break: break-word; }
 .name-row { display: flex; align-items: center; flex-wrap: wrap; }
 
 /* Member Level and Voting Power - Left and Right */
@@ -221,10 +223,10 @@ body {
 }
 .voting-power-box {
     background: #fbbf24;
-    padding: 0.8mm 2.5mm;
+    padding: 1.5mm 3.5mm;
     border-radius: 3mm;
     font-weight: bold;
-    font-size: 1.9mm;
+    font-size: 2.5mm;
     display: inline-block;
     color: #1e3c2c;
 }
@@ -252,8 +254,8 @@ body {
     margin: 5px 0;
 }
   .qr-side-member-photo {
-    width: 18mm;
-    height: 18mm;
+    width: 24mm;
+    height: 24mm;
     object-fit: cover;
     border-radius: 50%;
     filter: grayscale(100%);
@@ -267,8 +269,8 @@ body {
       transform: rotate(-5deg);
 }
 .qr-placeholder {
-    width: 22mm;
-    height: 22mm;
+    width: 30mm;
+    height: 30mm;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -287,28 +289,28 @@ body {
 }
 .scan-text {
     text-align: center;
-    font-size: 1.4mm;
+    font-size: 2mm;
     color: #555;
     margin-top: 0.5mm;
 }
 .motivation {
     text-align: center;
-    font-size: 1.5mm;
+    font-size: 3mm;
     font-weight: bold;
     color: #b45309;
     background: #fef9e6;
-    padding: 0.5mm;
+    padding: 1.2mm;
     border-radius: 2mm;
     margin: 0.5mm 0;
 }
 .dates-box {
     background: rgba(241,245,249,0.9);
     border-radius: 1.5mm;
-    padding: 0.6mm;
+    padding: 1.2mm;
     margin: 0.5mm 0;
     display: flex;
     justify-content: space-between;
-    font-size: 1.3mm;
+    font-size: 2mm;
     font-weight: 500;
 }
 .signatures-back {
@@ -324,7 +326,7 @@ body {
     align-items: center;
 }
 .role-title {
-    font-size: 1.3mm;
+    font-size: 2mm;
     font-weight: bold;
     color: #333;
     margin-bottom: 0.5mm;
@@ -359,8 +361,8 @@ body {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    width: 30px;
-    height: 30px;
+    width: 42px;
+    height: 42px;
     background: rgba(212, 175, 55, 0.15);
     border: 1.5px solid #d4af37;
     border-radius: 50%;
@@ -375,22 +377,22 @@ body {
 }
 .verification-seal::before {
     content: "✓";
-    font-size: 5mm;
+    font-size: 7mm;
     font-weight: bold;
 }
 .verification-seal::after {
     content: "DIGITAL VERIFICATION SEAL";
     position: absolute;
-    font-size: 1.8mm;
+    font-size: 2.4mm;
     white-space: nowrap;
-    bottom: -5px;
+    bottom: -9px;
     left: 50%;
     transform: translateX(-50%);
     color: #d4af37;
     font-weight: bold;
 }
 .back-notes {
-    font-size: 1.2mm;
+    font-size: 1.65mm;
     color: #1e293b;
     line-height: 1.2;
     margin-top: 0.5mm;
