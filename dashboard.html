@@ -3026,7 +3026,7 @@ function showCredentialPopup(credentials) {
             </div>
             <button onclick="this.closest('#credentialPopup').remove()" 
                 style="background: #2d6a1a; color: white; border: none; padding: 10px 30px; border-radius: 25px; cursor: pointer; font-size: 14px; margin-top: 5px;">
-                ዘጋ
+                CLOSE
             </button>
         </div>
     `;
@@ -3061,7 +3061,7 @@ async function showMemberDetails(memberId) {
         currentEditingMemberId = memberId;
         
         // Find serial number for display
-        const serialNumber = members.findIndex(m => (m._id || m.id) === memberId) + 1;
+       container.innerHTML = filtered.map((m) => `
         
         // Build address string
         const fullAddress = [
@@ -3090,8 +3090,8 @@ async function showMemberDetails(memberId) {
                     <div class="section-title">📋 የግል መረጃ</div>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">📝 ተራ ቁጥር</div>
-                            <div class="info-value">${serialNumber}</div>
+                            <div class="info-label">Member ID N_O</div>
+                            <div class="info-value">${escapeHtml(m.memberId || 'Pending')}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">♂/♀ ፆታ</div>
