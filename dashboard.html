@@ -2718,9 +2718,6 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
      console.log("📝 Submitting registration form...");
     if (currentEditingMemberId) {
-    submitBtn.innerHTML = '⏳ እባክዎ ይጠብቁ...';
-    submitBtn.disabled = true;
-    // This will run ONLY ONCE now
     await updateFullMember(currentEditingMemberId);
     return;
 }
