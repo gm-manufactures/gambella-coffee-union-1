@@ -3084,7 +3084,7 @@ async function showMemberDetails(memberId) {
                     <div class="profile-photo" style="background:#2d6a1a; display:flex; align-items:center; justify-content:center; font-size:48px; color:white; width:80px; height:80px; border-radius:50%;">
                         ${member.memberPhoto ? 
                             `<img src="${member.memberPhoto}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">` : 
-                            '👤'}
+                            ' '}
                     </div>
                     <div class="profile-name">${escapeHtml(member.fullName || 'ስም የለም')}</div>
                 </div>
