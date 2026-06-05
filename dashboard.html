@@ -2717,21 +2717,16 @@ async function deleteMember(id) {
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
      console.log("📝 Submitting registration form...");
-   if (currentEditingMemberId) {
+    if (currentEditingMemberId) {
+    // This will run ONLY ONCE now
+    await updateFullMember(currentEditingMemberId);
+    return;
+}
+    
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '⏳ እባክዎ ይጠብቁ...';
     submitBtn.disabled = true;
-    
-    try {
-        await updateFullMember(currentEditingMemberId);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '✏️ አዘምን';
-    }
-    return;
-}
-    
     try {
         // Collect form data
         const shareCount = parseInt(document.getElementById('shareCount').value) || 0;
