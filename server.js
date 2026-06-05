@@ -537,7 +537,7 @@ app.get('/api/members', authMiddleware, async (req, res) => {
     try {
         // EXCLUDE all large photo fields from list view
         const members = await Member.find()
-            .select('-memberPhoto -memberTaxDoc -repPhoto -repTaxDoc -powerOfAttorneyPhoto -hardCopyForm -hardCopyDocumentPhoto')
+            .select('-memberTaxDoc -repPhoto -repTaxDoc -powerOfAttorneyPhoto -hardCopyForm -hardCopyDocumentPhoto')
             .sort({ createdAt: -1 });
         
         console.log(`✅ Found ${members.length} members (photos excluded)`);
