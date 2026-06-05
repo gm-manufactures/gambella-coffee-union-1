@@ -98,23 +98,24 @@ body {
     padding: 5.5mm;
     background: rgba(255,255,255,0.94);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
     position: relative;
     z-index: 1;
+    backdrop-filter:blur(0px)
 }
 .logo-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 4mm;
-    margin-bottom: 3.5mm;
-    border-bottom: 0.3mm solid #e2e8f0;
-    padding-bottom: 2.5mm;
+    margin-bottom: 2.8mm;
+    border-bottom: 0.4mm solid #e2e8f0;
+    padding-bottom: 2mm;
 }
 .left-title { flex: 1; text-align: left; }
-.left-title .amharic { font-size: 3.5mm; font-weight: bold; color: #1e3c2c; }
-.left-title .english { font-size: 2.5mm; color: #4b5563; margin-top: 0.5mm; }
+.left-title .amharic { font-size: 3.5mm; font-weight: bold; color: #1e3c2c;letter-spacing: 0.2px; }
+.left-title .english { font-size: 2.5mm; color: #4b5563; margin-top: 0.6mm; }
 .logo-center { flex-shrink: 0; text-align: center; }
 .logo-img { width: 12mm; height: 12mm; object-fit: cover; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
 .right-title { flex: 1; text-align: right; }
