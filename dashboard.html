@@ -2485,19 +2485,19 @@ async function editMember(memberId) {
         submitBtn.style.color = '#333';
         
         // Change form handler
-        const form = document.getElementById('memberForm');
-        const originalSubmit = form.onsubmit;
-        
+        //const form = document.getElementById('memberForm');
+        //const originalSubmit = form.onsubmit;
+        /*
         form.onsubmit = async (e) => {
             e.preventDefault();
             await updateFullMember(currentEditingMemberId);
-           // form.onsubmit = originalSubmit;
+            form.onsubmit = originalSubmit;
             submitBtn.innerHTML = '✅ አስመዝግብ';
             submitBtn.style.background = '#2d6a1a';
             submitBtn.style.color = 'white';
             currentEditingMemberId = null;
         };
-        
+        */
         // Switch to register tab
         showTab('register');
         window.scrollTo({ top: 0, behavior: 'smooth' });
