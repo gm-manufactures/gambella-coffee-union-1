@@ -2491,7 +2491,7 @@ async function editMember(memberId) {
         form.onsubmit = async (e) => {
             e.preventDefault();
             await updateFullMember(currentEditingMemberId);
-            form.onsubmit = originalSubmit;
+           // form.onsubmit = originalSubmit;
             submitBtn.innerHTML = '✅ አስመዝግብ';
             submitBtn.style.background = '#2d6a1a';
             submitBtn.style.color = 'white';
