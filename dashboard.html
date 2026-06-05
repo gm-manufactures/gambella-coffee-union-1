@@ -3745,6 +3745,7 @@ function toggleEditPowerOfAttorneyOptions() {
 }
 
 async function saveMemberEdit() {
+    const memberId = currentEditingMemberId;
   if (!currentEditingMemberId) { alert('No member selected for editing'); return; }
   const newShareCount = parseInt(document.getElementById('editShareCount')?.value) || 0;
   const oldMember = members.find(m => m.id === currentEditingMemberId);
