@@ -2716,10 +2716,12 @@ async function deleteMember(id) {
 
 document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+     console.log("📝 Submitting registration form...");
    if (currentEditingMemberId) {
     const submitBtn = e.target.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;  // Disable immediately
-    submitBtn.innerHTML = '⏳ እያዘመነ...';
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '⏳ እባክዎ ይጠብቁ...';
+    submitBtn.disabled = true;
     
     try {
         await updateFullMember(currentEditingMemberId);
@@ -2729,14 +2731,6 @@ document.getElementById('memberForm')?.addEventListener('submit', async (e) => {
     }
     return;
 }
-    
-    console.log("📝 Submitting registration form...");
-    
-    // Disable submit button to prevent double submission
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '⏳ እባክዎ ይጠብቁ...';
-    submitBtn.disabled = true;
     
     try {
         // Collect form data
