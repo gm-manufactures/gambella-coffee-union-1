@@ -431,7 +431,7 @@ body {
     padding: 8px 18px;
     border-radius: 50px;
     color: white;
-} 
+}
 
 /* ==================== SEARCH BAR ==================== */
 .search-bar {
@@ -456,11 +456,15 @@ body {
 
 /* ==================== MEMBER CARD ==================== */
 .member-card {
-    min-height: 180px;
-    max-height: 260px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: var(--border-radius-lg);
+    background: var(--white);
+    border-left: 5px solid var(--primary);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 
 .member-card::before {
@@ -556,8 +560,7 @@ body {
     padding-top: 16px;
     position: relative;
     z-index: 1;
-} 
-
+}
 /* ==================== PAYMENT STATUS ==================== */
 .payment-status {
     display: inline-block;
