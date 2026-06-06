@@ -2317,7 +2317,7 @@ async function loadMembers() {
       return;
     }
     
-    filtered.map((m, index) => `
+    container.innerHTML = filtered.map((m, index) => `
       <div class="member-card">
         <div class="member-header">
           <div class="member-name">
