@@ -431,7 +431,7 @@ body {
     padding: 8px 18px;
     border-radius: 50px;
     color: white;
-}
+} 
 
 /* ==================== SEARCH BAR ==================== */
 .search-bar {
@@ -556,7 +556,7 @@ body {
     padding-top: 16px;
     position: relative;
     z-index: 1;
-}
+} 
 
 /* ==================== PAYMENT STATUS ==================== */
 .payment-status {
@@ -4031,7 +4031,7 @@ function displayMemberSalesHistory(memberSales) {
         <div><span class="detail-label">💰 ዋጋ/kg:</span> ${s.pricePerKg} ብር</div>
         <div><span class="detail-label">💳 ክፍያ:</span> ${s.paymentMethod}</div>
       </div>
-      //<button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
+      <button onclick="deleteSale('${s.id}')" class="btn-danger">🗑️ ሰርዝ</button>
     </div>
   `).join('');
 }
