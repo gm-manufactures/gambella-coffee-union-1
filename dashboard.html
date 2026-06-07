@@ -1696,7 +1696,7 @@ function calculateTransferDetails() {
     
     // Percentage calculation
     const transferPercent = (transferShares / TOTAL_SHARES_LIMIT * 100).toFixed(2);
-    document.getElementById('transferPercentage').value = `${transferPercent}% (ከ${TOTAL_SHARES.toLocaleString()})`;
+    document.getElementById('transferPercentage').value = `${transferPercent}% (ከ${SHARE_PRICE.toLocaleString()})`;
     
     // Seller after transfer
     if (seller) {
