@@ -1525,7 +1525,79 @@ let tradingRequests = []; // FIXED: Added missing variable declaration
 let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 let currentEditingMemberId = null;
   let currentMemberData = null;
-  let currentViewingMember = null;
+  let currentViewingMember = null
+      // ==================== SHARE TRANSFER FUNCTIONS ====================
+
+// 1. First, add this function
+function showTransferSubTab(subTabId) {
+    console.log("Switching to sub-tab:", subTabId);
+    
+    const nameSub = document.getElementById('nameTransferSub');
+    const shareSub = document.getElementById('shareTransferSub');
+    
+    if (nameSub) nameSub.style.display = 'none';
+    if (shareSub) shareSub.style.display = 'none';
+    
+    const nameBtn = document.getElementById('nameTransferSubTab');
+    const shareBtn = document.getElementById('shareTransferSubTab');
+    
+    if (nameBtn) nameBtn.classList.remove('active');
+    if (shareBtn) shareBtn.classList.remove('active');
+    
+    const selectedSub = document.getElementById(subTabId);
+    if (selectedSub) selectedSub.style.display = 'block';
+    
+    if (subTabId === 'nameTransferSub') {
+        if (nameBtn) nameBtn.classList.add('active');
+        if (typeof loadTransfers === 'function') loadTransfers();
+    } else if (subTabId === 'shareTransferSub') {
+        if (shareBtn) shareBtn.classList.add('active');
+        if (typeof initializeShareTransfer === 'function') initializeShareTransfer();
+    }
+}
+
+// 2. Add this function
+function initializeShareTransfer() {
+    console.log("Initializing Share Transfer...");
+    
+    if (typeof loadSellersForTransfer === 'function') {
+        loadSellersForTransfer();
+    }
+    
+    if (typeof loadShareTransferHistory === 'function') {
+        loadShareTransferHistory();
+    }
+    
+    const shareTransferDate = document.getElementById('shareTransferDate');
+    if (shareTransferDate) {
+        shareTransferDate.valueAsDate = new Date();
+    }
+    
+    if (typeof resetShareTransferForm === 'function') {
+        resetShareTransferForm();
+    }
+}
+
+// 3. Add this function
+function initializeTransferTab() {
+    console.log("Initializing Transfer Tab...");
+    
+    const nameDate = document.getElementById('nameTransferDate');
+    if (nameDate) nameDate.valueAsDate = new Date();
+    
+    const shareDate = document.getElementById('shareTransferDate');
+    if (shareDate) shareDate.valueAsDate = new Date();
+    
+    if (typeof loadTransfers === 'function') loadTransfers();
+    
+    if (typeof showTransferSubTab === 'function') {
+        showTransferSubTab('nameTransferSub');
+    }
+}
+
+// 4. Make sure your HTML has these input fields
+// Add this inside the shareTransferSub div if missing:
+// <input type="date" id="shareTransferDate" class="form-control">
 
 // Constants
 const TOTAL_SHARES_LIMIT = 25000;
@@ -2847,20 +2919,7 @@ async function editMember(memberId) {
         submitBtn.style.background = '#ffc107';
         submitBtn.style.color = '#333';
         
-        // Change form handler
-        //const form = document.getElementById('memberForm');
-        //const originalSubmit = form.onsubmit;
-        /*
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await updateFullMember(currentEditingMemberId);
-            form.onsubmit = originalSubmit;
-            submitBtn.innerHTML = '✅ አስመዝግብ';
-            submitBtn.style.background = '#2d6a1a';
-            submitBtn.style.color = 'white';
-            currentEditingMemberId = null;
-        };
-        */
+    
         // Switch to register tab
         showTab('register');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4643,11 +4702,12 @@ function showTab(tabId) {
   else { console.error("Tab not found:", tabId); return; }
   const buttons = document.querySelectorAll('.tab-btn');
   const tabMap = { 'register': 0, 'list': 1, 'sales': 2, 'transfer': 3, 'trading': 4, 'search': 5, 'admin': 6 };
+    
   const index = tabMap[tabId];
      if (tabId === 'transfer') {
         // Initialize both sub-tabs
         loadTransfers(); // Name transfer history
-        initShareTransferTab(); // Share transfer initialization
+         initializeTransferTab(); // Share transfer initialization
     }
   if (buttons[index]) buttons[index].classList.add('active');
   if (tabId === 'list') loadMembers();
