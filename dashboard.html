@@ -1298,19 +1298,207 @@ body {
   </div>
 
   <!-- Transfer Tab -->
-  <div id="transfer" class="tab-content"><h2>🔄 የስም ዝውውር</h2>
-    <div class="form-section"><h3>📝 አዲስ ዝውውር</h3>
-      <div class="form-group"><label>👤 የድሮ አባል</label><select id="oldMemberId" onchange="loadOldMemberInfo()"><option value="">አባል ይምረጡ</option></select></div>
-      <div id="oldMemberInfo" style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px"></div>
-      <div class="form-group"><label>👤 አዲስ አባል ስም</label><input type="text" id="newMemberName"></div>
-      <div class="form-row"><div class="form-group"><label>🆔 መታወቂያ</label><input type="text" id="newMemberIdNumber"></div><div class="form-group"><label>📞 ስልክ</label><input type="tel" id="newMemberPhone"></div></div>
-      <div class="form-row"><div class="form-group"><label>📅 ቀን</label><input type="date" id="transferDate" required></div><div class="form-group"><label>💰 ክፍያ</label><input type="number" id="transferFee" step="0.01"></div></div>
-      <div class="form-group"><label>📝 ምክንያት</label><textarea id="transferReason" rows="2"></textarea></div>
-      <div class="form-group"><label>📄 ሰነድ</label><input type="file" id="transferDocument" accept="image/*" onchange="previewImage(this,'transferDocPreview')"><div id="transferDocPreview" class="image-preview"></div></div>
-      <button onclick="processNameTransfer()" class="btn-primary">🔄 ያስመዝግቡ</button>
+  <!-- Share Transfer Tab - New -->
+<div id="shareTransfer" class="tab-content">
+    <h2>🔄 የአክሲዮን ዝውውር / ሽያጭ ቅፅ</h2>
+    
+    <form id="shareTransferForm" onsubmit="processShareTransfer(event)">
+        <!-- ===== SECTION 1: SELLER INFORMATION ===== -->
+        <div class="form-section">
+            <h3>📤 ክፍል 1፦ የሻጩ መረጃ (Seller Information)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ሙሉ ስም *</label>
+                    <select id="sellerMemberId" class="form-control" required onchange="loadSellerInfo()">
+                        <option value="">አባል ይምረጡ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>መታወቂያ ቁጥር (ID Number)</label>
+                    <input type="text" id="sellerIdNumber" class="form-control" readonly style="background:#e9ecef">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>አድራሻ</label>
+                    <textarea id="sellerAddress" class="form-control" readonly rows="2" style="background:#e9ecef"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>የአክሲዮን ባለቤትነት ቁጥር</label>
+                    <input type="text" id="sellerCertificateNumber" class="form-control" placeholder="ካለ ያስገቡ">
+                </div>
+            </div>
+            <div id="sellerCurrentShares" class="section-card" style="margin-top:10px; display:none">
+                <div class="section-title">📊 የሻጩ አሁን ያለው የአክሲዮን ድርሻ</div>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">የአክሲዮን ብዛት</div><div class="info-value" id="sellerCurrentShareCount">0</div></div>
+                    <div class="info-item"><div class="info-label">በመቶኛ ድርሻ (%)</div><div class="info-value" id="sellerCurrentPercentage">0%</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 2: BUYER INFORMATION ===== -->
+        <div class="form-section">
+            <h3>📥 ክፍል 2፦ የገዢው መረጃ (Buyer Information)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ሙሉ ስም *</label>
+                    <select id="buyerMemberId" class="form-control" required onchange="loadBuyerInfo()">
+                        <option value="">አባል ይምረጡ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>መታወቂያ ቁጥር (ID Number)</label>
+                    <input type="text" id="buyerIdNumber" class="form-control" readonly style="background:#e9ecef">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>አድራሻ</label>
+                    <textarea id="buyerAddress" class="form-control" readonly rows="2" style="background:#e9ecef"></textarea>
+                </div>
+                <div class="form-group"></div>
+            </div>
+            <div id="buyerCurrentShares" class="section-card" style="margin-top:10px; display:none">
+                <div class="section-title">📊 የገዢው አሁን ያለው የአክሲዮን ድርሻ</div>
+                <div class="info-grid">
+                    <div class="info-item"><div class="info-label">የአክሲዮን ብዛት</div><div class="info-value" id="buyerCurrentShareCount">0</div></div>
+                    <div class="info-item"><div class="info-label">በመቶኛ ድርሻ (%)</div><div class="info-value" id="buyerCurrentPercentage">0%</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 3: SHARE DETAILS ===== -->
+        <div class="form-section">
+            <h3>📊 ክፍል 3፦ የሚተላለፈው አክሲዮን ዝርዝር (Share Transfer Details)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>የሚሸጠው አክሲዮን ብዛት *</label>
+                    <input type="number" id="transferShares" class="form-control" min="1" required oninput="calculateTransferDetails()">
+                </div>
+                <div class="form-group">
+                    <label>የአንድ አክሲዮን ዋጋ</label>
+                    <input type="text" id="sharePriceDisplay" value="10,000 ብር" class="form-control" readonly style="background:#e9ecef">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>💰 ጠቅላላ የሽያጭ ዋጋ (ብር)</label>
+                    <input type="text" id="totalSalePrice" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#2d6a1a">
+                </div>
+                <div class="form-group">
+                    <label>📋 የአክሲዮን ሰርተፊኬት ቁጥር (ካለ)</label>
+                    <input type="text" id="certificateNumber" class="form-control" placeholder="ለምሳሌ: SC-2024-001">
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 4: PERCENTAGE CALCULATION ===== -->
+        <div class="form-section">
+            <h3>🧮 ክፍል 4፦ የአክሲዮን ድርሻ በመቶኛ (%) ስሌት</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ከጠቅላላው (25,000) መቶኛ ድርሻ (%)</label>
+                    <input type="text" id="transferPercentage" class="form-control" readonly style="background:#e9ecef; font-weight:bold">
+                </div>
+                <div class="form-group">
+                    <label>📊 ቀመር</label>
+                    <input type="text" id="percentageFormula" class="form-control" readonly style="background:#e9ecef; font-size:12px">
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 5: BEFORE & AFTER SHAREHOLDING ===== -->
+        <div class="form-section">
+            <h3>📊 ክፍል 5፦ ከሽያጩ በፊት እና በኋላ ያለው ድርሻ</h3>
+            
+            <!-- Seller Before/After -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">👤 ለሻጩ (Seller)</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ከሽያጩ በፊት የአክሲዮን ብዛት</label>
+                    <input type="text" id="sellerBeforeShares" class="form-control" readonly style="background:#e9ecef">
+                </div>
+                <div class="form-group">
+                    <label>ከሽያጩ በኋላ የአክሲዮን ብዛት</label>
+                    <input type="text" id="sellerAfterShares" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#dc3545">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ከሽያጩ በፊት በመቶኛ ድርሻ (%)</label>
+                    <input type="text" id="sellerBeforePercent" class="form-control" readonly style="background:#e9ecef">
+                </div>
+                <div class="form-group">
+                    <label>ከሽያጩ በኋላ በመቶኛ ድርሻ (%)</label>
+                    <input type="text" id="sellerAfterPercent" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#dc3545">
+                </div>
+            </div>
+
+            <!-- Buyer Before/After -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">👤 ለገዢው (Buyer)</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ከግዢው በፊት የአክሲዮን ብዛት</label>
+                    <input type="text" id="buyerBeforeShares" class="form-control" readonly style="background:#e9ecef">
+                </div>
+                <div class="form-group">
+                    <label>ከግዢው በኋላ የአክሲዮን ብዛት</label>
+                    <input type="text" id="buyerAfterShares" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#28a745">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ከግዢው በፊት በመቶኛ ድርሻ (%)</label>
+                    <input type="text" id="buyerBeforePercent" class="form-control" readonly style="background:#e9ecef">
+                </div>
+                <div class="form-group">
+                    <label>ከግዢው በኋላ በመቶኛ ድርሻ (%)</label>
+                    <input type="text" id="buyerAfterPercent" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#28a745">
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="form-section">
+            <h3>📝 ተጨማሪ መረጃ</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📅 የዝውውር ቀን</label>
+                    <input type="date" id="transferDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>💰 የዝውውር ክፍያ (Transfer Fee)</label>
+                    <input type="number" id="transferFee" class="form-control" step="0.01" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>📝 ማስታወሻ / ምክንያት</label>
+                <textarea id="transferNotes" class="form-control" rows="3" placeholder="የዝውውሩ ምክንያት ወይም ተጨማሪ ማስታወሻ..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>📄 የሽያጭ ውል ሰነድ (ካለ)</label>
+                <input type="file" id="transferDocument" accept="image/*,application/pdf" onchange="previewTransferDoc(this)">
+                <div id="transferDocPreview" class="image-preview"></div>
+            </div>
+        </div>
+
+        <!-- Form Buttons -->
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <button type="submit" class="btn-primary">✅ ዝውውር ያስመዝግቡ</button>
+            <button type="button" class="btn-cancel" onclick="resetShareTransferForm()">🗑️ ቅፅ አጽዳ</button>
+        </div>
+    </form>
+
+    <!-- Transfer History -->
+    <div class="form-section" style="margin-top: 30px;">
+        <h3>📜 የአክሲዮን ዝውውር ታሪክ</h3>
+        <div class="search-bar">
+            <input type="text" id="shareTransferSearch" placeholder="🔍 ፈልግ... (በሻጭ ወይም በገዢ ስም)" onkeyup="filterShareTransfers()">
+        </div>
+        <div id="shareTransferHistoryList" style="max-height: 400px; overflow-y: auto;"></div>
     </div>
-    <div class="form-section"><h3>📜 ታሪክ</h3><div id="transferHistoryList"></div></div>
-  </div>
+</div>
 
   <!-- Trading Tab -->
   <div id="trading" class="tab-content">
