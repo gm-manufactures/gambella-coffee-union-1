@@ -261,7 +261,7 @@ function getUsernameFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('memberId');
 }
-
+/*
 function showQRInfo(username) {
     const qrInfo = document.getElementById('qrInfo');
     if (qrInfo && username) {
@@ -272,7 +272,7 @@ function showQRInfo(username) {
         }, 8000);
     }
 }
-
+*/
 async function autoLoginFromQR() {
     const username = getUsernameFromUrl();
     
