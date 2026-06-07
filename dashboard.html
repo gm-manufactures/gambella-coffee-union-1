@@ -1008,6 +1008,10 @@ body {
     background: var(--gray);
     margin-right: 8px;
 }
+    /* Transfer Sub Tabs */
+.transfer-sub-content {
+    animation: fadeInUp 0.3s ease;
+}
 
 </style>
 </head>
@@ -1024,7 +1028,7 @@ body {
     <button class="tab-btn active" onclick="showTab('register')">📝 አዲስ አባል ይመዝግቡ</button>
     <button class="tab-btn" onclick="showTab('list')">📋 የአባላት ዝርዝር</button>
     <button class="tab-btn" onclick="showTab('sales')">💰 ሽያጭ ይመዝግቡ</button>
-    <button class="tab-btn" onclick="showTab('transfer')">🔄 የስም ዝውውር</button>
+    <button class="tab-btn" onclick="showTab('transfer')">🔄ዝውውር</button>
     <button class="tab-btn" onclick="showTab('trading')">📊 የአክሲዬን ግብይት</button>
     <button class="tab-btn" onclick="showTab('search')">🔍 አባል ይፈልጉ</button>
     <button class="tab-btn" onclick="showTab('admin')">⚙️ አስተዳዳሪ</button>
@@ -1297,15 +1301,56 @@ body {
     </div>
   </div>
 
-  <!-- Transfer Tab -->
-  <!-- Share Transfer Tab - New -->
-<div id="shareTransfer" class="tab-content">
-    <h2>🔄 የአክሲዮን ዝውውር / ሽያጭ ቅፅ</h2>
+ <!-- Transfer Tab - Contains both Name Transfer and Share Transfer -->
+<div id="transfer" class="tab-content">
+    <h2>🔄 ዝውውር (Transfer)</h2>
     
-    <form id="shareTransferForm" onsubmit="processShareTransfer(event)">
-        <!-- ===== SECTION 1: SELLER INFORMATION ===== -->
+    <!-- Sub Tabs inside Transfer Tab -->
+    <div style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">
+        <button type="button" id="nameTransferSubTab" class="tab-btn active" style="padding: 8px 20px;" onclick="showTransferSubTab('nameTransferSub')">📝 የስም ዝውውር</button>
+        <button type="button" id="shareTransferSubTab" class="tab-btn" style="padding: 8px 20px;" onclick="showTransferSubTab('shareTransferSub')">🔄 የአክሲዮን ዝውውር</button>
+    </div>
+    
+    <!-- ===== NAME TRANSFER SUB-TAB ===== -->
+    <div id="nameTransferSub" class="transfer-sub-content active">
         <div class="form-section">
-            <h3>📤 ክፍል 1፦ የሻጩ መረጃ (Seller Information)</h3>
+            <h3>📝 አዲስ የስም ዝውውር (Name Transfer)</h3>
+            <div class="form-group">
+                <label>👤 የድሮ አባል</label>
+                <select id="oldMemberId" onchange="loadOldMemberInfo()">
+                    <option value="">አባል ይምረጡ</option>
+                </select>
+            </div>
+            <div id="oldMemberInfo" style="background:#e8f5e9;padding:15px;border-radius:8px;margin-bottom:20px"></div>
+            <div class="form-group">
+                <label>👤 አዲስ አባል ስም</label>
+                <input type="text" id="newMemberName" placeholder="ሙሉ ስም">
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>🆔 መታወቂያ</label><input type="text" id="newMemberIdNumber"></div>
+                <div class="form-group"><label>📞 ስልክ</label><input type="tel" id="newMemberPhone"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>📅 ቀን</label><input type="date" id="nameTransferDate" required></div>
+                <div class="form-group"><label>💰 ክፍያ</label><input type="number" id="transferFee" step="0.01"></div>
+            </div>
+            <div class="form-group"><label>📝 ምክንያት</label><textarea id="transferReason" rows="2"></textarea></div>
+            <div class="form-group"><label>📄 ሰነድ</label><input type="file" id="transferDocument" accept="image/*" onchange="previewImage(this,'transferDocPreview')"><div id="transferDocPreview" class="image-preview"></div></div>
+            <button onclick="processNameTransfer()" class="btn-primary">🔄 ያስመዝግቡ</button>
+        </div>
+        <div class="form-section">
+            <h3>📜 የስም ዝውውር ታሪክ</h3>
+            <div id="transferHistoryList"></div>
+        </div>
+    </div>
+    
+    <!-- ===== SHARE TRANSFER SUB-TAB ===== -->
+    <div id="shareTransferSub" class="transfer-sub-content" style="display:none;">
+        <div class="form-section">
+            <h3>🔄 አዲስ የአክሲዮን ዝውውር (Share Transfer)</h3>
+            
+            <!-- Seller Information -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">📤 የሻጩ መረጃ (Seller)</h4>
             <div class="form-row">
                 <div class="form-group">
                     <label>ሙሉ ስም *</label>
@@ -1314,7 +1359,7 @@ body {
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>መታወቂያ ቁጥር (ID Number)</label>
+                    <label>መታወቂያ ቁጥር (ID)</label>
                     <input type="text" id="sellerIdNumber" class="form-control" readonly style="background:#e9ecef">
                 </div>
             </div>
@@ -1335,11 +1380,9 @@ body {
                     <div class="info-item"><div class="info-label">በመቶኛ ድርሻ (%)</div><div class="info-value" id="sellerCurrentPercentage">0%</div></div>
                 </div>
             </div>
-        </div>
-
-        <!-- ===== SECTION 2: BUYER INFORMATION ===== -->
-        <div class="form-section">
-            <h3>📥 ክፍል 2፦ የገዢው መረጃ (Buyer Information)</h3>
+            
+            <!-- Buyer Information -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">📥 የገዢው መረጃ (Buyer)</h4>
             <div class="form-row">
                 <div class="form-group">
                     <label>ሙሉ ስም *</label>
@@ -1348,7 +1391,7 @@ body {
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>መታወቂያ ቁጥር (ID Number)</label>
+                    <label>መታወቂያ ቁጥር (ID)</label>
                     <input type="text" id="buyerIdNumber" class="form-control" readonly style="background:#e9ecef">
                 </div>
             </div>
@@ -1366,11 +1409,9 @@ body {
                     <div class="info-item"><div class="info-label">በመቶኛ ድርሻ (%)</div><div class="info-value" id="buyerCurrentPercentage">0%</div></div>
                 </div>
             </div>
-        </div>
-
-        <!-- ===== SECTION 3: SHARE DETAILS ===== -->
-        <div class="form-section">
-            <h3>📊 ክፍል 3፦ የሚተላለፈው አክሲዮን ዝርዝር (Share Transfer Details)</h3>
+            
+            <!-- Share Details -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">📊 የሚተላለፈው አክሲዮን ዝርዝር</h4>
             <div class="form-row">
                 <div class="form-group">
                     <label>የሚሸጠው አክሲዮን ብዛት *</label>
@@ -1387,116 +1428,46 @@ body {
                     <input type="text" id="totalSalePrice" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#2d6a1a">
                 </div>
                 <div class="form-group">
-                    <label>📋 የአክሲዮን ሰርተፊኬት ቁጥር (ካለ)</label>
+                    <label>📋 የአክሲዮን ሰርተፊኬት ቁጥር</label>
                     <input type="text" id="certificateNumber" class="form-control" placeholder="ለምሳሌ: SC-2024-001">
                 </div>
             </div>
-        </div>
-
-        <!-- ===== SECTION 4: PERCENTAGE CALCULATION ===== -->
-        <div class="form-section">
-            <h3>🧮 ክፍል 4፦ የአክሲዮን ድርሻ በመቶኛ (%) ስሌት</h3>
+            
+            <!-- Percentage Calculation -->
             <div class="form-row">
                 <div class="form-group">
-                    <label>ከጠቅላላው (25,000) መቶኛ ድርሻ (%)</label>
+                    <label>🧮 ከጠቅላላው (25,000) መቶኛ ድርሻ (%)</label>
                     <input type="text" id="transferPercentage" class="form-control" readonly style="background:#e9ecef; font-weight:bold">
                 </div>
-                <div class="form-group">
-                    <label>📊 ቀመር</label>
-                    <input type="text" id="percentageFormula" class="form-control" readonly style="background:#e9ecef; font-size:12px">
-                </div>
             </div>
-        </div>
-
-        <!-- ===== SECTION 5: BEFORE & AFTER SHAREHOLDING ===== -->
-        <div class="form-section">
-            <h3>📊 ክፍል 5፦ ከሽያጩ በፊት እና በኋላ ያለው ድርሻ</h3>
             
-            <!-- Seller Before/After -->
-            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">👤 ለሻጩ (Seller)</h4>
+            <!-- Before & After -->
+            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">📊 ከዝውውሩ በፊት እና በኋላ ያለው ድርሻ</h4>
             <div class="form-row">
-                <div class="form-group">
-                    <label>ከሽያጩ በፊት የአክሲዮን ብዛት</label>
-                    <input type="text" id="sellerBeforeShares" class="form-control" readonly style="background:#e9ecef">
-                </div>
-                <div class="form-group">
-                    <label>ከሽያጩ በኋላ የአክሲዮን ብዛት</label>
-                    <input type="text" id="sellerAfterShares" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#dc3545">
-                </div>
+                <div class="form-group"><label>ለሻጩ: ከዝውውሩ በፊት</label><input type="text" id="sellerBeforeShares" class="form-control" readonly style="background:#e9ecef"></div>
+                <div class="form-group"><label>ለሻጩ: ከዝውውሩ በኋላ</label><input type="text" id="sellerAfterShares" class="form-control" readonly style="background:#e9ecef; color:#dc3545; font-weight:bold"></div>
             </div>
             <div class="form-row">
-                <div class="form-group">
-                    <label>ከሽያጩ በፊት በመቶኛ ድርሻ (%)</label>
-                    <input type="text" id="sellerBeforePercent" class="form-control" readonly style="background:#e9ecef">
-                </div>
-                <div class="form-group">
-                    <label>ከሽያጩ በኋላ በመቶኛ ድርሻ (%)</label>
-                    <input type="text" id="sellerAfterPercent" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#dc3545">
-                </div>
+                <div class="form-group"><label>ለገዢው: ከዝውውሩ በፊት</label><input type="text" id="buyerBeforeShares" class="form-control" readonly style="background:#e9ecef"></div>
+                <div class="form-group"><label>ለገዢው: ከዝውውሩ በኋላ</label><input type="text" id="buyerAfterShares" class="form-control" readonly style="background:#e9ecef; color:#28a745; font-weight:bold"></div>
             </div>
-
-            <!-- Buyer Before/After -->
-            <h4 style="color:#2d6a1a; margin:15px 0 10px 0;">👤 ለገዢው (Buyer)</h4>
+            
+            <!-- Additional Info -->
             <div class="form-row">
-                <div class="form-group">
-                    <label>ከግዢው በፊት የአክሲዮን ብዛት</label>
-                    <input type="text" id="buyerBeforeShares" class="form-control" readonly style="background:#e9ecef">
-                </div>
-                <div class="form-group">
-                    <label>ከግዢው በኋላ የአክሲዮን ብዛት</label>
-                    <input type="text" id="buyerAfterShares" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#28a745">
-                </div>
+                <div class="form-group"><label>📅 የዝውውር ቀን</label><input type="date" id="shareTransferDate" class="form-control"></div>
+                <div class="form-group"><label>💰 የዝውውር ክፍያ</label><input type="number" id="shareTransferFee" class="form-control" step="0.01" value="0"></div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>ከግዢው በፊት በመቶኛ ድርሻ (%)</label>
-                    <input type="text" id="buyerBeforePercent" class="form-control" readonly style="background:#e9ecef">
-                </div>
-                <div class="form-group">
-                    <label>ከግዢው በኋላ በመቶኛ ድርሻ (%)</label>
-                    <input type="text" id="buyerAfterPercent" class="form-control" readonly style="background:#e9ecef; font-weight:bold; color:#28a745">
-                </div>
-            </div>
+            <div class="form-group"><label>📝 ማስታወሻ</label><textarea id="shareTransferNotes" class="form-control" rows="2"></textarea></div>
+            <div class="form-group"><label>📄 የሽያጭ ውል ሰነድ</label><input type="file" id="shareTransferDocument" accept="image/*" onchange="previewShareTransferDoc(this)"><div id="shareTransferDocPreview" class="image-preview"></div></div>
+            
+            <button onclick="processShareTransfer()" class="btn-primary">✅ ዝውውር ያስመዝግቡ</button>
         </div>
-
-        <!-- Additional Information -->
+        
         <div class="form-section">
-            <h3>📝 ተጨማሪ መረጃ</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>📅 የዝውውር ቀን</label>
-                    <input type="date" id="transferDate" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>💰 የዝውውር ክፍያ (Transfer Fee)</label>
-                    <input type="number" id="transferFee" class="form-control" step="0.01" value="0">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>📝 ማስታወሻ / ምክንያት</label>
-                <textarea id="transferNotes" class="form-control" rows="3" placeholder="የዝውውሩ ምክንያት ወይም ተጨማሪ ማስታወሻ..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>📄 የሽያጭ ውል ሰነድ (ካለ)</label>
-                <input type="file" id="transferDocument" accept="image/*,application/pdf" onchange="previewTransferDoc(this)">
-                <div id="transferDocPreview" class="image-preview"></div>
-            </div>
+            <h3>📜 የአክሲዮን ዝውውር ታሪክ</h3>
+            <div class="search-bar"><input type="text" id="shareTransferSearch" placeholder="🔍 ፈልግ..." onkeyup="filterShareTransfers()"></div>
+            <div id="shareTransferHistoryList"></div>
         </div>
-
-        <!-- Form Buttons -->
-        <div style="display: flex; gap: 15px; margin-top: 20px;">
-            <button type="submit" class="btn-primary">✅ ዝውውር ያስመዝግቡ</button>
-            <button type="button" class="btn-cancel" onclick="resetShareTransferForm()">🗑️ ቅፅ አጽዳ</button>
-        </div>
-    </form>
-
-    <!-- Transfer History -->
-    <div class="form-section" style="margin-top: 30px;">
-        <h3>📜 የአክሲዮን ዝውውር ታሪክ</h3>
-        <div class="search-bar">
-            <input type="text" id="shareTransferSearch" placeholder="🔍 ፈልግ... (በሻጭ ወይም በገዢ ስም)" onkeyup="filterShareTransfers()">
-        </div>
-        <div id="shareTransferHistoryList" style="max-height: 400px; overflow-y: auto;"></div>
     </div>
 </div>
 
@@ -1549,6 +1520,7 @@ const token = localStorage.getItem('token');
 if (!token) window.location.href = '/';
 
 let members = [], sales = [], transfers = [];
+let shareTransfers = [];
 let tradingRequests = []; // FIXED: Added missing variable declaration
 let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 let currentEditingMemberId = null;
@@ -1558,8 +1530,212 @@ let currentEditingMemberId = null;
 // Constants
 const TOTAL_SHARES_LIMIT = 25000;
 const SHARE_PRICE = 10000;
+    
+// Load sellers and buyers dropdown - Using memberID
+function loadSellersForTransfer() {
+    const sellerSelect = document.getElementById('sellerMemberId');
+    const buyerSelect = document.getElementById('buyerMemberId');
+    
+    if (!sellerSelect || !buyerSelect) return;
+    
+    sellerSelect.innerHTML = '<option value="">አባል ይምረጡ</option>';
+    buyerSelect.innerHTML = '<option value="">አባል ይምረጡ</option>';
+    
+    members.forEach(member => {
+        const option1 = document.createElement('option');
+        option1.value = member.memberID;  // Using memberID
+        option1.textContent = `${member.fullName} - ${member.phone} (${member.shareCount || 0} አክሲዮን)`;
+        sellerSelect.appendChild(option1);
+        
+        const option2 = document.createElement('option');
+        option2.value = member.memberID;  // Using memberID
+        option2.textContent = `${member.fullName} - ${member.phone} (${member.shareCount || 0} አክሲዮን)`;
+        buyerSelect.appendChild(option2);
+    });
+}
 
-// location Data
+// Load seller information - Using memberID
+function loadSellerInfo() {
+    const sellerId = document.getElementById('sellerMemberId').value;
+    const seller = members.find(m => m.memberID === sellerId);  // Find by memberID
+    
+    if (seller) {
+        document.getElementById('sellerIdNumber').value = seller.taxId || 'N/A';
+        document.getElementById('sellerAddress').value = seller.address || 'N/A';
+        document.getElementById('sellerCurrentShareCount').innerHTML = seller.shareCount || 0;
+        const sellerPercent = ((seller.shareCount || 0) / TOTAL_SHARES_LIMIT * 100).toFixed(2);
+        document.getElementById('sellerCurrentPercentage').innerHTML = `${sellerPercent}%`;
+        document.getElementById('sellerCurrentShares').style.display = 'block';
+        document.getElementById('sellerBeforeShares').value = seller.shareCount || 0;
+        
+        validateTransferAmount();
+    } else {
+        document.getElementById('sellerCurrentShares').style.display = 'none';
+    }
+    calculateTransferDetails();
+}
+
+// Load buyer information - Using memberID
+function loadBuyerInfo() {
+    const buyerId = document.getElementById('buyerMemberId').value;
+    const buyer = members.find(m => m.memberID === buyerId);  // Find by memberID
+    
+    if (buyer) {
+        document.getElementById('buyerIdNumber').value = buyer.taxId || 'N/A';
+        document.getElementById('buyerAddress').value = buyer.address || 'N/A';
+        document.getElementById('buyerCurrentShareCount').innerHTML = buyer.shareCount || 0;
+        const buyerPercent = ((buyer.shareCount || 0) / TOTAL_SHARES_LIMIT * 100).toFixed(2);
+        document.getElementById('buyerCurrentPercentage').innerHTML = `${buyerPercent}%`;
+        document.getElementById('buyerCurrentShares').style.display = 'block';
+        document.getElementById('buyerBeforeShares').value = buyer.shareCount || 0;
+    } else {
+        document.getElementById('buyerCurrentShares').style.display = 'none';
+    }
+    calculateTransferDetails();
+}
+
+// Validate transfer amount - Using memberID
+function validateTransferAmount() {
+    const sellerId = document.getElementById('sellerMemberId').value;
+    const seller = members.find(m => m.memberID === sellerId);  // Find by memberID
+    const transferShares = parseInt(document.getElementById('transferShares').value) || 0;
+    
+    if (seller && transferShares > (seller.shareCount || 0)) {
+        alert(`⚠️ ሻጩ ${seller.fullName} በቂ አክሲዮን የለውም!\n\nያለው አክሲዮን: ${seller.shareCount}\nለመሸጥ የሞከሩት: ${transferShares}`);
+        document.getElementById('transferShares').value = seller.shareCount || 0;
+        calculateTransferDetails();
+        return false;
+    }
+    return true;
+}
+
+// Calculate transfer details - Using memberID
+function calculateTransferDetails() {
+    const transferShares = parseInt(document.getElementById('transferShares').value) || 0;
+    const sellerId = document.getElementById('sellerMemberId').value;
+    const buyerId = document.getElementById('buyerMemberId').value;
+    
+    const seller = members.find(m => m.memberID === sellerId);  // Find by memberID
+    const buyer = members.find(m => m.memberID === buyerId);    // Find by memberID
+    
+    // Total sale price
+    const totalPrice = transferShares * SHARE_PRICE;
+    document.getElementById('totalSalePrice').value = `${totalPrice.toLocaleString()} ብር`;
+    
+    // Percentage calculation
+    const transferPercent = (transferShares / TOTAL_SHARES_LIMIT * 100).toFixed(2);
+    document.getElementById('transferPercentage').value = `${transferPercent}% (ከ${TOTAL_SHARES.toLocaleString()})`;
+    
+    // Seller after transfer
+    if (seller) {
+        const sellerCurrent = seller.shareCount || 0;
+        const sellerAfter = sellerCurrent - transferShares;
+        document.getElementById('sellerAfterShares').value = sellerAfter < 0 ? 0 : sellerAfter;
+    }
+    
+    // Buyer after transfer
+    if (buyer) {
+        const buyerCurrent = buyer.shareCount || 0;
+        const buyerAfter = buyerCurrent + transferShares;
+        document.getElementById('buyerAfterShares').value = buyerAfter;
+    }
+}
+
+// Process share transfer - Using memberID for API calls
+async function processShareTransfer() {
+    const sellerMemberID = document.getElementById('sellerMemberId').value;
+    const buyerMemberID = document.getElementById('buyerMemberId').value;
+    const transferShares = parseInt(document.getElementById('transferShares').value);
+    const certificateNumber = document.getElementById('certificateNumber').value;
+    const transferDate = document.getElementById('shareTransferDate').value;
+    const transferFee = parseFloat(document.getElementById('shareTransferFee').value) || 0;
+    const transferNotes = document.getElementById('shareTransferNotes').value;
+    const totalPrice = transferShares * SHARE_PRICE;
+    
+    if (!sellerMemberID) { alert('እባክዎ ሻጩን ይምረጡ!'); return; }
+    if (!buyerMemberID) { alert('እባክዎ ገዢውን ይምረጡ!'); return; }
+    if (!transferShares || transferShares <= 0) { alert('እባክዎ የሚሸጠውን አክሲዮን ብዛት ያስገቡ!'); return; }
+    if (sellerMemberID === buyerMemberID) { alert('ሻጩ እና ገዢው አንድ ሰው መሆን አይችሉም!'); return; }
+    
+    const seller = members.find(m => m.memberID === sellerMemberID);
+    const buyer = members.find(m => m.memberID === buyerMemberID);
+    
+    if (transferShares > (seller.shareCount || 0)) {
+        alert(`⚠️ ሻጩ ${seller.fullName} በቂ አክሲዮን የለውም!\n\nያለው አክሲዮን: ${seller.shareCount}`);
+        return;
+    }
+    
+    if (confirm(`✅ የአክሲዮን ዝውውሩን ማረጋገጥ ይፈልጋሉ?\n\n━━━━━━━━━━━━━━━━━━━━\n📤 ሻጩ: ${seller.fullName}\n📥 ገዢው: ${buyer.fullName}\n📊 የሚተላለፈው አክሲዮን: ${transferShares}\n💰 ጠቅላላ ዋጋ: ${totalPrice.toLocaleString()} ብር\n━━━━━━━━━━━━━━━━━━━━`)) {
+        
+        // Update seller's shares
+        const sellerNewShares = (seller.shareCount || 0) - transferShares;
+        const sellerUpdate = {
+            shareCount: sellerNewShares,
+            sharePricePaid: seller.sharePricePaid,
+            remainingBalance: (sellerNewShares * PRICE_VALUE) - (seller.sharePricePaid || 0),
+            paymentStatus: sellerNewShares === 0 ? 'አልተከፈለም' : seller.paymentStatus,
+            updatedAt: new Date()
+        };
+        
+        // Update buyer's shares
+        const buyerNewShares = (buyer.shareCount || 0) + transferShares;
+        const buyerTotalPayable = buyerNewShares * SHARE_PRICE;
+        const buyerUpdate = {
+            shareCount: buyerNewShares,
+            totalPayable: buyerTotalPayable,
+            remainingBalance: buyerTotalPayable - (buyer.sharePricePaid || 0),
+            updatedAt: new Date()
+        };
+        
+        try {
+            const token = localStorage.getItem('token');
+            
+            // Update seller using memberID
+            await fetch(`/api/members/${sellerMemberID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(sellerUpdate)
+            });
+            
+            // Update buyer using memberID
+            await fetch(`/api/members/${buyerMemberID}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(buyerUpdate)
+            });
+            
+            // Record the transfer
+            const transferRecord = {
+                id: Date.now().toString(),
+                sellerMemberID, sellerName: seller.fullName,
+                buyerMemberID, buyerName: buyer.fullName,
+                transferShares, totalPrice, certificateNumber,
+                transferDate: transferDate || new Date().toISOString().split('T')[0],
+                transferFee, transferNotes,
+                sellerBeforeShares: seller.shareCount || 0,
+                sellerAfterShares: sellerNewShares,
+                buyerBeforeShares: buyer.shareCount || 0,
+                buyerAfterShares: buyerNewShares,
+                createdAt: new Date()
+            };
+            
+            // Save transfer locally
+            shareTransfers.unshift(transferRecord);
+            localStorage.setItem('shareTransfers', JSON.stringify(shareTransfers));
+            
+            alert(`✅ የአክሲዮን ዝውውር በሚገባ ተመዝግቧል!`);
+            
+            resetShareTransferForm();
+            await loadMembers(); // Refresh member list
+            loadShareTransferHistory();
+            updateShareStatistics();
+            
+        } catch (error) {
+            console.error('Transfer error:', error);
+            alert('❌ ዝውውሩ ሳይሳካ ቀረ: ' + error.message);
+        }
+    }
+}
 // ==================== ETHIOPIAN LOCATION DATA ====================
 
 const ethiopiaLocationData = {
@@ -4468,6 +4644,11 @@ function showTab(tabId) {
   const buttons = document.querySelectorAll('.tab-btn');
   const tabMap = { 'register': 0, 'list': 1, 'sales': 2, 'transfer': 3, 'trading': 4, 'search': 5, 'admin': 6 };
   const index = tabMap[tabId];
+     if (tabId === 'transfer') {
+        // Initialize both sub-tabs
+        loadTransfers(); // Name transfer history
+        initShareTransferTab(); // Share transfer initialization
+    }
   if (buttons[index]) buttons[index].classList.add('active');
   if (tabId === 'list') loadMembers();
   if (tabId === 'sales') { loadAllSales(); loadMemberSales(); }
