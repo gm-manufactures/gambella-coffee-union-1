@@ -4722,7 +4722,10 @@ function logout() { stopInactivityTracking(); localStorage.clear(); window.locat
 document.getElementById('quantity')?.addEventListener('input', calculateTotalAmount);
 document.getElementById('pricePerKg')?.addEventListener('input', calculateTotalAmount);
 document.getElementById('saleDate').valueAsDate = new Date();
-document.getElementById('transferDate').valueAsDate = new Date();
+const nameTransferDate = document.getElementById('nameTransferDate');
+if (nameTransferDate) nameTransferDate.valueAsDate = new Date();
+const shareTransferDate = document.getElementById('shareTransferDate');
+if (shareTransferDate) shareTransferDate.valueAsDate = new Date();
 document.getElementById('shareCount')?.addEventListener('input', calculateShareTotal);
 document.getElementById('sharePricePaid')?.addEventListener('input', calculateRemainingBalance);
 document.getElementById('userName').innerHTML = `👤 ${escapeHtml(currentUser.fullName) || 'Admin'}`;
