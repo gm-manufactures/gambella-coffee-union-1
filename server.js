@@ -396,8 +396,8 @@ app.post('/api/members/register', async (req, res) => {
         let address = cleanData.address || '';
         if (!address) {
             const addressParts = [
-                cleanData.region, cleanData.zone, //cleanData.district,
-                cleanData.city //cleanData.kebele, cleanData.houseNumber
+                cleanData.region, cleanData.zone, cleanData.district,
+                cleanData.city, cleanData.kebele, cleanData.houseNumber
             ].filter(part => part && part.trim() !== '');
             address = addressParts.join(', ');
         }
