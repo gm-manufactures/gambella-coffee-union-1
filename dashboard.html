@@ -2430,6 +2430,7 @@ function loadCities() {
     const kebeleInput = document.getElementById('kebele');
     
     // Reset kebele
+    
     if (kebeleInput) kebeleInput.value = '';
     
     if (!region || !zone) return;
@@ -2453,7 +2454,7 @@ function loadCities() {
         metiOption.value = 'ሜጢ';
         metiOption.textContent = 'ሜጢ';
         citySelectElem.appendChild(metiOption);
-        
+        /*
         // Add kebele selector instead of input for Meti
         if (kebeleInput && kebeleInput.tagName === 'INPUT') {
             // Replace input with select for kebeles
@@ -2471,6 +2472,7 @@ function loadCities() {
             });
             parent.replaceChild(select, kebeleInput);
         }
+        */
     }
 }
 
