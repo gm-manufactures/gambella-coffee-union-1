@@ -3489,7 +3489,9 @@ async function showMemberDetails(memberId) {
         currentEditingMemberId = memberId;
         
         // Find serial number for display
-       const serialNumber = members.findIndex(m => (m._id || m.id) === memberId) + 1;
+           //const serialNumber = members.findIndex(m => (m._id || m.id) === memberId) + 1;
+       
+        const memberIdDisplay = member.memberId || 'Not assigned';
         
         // Build address string
         const fullAddress = [
@@ -3518,8 +3520,8 @@ async function showMemberDetails(memberId) {
                     <div class="section-title">📋 የግል መረጃ</div>
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">📝 ተራ ቁጥር</div>
-                                 <div class="info-value">${serialNumber}</div>
+                            <div class="info-label">🆔 የአባል መለያ (Member ID)</div>
+                                 <div class="info-value">${escapeHtml(memberIdDisplay)}</div>
                                        </div>
                         <div class="info-item">
                             <div class="info-label">♂/♀ ፆታ</div>
