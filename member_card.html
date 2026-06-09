@@ -817,7 +817,7 @@ function updateCard(member) {
     document.getElementById('displayAge').textContent = member.age || '-';
     document.getElementById('displayGender').textContent = member.gender || '-';
     document.getElementById('displayPhone').textContent = member.phone || '-';
-    document.getElementById('displayAddress').textContent = member.region || '-';
+    document.getElementById('displayAddress').textContent = member.region & member.zone || '-';
     document.getElementById('displayPosition').textContent = member.role || member.position || '-';
     document.getElementById('displayShares').textContent = member.shareCount || '0';
 
