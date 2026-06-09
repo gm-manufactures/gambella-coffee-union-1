@@ -2976,10 +2976,10 @@ async function updateFullMember(memberId) {
         const address = [
             document.getElementById('region').value,
             document.getElementById('zone').value,
-            document.getElementById('district').value,
-            document.getElementById('city').value,
-            document.getElementById('kebele').value,
-            document.getElementById('houseNumber').value
+            // document.getElementById('district').value,
+             document.getElementById('city').value
+            // document.getElementById('kebele').value,
+            // document.getElementById('houseNumber').value
         ].filter(part => part && part.trim() !== '').join(', ');
         
         // Prepare update data with ALL fields
