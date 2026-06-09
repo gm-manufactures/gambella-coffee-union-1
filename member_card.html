@@ -817,7 +817,14 @@ function updateCard(member) {
     document.getElementById('displayAge').textContent = member.age || '-';
     document.getElementById('displayGender').textContent = member.gender || '-';
     document.getElementById('displayPhone').textContent = member.phone || '-';
-    document.getElementById('displayAddress').textContent = member.address || '-';
+  // Build address without woreda/district, kebele, and house number
+const displayAddress = [
+    member.region,
+    member.zone,
+    member.city
+].filter(part => part && part.trim() !== '').join(', ');
+
+document.getElementById('displayAddress').textContent = displayAddress || '-';
     document.getElementById('displayPosition').textContent = member.role || member.position || '-';
     document.getElementById('displayShares').textContent = member.shareCount || '0';
 
