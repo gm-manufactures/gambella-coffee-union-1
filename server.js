@@ -354,7 +354,7 @@ app.post('/api/members/register', async (req, res) => {
         const { id, _id, ...cleanData } = req.body;
         
         // Validate required fields
-        const requiredFields = ['fullName', 'gender', 'age', 'motherName', 'phone', 'role'];
+        const requiredFields = ['fullName', 'gender', 'age', 'phone', 'role'];
         const missingFields = requiredFields.filter(field => !cleanData[field]);
         
         if (missingFields.length > 0) {
@@ -396,8 +396,8 @@ app.post('/api/members/register', async (req, res) => {
         let address = cleanData.address || '';
         if (!address) {
             const addressParts = [
-                cleanData.region, cleanData.zone, cleanData.district,
-                cleanData.city, cleanData.kebele, cleanData.houseNumber
+                cleanData.region, cleanData.zone, //cleanData.district,
+                cleanData.city //cleanData.kebele, cleanData.houseNumber
             ].filter(part => part && part.trim() !== '');
             address = addressParts.join(', ');
         }
