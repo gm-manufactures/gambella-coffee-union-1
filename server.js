@@ -113,7 +113,7 @@ app.post('/api/login', async (req, res) => {
 // --- Get All Members (ለካርድ ሰሪ እና አድሚን) ---
 app.get('/api/members', async (req, res) => {
     try {
-        const members = await Member.find().sort({ created_at: -1 });
+        const members = await Member.find();
         res.json(members);
     } catch (err) {
         res.status(500).json({ error: err.message });
