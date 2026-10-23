@@ -99,16 +99,16 @@ body { background: linear-gradient(135deg, #1e3c2c 0%, #2d5a3b 100%); font-famil
     
     <div class="toolbar hidden" id="toolbar">
         <button class="tool-btn" onclick="downloadAsImage()">📸 እንደ ምስል አውርድ</button>
-        <button class="tool-btn" onclick="printCard()">🖨️ ካርድ ማተም</button>
+        <button class="tool-btn" onclick="printCard()">🖨 ካርድ ማተም</button>
     </div>
 </div>
 
 <script>
 const API_BASE = window.location.origin + '/api';
 
-// ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
 async function fetchMemberByMemberId(memberId) {
     try {
+        // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
         const response = await fetch(`${API_BASE}/members`);
         if (!response.ok) throw new Error('Failed to fetch members');
         
@@ -149,11 +149,12 @@ function updateCard(member) {
     document.getElementById('displayFullName').textContent = member.full_name || '-';
     document.getElementById('displayMemberId').textContent = member.member_id || '-';
     document.getElementById('displayPhone').textContent = member.phone || '-';
-    document.getElementById('displayShares').textContent = member.share_count || '0';
+    // ✅ share_count እና shareCount ሁለቱንም ይደግፋል
+    document.getElementById('displayShares').textContent = member.share_count || member.shareCount || '0';
     
-    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
     const photoContainer = document.getElementById('memberPhoto');
     if (member.memberPhoto || member.photo) {
+        // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
         photoContainer.innerHTML = `<img src="${member.memberPhoto || member.photo}" class="member-photo-img">`;
     } else {
         photoContainer.innerHTML = '👤';
