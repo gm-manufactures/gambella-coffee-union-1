@@ -122,6 +122,29 @@ async function loadMembers() {
       return;
     }
     
+    // ✅ የዳታቤዝ መስኮች ስም ሊለያይ ስለሚችል ሁለቱንም እንጠቀም
+    container.innerHTML = members.map((m, index) => {
+      const name = m.full_name  m.fullName  'No Name';
+      const id = m.member_id  m.memberId  'N/A';
+      const phone = m.phone || 'N/A';
+      const shares = m.share_count  m.shareCount  0;
+
+      return 
+      <div class="member-card">
+        <div class="member-name">👤 ${escapeHtml(name)}</div>
+        <div class="member-details">
+          <div>📞 ${escapeHtml(phone)}</div>
+          <div>🆔 ${escapeHtml(id)}</div>
+          <div>📊 አክሲዮን: ${shares}</div>
+        </div>
+      </div>
+      ;
+    }).join('');
+  } catch (err) {
+    document.getElementById('membersList').innerHTML = '<div style="text-align:center; color:#dc3545;">❌ ስህተት ተከስቷል</div>';
+  }
+}
+    
     // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
     container.innerHTML = members.map((m, index) => `
       <div class="member-card">
