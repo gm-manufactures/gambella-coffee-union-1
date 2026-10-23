@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - የጋምቤላ ማጃንግ የጫካ ቡና አምራችና ላኪ አክሲዬን ማህበር</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a3c0e,#2d5a1a);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-container{max-width:450px;width:100%;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden}
+.login-header{background:linear-gradient(135deg,#1a3c0e,#2d6a1a);color:white;padding:30px;text-align:center}
+.union-logo-img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;margin-bottom:15px;background:white}
+.login-header h2{font-size:1.2em;margin-bottom:5px}
+.login-header .manufacturer{font-size:0.8em;opacity:0.9;margin-top:5px}
+.login-form{padding:30px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:8px;font-weight:bold}
+.form-group input{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:14px}
+.form-group input:focus{outline:none;border-color:#2d6a1a}
+.btn-login{width:100%;padding:12px;background:#2d6a1a;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer}
+.btn-login:hover{background:#1a4a0e}
+.error-message{background:#f8d7da;color:#721c24;padding:12px;border-radius:8px;margin-bottom:20px;display:none}
+.loading{display:none;text-align:center;margin-top:10px;color:#2d6a1a}
+</style>
+</head>
+<body>
+<div class="login-container">
+<div class="login-header">
+<img src="logo.jpg" alt="Union Logo" class="union-logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f5c542%22/%3E%3Ctext x=%2250%22 y=%2265%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23333%22%3E🌿%3C/text%3E%3C/svg%3E';">
+<h2>የጋምቤላ ማጃንግ የጫካ ቡና</h2>
+<div class="manufacturer">🌿 Manufacturer and Exporter PLC ☕️</div>
+</div>
+<div class="login-form">
+<div id="errorMessage" class="error-message"></div>
+<form id="loginForm">
+<div class="form-group">
+<label>Username</label>
+<input type="text" id="username" required placeholder="Enter username">
+</div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" id="password" required placeholder="Enter password">
+</div>
+<button type="submit" class="btn-login"> Login</button>
+<div id="loading" class="loading">Logging in...</div>
+</form>
+</div>
+</div>
+<script>
+// የድሮ መረጃን ማጽዳት
+localStorage.removeItem('token');
+localStorage.removeItem('user');
+
+const token = localStorage.getItem('token');
+// ✅ ከገባ በኋላ ወደ አድሚን ገጽ እንዲሄድ
+if (token) window.location.href = '/ADMIN.HTML';
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+e.preventDefault();
+const username = document.getElementById('username').value.trim();
+const password = document.getElementById('password').value;
+const errorDiv = document.getElementById('errorMessage');
+const loadingDiv = document.getElementById('loading');
+const submitBtn = document.querySelector('.btn-login');
+
+errorDiv.style.display = 'none';
+errorDiv.innerHTML = '';
+
+// ✅ የጎደለው የሎጂክ ኦፕሬተር (||) ተጨምሯል
+if (!username || !password) {
+errorDiv.innerHTML = 'Please enter both username and password';
+errorDiv.style.display = 'block';
+return;
+}
+
+loadingDiv.style.display = 'block';
+submitBtn.disabled = true;
+submitBtn.textContent = 'Logging in...';
+
+try {
+// ✅ ወደ አዲሱ የአድሚን መግቢያ API እንዲገናኝ ተስተካክሏል
+const response = await fetch('/api/admin/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ username, password })
+});
+
+const data = await response.json();
+
+if (response.ok && data.token) {
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+// ✅ ወደ አድሚን ዳሽቦርድ ይወስዳል
+window.location.href = '/ADMIN.HTML';
+} else {
+// ✅ የጎደለው የሎጂክ ኦፕሬተር (||) ተጨምሯል
+errorDiv.innerHTML = data.error || data.message || 'Login failed';
+errorDiv.style.display = 'block';
+}
+} catch (error) {
+errorDiv.innerHTML = 'Connection error. Please try again.';
+errorDiv.style.display = 'block';
+} finally {
+loadingDiv.style.display = 'none';
+submitBtn.disabled = false;
+submitBtn.textContent = 'Login';
+}
+});
+</script>
+</body>
+</html>
