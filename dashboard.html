@@ -6,10 +6,7 @@
 <title>Admin Dashboard - የጋምቤላ ማጃንግ የጫካ ቡና</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
-    :root {
-        --primary: #2d6a1a; --primary-gradient: linear-gradient(135deg, #1a472a 0%, #2d6a1a 50%, #3e8e2a 100%);
-        --danger: #dc3545; --white: #ffffff; --gray-dark: #2d3436; --shadow-sm: 0 2px 8px rgba(0,0,0,0.08); --shadow-md: 0 4px 15px rgba(0,0,0,0.1);
-    }
+    :root { --primary: #2d6a1a; --primary-gradient: linear-gradient(135deg, #1a472a 0%, #2d6a1a 50%, #3e8e2a 100%); --danger: #dc3545; --white: #ffffff; --gray-dark: #2d3436; --shadow-sm: 0 2px 8px rgba(0,0,0,0.08); --shadow-md: 0 4px 15px rgba(0,0,0,0.1); --gray-bg: #f8f9fa; }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: #e8f0e8; min-height: 100vh; }
     .navbar { background: var(--primary-gradient); color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
@@ -20,10 +17,14 @@
     .tab-btn.active { background: var(--primary); color: white; }
     .tab-content { display: none; background: white; padding: 30px; border-radius: 16px; box-shadow: var(--shadow-md); }
     .tab-content.active { display: block; }
+    
+    .form-section { margin-bottom: 30px; padding: 20px; background: var(--gray-bg); border-radius: 8px; }
+    .form-section h3 { margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
     .btn-primary { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+    
     .member-card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid var(--primary); background: #fafafa; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
     .member-info { flex: 1; }
     .member-name { font-size: 18px; font-weight: bold; color: var(--primary); }
@@ -31,7 +32,6 @@
     .btn-view { background: #17a2b8; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
     .stat-card { background: var(--primary); color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; }
     
-    /* Modal (Popup) Styles */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; }
@@ -42,6 +42,7 @@
     .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 15px; }
     .info-row strong { color: var(--primary); }
     .info-row span { color: #333; text-align: right; }
+    .image-preview img { max-width: 80px; max-height: 80px; border-radius: 6px; margin-top: 5px; }
     @media (max-width: 768px) {
         .form-row { grid-template-columns: 1fr; }
         .navbar { padding: 12px 20px; }
@@ -63,20 +64,45 @@
 
   <!-- Register Tab -->
   <div id="tab-register" class="tab-content active">
-    <h2 style="margin-bottom: 20px; color: var(--primary);">📝 አዲስ አባል መመዝገቢያ</h2>
+    <h2 style="margin-bottom: 20px; color: var(--primary);">📝 የአባልነት ምዝገባ ቅፅ</h2>
     <form id="memberForm">
-      <div class="form-row">
-        <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="fullName" required></div>
-        <div class="form-group"><label>ስልክ ቁጥር *</label><input type="tel" id="phone" required></div>
+      <div class="form-section">
+        <h3>📌 የግል መረጃ</h3>
+        <div class="form-row">
+          <div class="form-group"><label>ሙሉ ስም *</label><input type="text" id="fullName" required></div>
+          <div class="form-group"><label>ፆታ</label><select id="gender"><option>ወንድ</option><option>ሴት</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>ዕድሜ</label><input type="number" id="age"></div>
+          <div class="form-group"><label>የእናት ሙሉ ስም</label><input type="text" id="motherName"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>ስልክ ቁጥር *</label><input type="tel" id="phone" required></div>
+          <div class="form-group"><label>የፋይዳ መለያ ቁጥር (TIN)</label><input type="text" id="taxId"></div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>ፆታ</label><select id="gender"><option>ወንድ</option><option>ሴት</option></select></div>
-        <div class="form-group"><label>ዕድሜ</label><input type="number" id="age"></div>
+
+      <div class="form-section">
+        <h3>📊 የአክሲዮን መረጃ</h3>
+        <div class="form-row">
+          <div class="form-group"><label>የአክሲዮን ብዛት</label><input type="number" id="shareCount" value="0"></div>
+          <div class="form-group"><label>የተከፈለ ብር</label><input type="number" id="sharePricePaid" value="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>የይለፍ ቃል (ለመግቢያ)</label><input type="text" id="password" value="1234"></div>
+          <div class="form-group"><label>በማህበሩ ያለው ኃላፊነት</label><input type="text" id="role" value="አባል"></div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>የይለፍ ቃል (ለመግቢያ)</label><input type="text" id="password" value="1234"></div>
-        <div class="form-group"><label>የአክሲዮን ብዛት</label><input type="number" id="shareCount" value="0"></div>
+
+      <div class="form-section">
+        <h3>📸 ፎቶዎች እና ሰነዶች</h3>
+        <div class="form-group">
+          <label>የአባሉ ፎቶ</label>
+          <input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')">
+          <div id="memberPhotoPreview" class="image-preview"></div>
+        </div>
       </div>
+
       <button type="submit" class="btn-primary">✅ አስመዝግብ</button>
     </form>
   </div>
@@ -93,7 +119,7 @@
   </div>
 </div>
 
-<!-- Modal for Viewing Details -->
+<!-- Modal -->
 <div id="detailModal" class="modal-overlay">
   <div class="modal-content">
     <div class="modal-header">
@@ -131,6 +157,25 @@ function switchTab(tabName) {
 
 document.getElementById('btn-register').addEventListener('click', () => switchTab('register'));
 document.getElementById('btn-list').addEventListener('click', () => switchTab('list'));
+
+function previewImage(input, previewId) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
+    reader.onload = e => document.getElementById(previewId).innerHTML = `<img src="${e.target.result}">`;
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve('');
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
+}
 
 async function loadMembers() {
   const container = document.getElementById('membersList');
@@ -178,34 +223,20 @@ async function loadMembers() {
 function showDetails(index) {
     const m = allMembersData[index];
     const modalBody = document.getElementById('modalBody');
-    
     // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
     modalBody.innerHTML = `
-        <div class="info-row"><strong>ሙሉ ስም:</strong> <span>${escapeHtml(m.full_name || m.fullName || 'N/A')}</span></div>
-        <div class="info-row"><strong>የአባል መለያ (ID):</strong> <span>${escapeHtml(m.member_id || m.memberId || 'N/A')}</span></div>
-        <div class="info-row"><strong>ስልክ ቁጥር:</strong> <span>${escapeHtml(m.phone || 'N/A')}</span></div>
-        <div class="info-row"><strong>ፆታ:</strong> <span>${escapeHtml(m.gender || 'N/A')}</span></div>
+        <div class="info-row"><strong>ሙሉ ስም:</strong> <span>${escapeHtml(m.full_name || 'N/A')}</span></div>
+        <div class="info-row"><strong>መለያ:</strong> <span>${escapeHtml(m.member_id || 'N/A')}</span></div>
+        <div class="info-row"><strong>ስልክ:</strong> <span>${escapeHtml(m.phone || 'N/A')}</span></div>
         <div class="info-row"><strong>ዕድሜ:</strong> <span>${m.age || 'N/A'}</span></div>
-        <div class="info-row"><strong>የእናት ስም:</strong> <span>${escapeHtml(m.mother_name || m.motherName || 'N/A')}</span></div>
-        <div class="info-row"><strong>የአክሲዮን ብዛት:</strong> <span>${m.share_count || m.shareCount || 0}</span></div>
-        <div class="info-row"><strong>የክፍያ ሁኔታ:</strong> <span>${escapeHtml(m.payment_status || m.paymentStatus || 'N/A')}</span></div>
-        <div class="info-row"><strong>ባንክ ስም:</strong> <span>${escapeHtml(m.bank_name || m.bankName || 'N/A')}</span></div>
-        <div class="info-row"><strong>የአካውንት ቁጥር:</strong> <span>${escapeHtml(m.account_number || m.accountNumber || 'N/A')}</span></div>
+        <div class="info-row"><strong>የአክሲዮን ብዛት:</strong> <span>${m.share_count || 0}</span></div>
+        ${m.memberPhoto ? `<div class="info-row"><strong>ፎቶ:</strong> <img src="${m.memberPhoto}" style="max-width:100px; border-radius:5px;"></div>` : ''}
     `;
-    
     document.getElementById('detailModal').classList.add('active');
 }
 
-function closeModal() {
-    document.getElementById('detailModal').classList.remove('active');
-}
-
-window.onclick = function(event) {
-    const modal = document.getElementById('detailModal');
-    if (event.target === modal) {
-        closeModal();
-    }
-}
+function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
+window.onclick = function(event) { if (event.target === document.getElementById('detailModal')) closeModal(); }
 
 document.getElementById('memberForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -214,14 +245,22 @@ document.getElementById('memberForm').addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
+        const photoFile = document.getElementById('memberPhoto').files[0];
+        const memberPhotoBase64 = photoFile ? await fileToBase64(photoFile) : '';
+
         const memberData = {
             member_id: 'GMFC' + Math.floor(Math.random() * 10000),
             full_name: document.getElementById('fullName').value,
             phone: document.getElementById('phone').value,
             gender: document.getElementById('gender').value,
             age: parseInt(document.getElementById('age').value) || 0,
+            mother_name: document.getElementById('motherName').value,
+            tax_id: document.getElementById('taxId').value,
             password: document.getElementById('password').value || '1234',
-            share_count: parseInt(document.getElementById('shareCount').value) || 0
+            share_count: parseInt(document.getElementById('shareCount').value) || 0,
+            share_price_paid: parseInt(document.getElementById('sharePricePaid').value) || 0,
+            role: document.getElementById('role').value,
+            memberPhoto: memberPhotoBase64
         };
 
         const response = await fetch('/api/members', {
