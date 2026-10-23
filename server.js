@@ -1,208 +1,189 @@
-<!DOCTYPE html>
-<html lang="am">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>ማጃንግ አባል ካርድ</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: linear-gradient(135deg, #1e3c2c 0%, #2d5a3b 100%); font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
-.container { max-width: 1400px; margin: 0 auto; }
-.search-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
-.search-box input { padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 8px; margin-right: 10px; }
-.search-box button { background: #2d5a3b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-.card-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 35px; margin-bottom: 25px; }
-.id-card { width: 105mm; height: 67mm; background: white; border-radius: 6mm; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; position: relative; }
-@media screen { .id-card { width: 560px; height: 358px; margin: 0 auto; } }
-.card-side { width: 100%; height: 100%; padding: 5.5mm; background: rgba(255,255,255,0.94); display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 1; }
-.logo-row { display: flex; align-items: center; justify-content: space-between; gap: 4mm; border-bottom: 0.4mm solid #e2e8f0; padding-bottom: 2mm; }
-.logo-img { width: 15mm; height: 15mm; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
-.photo-and-info { display: flex; gap: 2.5mm; margin-bottom: 1.5mm; align-items: flex-start; }
-.photo { width: 30mm; text-align: center; }
-.member-photo { width: 25mm; height: 28mm; background: #e2e8f0; border-radius: 4mm; display: flex; align-items: center; justify-content: center; font-size: 8mm; margin: 0 auto; border: 0.5mm solid #FFF; overflow: hidden; }
-.member-photo-img { width: 100%; height: 100%; object-fit: cover; }
-.info-grid { flex: 1; background: rgba(248,250,252,0.9); border-radius: 2.5mm; padding: 3mm; display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5mm 2.5mm; }
-.info-label { font-size: 2mm; font-weight: 600; color: #475569; }
-.info-value { font-size: 3mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; }
-.level-voting-row { display: flex; justify-content: space-between; align-items: center; margin: 1.2mm 0; padding: 1mm 0; }
-.member-level { background: linear-gradient(135deg,#00b4d8,#0077b6); color: white; padding: 0.8mm 2.5mm; border-radius: 3mm; font-weight: bold; font-size: 3.6mm; }
-.voting-power-box { background: #fbbf24; padding: 1.5mm 3.5mm; border-radius: 3mm; font-weight: bold; font-size: 4mm; color: #1e3c2c; }
-.qr-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 5px 0; }
-.qr-side-member-photo { width: 24mm; height: 24mm; object-fit: cover; border-radius: 50%; filter: grayscale(100%); opacity: 0.3; }
-.qr-placeholder { width: 30mm; height: 30mm; background: white; padding: 1mm; border-radius: 2mm; }
-#qrcode img { width: 100% !important; height: 100% !important; }
-.toolbar { display: flex; gap: 10px; margin: 20px auto; justify-content: center; }
-.tool-btn { background: #2d5a3b; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; }
-.hidden { display: none; }
-.error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-.success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-</style>
-</head>
-<body>
-<div class="container">
-    <div class="search-box">
-        <h3>የአባል ካርድ ማውጫ</h3>
-        <p style="margin-bottom: 10px; font-size: 12px; color: #666;">እባክዎ የአባሉን Member ID ያስገቡ (ለምሳሌ: GMFC002)</p>
-        <input type="text" id="memberIdInput" placeholder="Member ID: GMFC002" />
-        <button onclick="loadCardByMemberId()">ካርድ አምጣ</button>
-    </div>
-    
-    <div id="loginWarning" class="error-message hidden">⚠️ እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! <a href="/ADMIN.HTML">እዚህ ይጫኑ</a></div>
-    <div id="successMessage" class="success-message hidden">✅ ካርድ በሚገባ ተዘጋጅቷል!</div>
-    <div id="loadingMessage" class="loading hidden" style="color:white; text-align:center;">⏳ እባክዎ ይጠብቁ...</div>
-    <div id="errorMessage" class="error-message hidden">❌ አባል አልተገኘም</div>
-    
-    <div id="cardContainer" class="card-container hidden">
-        <!-- የፊት ካርድ -->
-        <div class="id-card" id="frontCard">
-            <div class="card-side front">
-                <div>
-                    <div class="logo-row">
-                        <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english">Gambella Majang Forest Coffee Producer</div></div>
-                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img"></div>
-                        <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div></div>
-                    </div>
-                    <div class="photo-and-info">
-                        <div class="photo">
-                            <div class="member-photo" id="memberPhoto">👤</div>
-                        </div>
-                        <div class="info-grid">
-                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="displayFullName">-</div></div>
-                            <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
-                            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="displayPhone">-</div></div>
-                            <div class="info-item"><div class="info-label">Shares</div><div class="info-value" id="displayShares">-</div></div>
-                        </div>
-                    </div>
-                    <div class="level-voting-row">
-                        <span class="member-level" id="tierBadge">MEMBER</span>
-                        <span class="voting-power-box">Voting: <span id="displayVotingPower">-</span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- የኋላ ካርድ -->
-        <div class="id-card" id="backCard">
-            <div class="card-side back">
-                <div class="qr-section" style="text-align:center;">
-                    <div class="qr-wrapper">
-                        <div class="qr-placeholder">
-                            <div id="qrcode"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="toolbar hidden" id="toolbar">
-        <button class="tool-btn" onclick="downloadAsImage()">📸 እንደ ምስል አውርድ</button>
-        <button class="tool-btn" onclick="printCard()">🖨️ ካርድ ማተም</button>
-    </div>
-</div>
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']); 
 
-<script>
-const API_BASE = window.location.origin + '/api';
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const mongoose = require('mongoose');
 
-// ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
-async function fetchMemberByMemberId(memberId) {
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// ✅ የፊት ገጽ ፋይሎች በቀጥታ ከዚሁ ፎልደር እንዲነበቡ ማድረግ
+app.use(express.static(__dirname));
+
+// ==========================================
+// 🔴 MongoDB Connection
+// ==========================================
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://gambella_admin:Admin1234@gammajmembers.di2ho2h.mongodb.net/gambella_coffee_union?retryWrites=true&w=majority';
+
+mongoose.connect(MONGODB_URI)
+.then(() => console.log('✅ MongoDB Connected Successfully'))
+.catch(err => console.error('❌ MongoDB Connection Error:', err.message));
+
+// ==========================================
+// 🔴 Schemas
+// ==========================================
+// 1. Member Schema (ለአባላት መረጃ)
+const memberSchema = new mongoose.Schema({
+    member_id: { type: String, required: true, unique: true },
+    full_name: { type: String, required: true },
+    password: { type: String, required: true },
+    phone: { type: String, default: '' },
+    share_count: { type: Number, default: 0 },
+    photo: { type: String, default: '' },
+    created_at: { type: Date, default: Date.now }
+});
+const Member = mongoose.model('Member', memberSchema);
+
+// 2. Admin Schema (ለአድሚን መግቢያ)
+const adminSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    created_at: { type: Date, default: Date.now }
+});
+const Admin = mongoose.model('Admin', adminSchema);
+
+// 3. Product Schema (ለግብይት ገጽ)
+const productSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    price: { type: String, required: true },
+    category: { type: String, required: true },
+    description: { type: String, default: '' },
+    image: { type: String, default: '' },
+    seller_name: { type: String, default: 'GMFC Admin' },
+    createdAt: { type: Date, default: Date.now }
+});
+const Product = mongoose.model('Product', productSchema);
+
+// 4. News Schema (ለዜና)
+const newsSchema = new mongoose.Schema({
+    year: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    image: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now }
+});
+const News = mongoose.model('News', newsSchema);
+
+// ==========================================
+// 🔴 API ROUTES
+// ==========================================
+
+// --- Admin Login ---
+app.post('/api/admin/login', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE}/members`);
-        if (!response.ok) throw new Error('Failed to fetch members');
+        const { username, password } = req.body;
+        let admin = await Admin.findOne({ username });
         
-        const members = await response.json();
-        const member = members.find(m => m.member_id === memberId);
-        
-        if (member) return member;
-        
-        showError(`አባል ቁጥር "${memberId}" አልተገኘም!`);
-        return null;
+        // መጀመሪያ ሲገባ አድሚን ከሌለ በራሱ ይፈጥራል
+        if (!admin && username === 'admin' && password === 'admin123') {
+            admin = new Admin({ username: 'admin', password: 'admin123' });
+            await admin.save();
+            return res.json({ success: true, token: 'dummy-token', user: { username: 'admin' } });
+        }
+
+        if (!admin || admin.password !== password) {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+
+        res.json({ success: true, token: 'dummy-token', user: { username: admin.username } });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- Member Login (ለአባላት ፖርታል) ---
+app.post('/api/login', async (req, res) => {
+    try {
+        const { member_id, password } = req.body;
+        const member = await Member.findOne({ member_id, password });
+        if (!member) return res.status(401).json({ error: "Invalid Member ID or Password" });
+        res.json({ success: true, user: member });
     } catch (error) {
-        console.error('Error:', error);
-        showError('የአገልጋይ ስህተት: ' + error.message);
-        return null;
+        res.status(500).json({ error: error.message });
     }
-}
+});
 
-async function loadCardByMemberId() {
-    let memberId = document.getElementById('memberIdInput').value.trim();
-    if (!memberId) { alert('እባክዎ የአባል Member ID ያስገቡ!'); return; }
-    
-    document.getElementById('loadingMessage').classList.remove('hidden');
-    document.getElementById('cardContainer').classList.add('hidden');
-    document.getElementById('errorMessage').classList.add('hidden');
-    
-    const member = await fetchMemberByMemberId(memberId);
-    document.getElementById('loadingMessage').classList.add('hidden');
-    
-    if (member) {
-        updateCard(member);
-    } else {
-        document.getElementById('errorMessage').classList.remove('hidden');
-    }
-}
-
-function updateCard(member) {
-    document.getElementById('displayFullName').textContent = member.full_name || '-';
-    document.getElementById('displayMemberId').textContent = member.member_id || '-';
-    document.getElementById('displayPhone').textContent = member.phone || '-';
-    document.getElementById('displayShares').textContent = member.share_count || '0';
-    
-    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
-    const photoContainer = document.getElementById('memberPhoto');
-    if (member.memberPhoto || member.photo) {
-        photoContainer.innerHTML = `<img src="${member.memberPhoto || member.photo}" class="member-photo-img">`;
-    } else {
-        photoContainer.innerHTML = '👤';
-    }
-    
-    // QR Code Generation
-    const qrContainer = document.getElementById('qrcode');
-    qrContainer.innerHTML = '';
-    const portalUrl = `${window.location.origin}/member-portal.html`;
-    
+// --- Get All Members (ለካርድ ሰሪ እና አድሚን) ---
+app.get('/api/members', async (req, res) => {
     try {
-        new QRCode(qrContainer, { 
-            text: portalUrl, 
-            width: 140, 
-            height: 140, 
-            colorDark: "#1a3c0e", 
-            colorLight: "#ffffff"
-        });
-    } catch(e) {
-        qrContainer.innerHTML = `<div style="font-size:10px;">${member.member_id}</div>`;
+        const members = await Member.find().sort({ created_at: -1 });
+        res.json(members);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    
-    document.getElementById('cardContainer').classList.remove('hidden');
-    document.getElementById('toolbar').classList.remove('hidden');
-    document.getElementById('successMessage').classList.remove('hidden');
-    setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
-}
+});
 
-function showError(message) {
-    const errorDiv = document.getElementById('errorMessage');
-    errorDiv.innerHTML = `❌ ${message}`;
-    errorDiv.classList.remove('hidden');
-    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-}
-
-async function downloadAsImage() {
-    const front = document.getElementById('frontCard');
-    const back = document.getElementById('backCard');
+// --- Add New Member (አዲስ አባል መመዝገቢያ) ---
+app.post('/api/members', async (req, res) => {
     try {
-        const fc = await html2canvas(front, { scale: 4, useCORS: true });
-        const bc = await html2canvas(back, { scale: 4, useCORS: true });
+        const { member_id, full_name, password } = req.body;
         
-        let a = document.createElement('a'); a.download = 'card_front.png'; a.href = fc.toDataURL(); a.click();
-        setTimeout(() => {
-            let b = document.createElement('a'); b.download = 'card_back.png'; b.href = bc.toDataURL(); b.click();
-        }, 500);
-    } catch(e) { alert('ምስል ማውረድ አልተሳካም'); }
-}
+        if (!member_id || !full_name || !password) {
+            return res.status(400).json({ error: "member_id, full_name and password are required" });
+        }
+        
+        const existing = await Member.findOne({ member_id });
+        if (existing) {
+            return res.status(400).json({ error: "Member ID already exists" });
+        }
+        
+        const newMember = new Member(req.body);
+        await newMember.save();
+        res.json({ success: true, message: "Member registered successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
-function printCard() { window.print(); }
-</script>
-</body>
-</html>
+// --- Products (ለግብይት ገጽ) ---
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await Product.find().sort({ createdAt: -1 });
+        res.json(products);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/products', async (req, res) => {
+    try {
+        const newProduct = new Product(req.body);
+        await newProduct.save();
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// --- News (ዜና) ---
+app.get('/api/news', async (req, res) => {
+    try {
+        const news = await News.find().sort({ createdAt: -1 });
+        res.json(news);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+app.post('/api/news', async (req, res) => {
+    try {
+        const newNews = new News(req.body);
+        await newNews.save();
+        res.json({ success: true });
+    } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// ==========================================
+// 🔴 Frontend Catch-all (ማንኛውም ያልተገኘ ገጽ ወደ index.html እንዲሄድ)
+// ==========================================
+// ✅ ከ app.get('*') ወደ app.use() ተቀይሯል (Express 5 ላይ ችግር እንዳያመጣ)
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Start Server
+app.listen(PORT, '0.0.0.0', () => {
+    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
+    console.log(`🚀 Server running on port ${PORT}`);
+});
