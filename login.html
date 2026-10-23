@@ -53,8 +53,7 @@ localStorage.removeItem('user');
 
 const token = localStorage.getItem('token');
 // ✅ ከገባ በኋላ ወደ አድሚን ገጽ እንዲሄድ
-if (token) window.location.href = '/ADMIN.HTML';
-
+if (token) window.location.href = '/dashboard.html';
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const username = document.getElementById('username').value.trim();
@@ -91,7 +90,7 @@ if (response.ok && data.token) {
 localStorage.setItem('token', data.token);
 localStorage.setItem('user', JSON.stringify(data.user));
 // ✅ ወደ አድሚን ዳሽቦርድ ይወስዳል
-window.location.href = '/ADMIN.HTML';
+window.location.href = '/dashboard.html';
 } else {
 // ✅ የጎደለው የሎጂክ ኦፕሬተር (||) ተጨምሯል
 errorDiv.innerHTML = data.error || data.message || 'Login failed';
