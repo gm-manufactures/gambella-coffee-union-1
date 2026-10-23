@@ -111,9 +111,11 @@ app.post('/api/login', async (req, res) => {
 });
 
 // --- Get All Members (ለካርድ ሰሪ እና አድሚን) ---
+// --- Get All Members (ለካርድ ሰሪ እና አድሚን) ---
 app.get('/api/members', async (req, res) => {
     try {
-        const members = await Member.find();
+        // ✅ የሚፈለጉትን መስኮች ብቻ መርጠን እናውጣ (ፎቶዎችን ሳይጨምር)
+        const members = await Member.find().select('full_name fullName member_id memberId phone share_count role');
         res.json(members);
     } catch (err) {
         res.status(500).json({ error: err.message });
