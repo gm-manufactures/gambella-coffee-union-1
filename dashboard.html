@@ -24,13 +24,28 @@
     .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
     .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
     .btn-primary { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
-    .member-card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid var(--primary); background: #fafafa; }
+    .member-card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid var(--primary); background: #fafafa; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .member-info { flex: 1; }
     .member-name { font-size: 18px; font-weight: bold; color: var(--primary); }
-    .member-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 14px; }
+    .member-details { display: flex; gap: 15px; margin-top: 8px; font-size: 14px; color: #555; flex-wrap: wrap; }
+    .btn-view { background: #17a2b8; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; }
     .stat-card { background: var(--primary); color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; }
+    
+    /* Modal (Popup) Styles */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; }
+    .modal-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; position: sticky; top: 0; }
+    .modal-header h3 { margin: 0; }
+    .close-modal { font-size: 24px; cursor: pointer; font-weight: bold; }
+    .modal-body { padding: 20px; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 15px; }
+    .info-row strong { color: var(--primary); }
+    .info-row span { color: #333; text-align: right; }
     @media (max-width: 768px) {
         .form-row { grid-template-columns: 1fr; }
-        .member-details { grid-template-columns: 1fr; }
+        .navbar { padding: 12px 20px; }
+        .container { padding: 0 16px; }
     }
 </style>
 </head>
@@ -78,14 +93,26 @@
   </div>
 </div>
 
+<!-- Modal for Viewing Details -->
+<div id="detailModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>👤 የአባል ሙሉ መረጃ</h3>
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
 const token = localStorage.getItem('token');
 // ✅ ከ '/login.html' ወደ '/' ተቀይሯል
 if (!token) window.location.href = '/';
 
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+let allMembersData = [];
 
-// ✅ አዲሱ የታብ መቀየሪያ ኮድ
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
 function switchTab(tabName) {
     document.getElementById('tab-register').classList.remove('active');
     document.getElementById('tab-list').classList.remove('active');
@@ -112,17 +139,17 @@ async function loadMembers() {
   try {
     const res = await fetch('/api/members');
     const data = await res.json();
-    const members = Array.isArray(data) ? data : (data.members || []);
+    allMembersData = Array.isArray(data) ? data : (data.members || []);
     
-    document.getElementById('memberCount').innerText = members.length;
+    document.getElementById('memberCount').innerText = allMembersData.length;
     
-    if (!members.length) {
+    if (!allMembersData.length) {
       container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">📭 ምንም አባላት የሉም</div>';
       return;
     }
     
     // ✅ የጎደሉ የቦሊያን ኦፕሬተሮች (||) እና የባክቲክ ምልክቶች (`) ተጨምረዋል
-    container.innerHTML = members.map(m => {
+    container.innerHTML = allMembersData.map((m, index) => {
       const name = m.full_name || m.fullName || 'No Name';
       const id = m.member_id || m.memberId || 'N/A';
       const phone = m.phone || 'N/A';
@@ -130,12 +157,15 @@ async function loadMembers() {
 
       return `
       <div class="member-card">
-        <div class="member-name">👤 ${escapeHtml(name)}</div>
-        <div class="member-details">
-          <div>📞 ${escapeHtml(phone)}</div>
-          <div>🆔 ${escapeHtml(id)}</div>
-          <div>📊 አክሲዮን: ${shares}</div>
+        <div class="member-info">
+            <div class="member-name">👤 ${escapeHtml(name)}</div>
+            <div class="member-details">
+              <span>📞 ${escapeHtml(phone)}</span>
+              <span>🆔 ${escapeHtml(id)}</span>
+              <span>📊 አክሲዮን: ${shares}</span>
+            </div>
         </div>
+        <button class="btn-view" onclick="showDetails(${index})">🔍 ዝርዝር ተመልከት</button>
       </div>
       `;
     }).join('');
@@ -143,6 +173,38 @@ async function loadMembers() {
     console.error(err);
     container.innerHTML = '<div style="text-align:center; color:#dc3545;">❌ ስህተት ተከስቷል</div>';
   }
+}
+
+function showDetails(index) {
+    const m = allMembersData[index];
+    const modalBody = document.getElementById('modalBody');
+    
+    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
+    modalBody.innerHTML = `
+        <div class="info-row"><strong>ሙሉ ስም:</strong> <span>${escapeHtml(m.full_name || m.fullName || 'N/A')}</span></div>
+        <div class="info-row"><strong>የአባል መለያ (ID):</strong> <span>${escapeHtml(m.member_id || m.memberId || 'N/A')}</span></div>
+        <div class="info-row"><strong>ስልክ ቁጥር:</strong> <span>${escapeHtml(m.phone || 'N/A')}</span></div>
+        <div class="info-row"><strong>ፆታ:</strong> <span>${escapeHtml(m.gender || 'N/A')}</span></div>
+        <div class="info-row"><strong>ዕድሜ:</strong> <span>${m.age || 'N/A'}</span></div>
+        <div class="info-row"><strong>የእናት ስም:</strong> <span>${escapeHtml(m.mother_name || m.motherName || 'N/A')}</span></div>
+        <div class="info-row"><strong>የአክሲዮን ብዛት:</strong> <span>${m.share_count || m.shareCount || 0}</span></div>
+        <div class="info-row"><strong>የክፍያ ሁኔታ:</strong> <span>${escapeHtml(m.payment_status || m.paymentStatus || 'N/A')}</span></div>
+        <div class="info-row"><strong>ባንክ ስም:</strong> <span>${escapeHtml(m.bank_name || m.bankName || 'N/A')}</span></div>
+        <div class="info-row"><strong>የአካውንት ቁጥር:</strong> <span>${escapeHtml(m.account_number || m.accountNumber || 'N/A')}</span></div>
+    `;
+    
+    document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('detailModal').classList.remove('active');
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('detailModal');
+    if (event.target === modal) {
+        closeModal();
+    }
 }
 
 document.getElementById('memberForm').addEventListener('submit', async (e) => {
