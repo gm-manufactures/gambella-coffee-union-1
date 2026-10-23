@@ -1,1050 +1,208 @@
-const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const path = require('path');
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>ማጃንግ አባል ካርድ</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: linear-gradient(135deg, #1e3c2c 0%, #2d5a3b 100%); font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
+.container { max-width: 1400px; margin: 0 auto; }
+.search-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+.search-box input { padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 8px; margin-right: 10px; }
+.search-box button { background: #2d5a3b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.card-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 35px; margin-bottom: 25px; }
+.id-card { width: 105mm; height: 67mm; background: white; border-radius: 6mm; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; position: relative; }
+@media screen { .id-card { width: 560px; height: 358px; margin: 0 auto; } }
+.card-side { width: 100%; height: 100%; padding: 5.5mm; background: rgba(255,255,255,0.94); display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 1; }
+.logo-row { display: flex; align-items: center; justify-content: space-between; gap: 4mm; border-bottom: 0.4mm solid #e2e8f0; padding-bottom: 2mm; }
+.logo-img { width: 15mm; height: 15mm; border-radius: 50%; border: 0.3mm solid #2d5a3b; }
+.photo-and-info { display: flex; gap: 2.5mm; margin-bottom: 1.5mm; align-items: flex-start; }
+.photo { width: 30mm; text-align: center; }
+.member-photo { width: 25mm; height: 28mm; background: #e2e8f0; border-radius: 4mm; display: flex; align-items: center; justify-content: center; font-size: 8mm; margin: 0 auto; border: 0.5mm solid #FFF; overflow: hidden; }
+.member-photo-img { width: 100%; height: 100%; object-fit: cover; }
+.info-grid { flex: 1; background: rgba(248,250,252,0.9); border-radius: 2.5mm; padding: 3mm; display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5mm 2.5mm; }
+.info-label { font-size: 2mm; font-weight: 600; color: #475569; }
+.info-value { font-size: 3mm; font-weight: 500; color: #0f172a; margin-top: 0.5mm; }
+.level-voting-row { display: flex; justify-content: space-between; align-items: center; margin: 1.2mm 0; padding: 1mm 0; }
+.member-level { background: linear-gradient(135deg,#00b4d8,#0077b6); color: white; padding: 0.8mm 2.5mm; border-radius: 3mm; font-weight: bold; font-size: 3.6mm; }
+.voting-power-box { background: #fbbf24; padding: 1.5mm 3.5mm; border-radius: 3mm; font-weight: bold; font-size: 4mm; color: #1e3c2c; }
+.qr-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 5px 0; }
+.qr-side-member-photo { width: 24mm; height: 24mm; object-fit: cover; border-radius: 50%; filter: grayscale(100%); opacity: 0.3; }
+.qr-placeholder { width: 30mm; height: 30mm; background: white; padding: 1mm; border-radius: 2mm; }
+#qrcode img { width: 100% !important; height: 100% !important; }
+.toolbar { display: flex; gap: 10px; margin: 20px auto; justify-content: center; }
+.tool-btn { background: #2d5a3b; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; }
+.hidden { display: none; }
+.error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+.success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="search-box">
+        <h3>የአባል ካርድ ማውጫ</h3>
+        <p style="margin-bottom: 10px; font-size: 12px; color: #666;">እባክዎ የአባሉን Member ID ያስገቡ (ለምሳሌ: GMFC002)</p>
+        <input type="text" id="memberIdInput" placeholder="Member ID: GMFC002" />
+        <button onclick="loadCardByMemberId()">ካርድ አምጣ</button>
+    </div>
+    
+    <div id="loginWarning" class="error-message hidden">⚠️ እባክዎ በመጀመሪያ ወደ ስርዓቱ ይግቡ! <a href="/ADMIN.HTML">እዚህ ይጫኑ</a></div>
+    <div id="successMessage" class="success-message hidden">✅ ካርድ በሚገባ ተዘጋጅቷል!</div>
+    <div id="loadingMessage" class="loading hidden" style="color:white; text-align:center;">⏳ እባክዎ ይጠብቁ...</div>
+    <div id="errorMessage" class="error-message hidden">❌ አባል አልተገኘም</div>
+    
+    <div id="cardContainer" class="card-container hidden">
+        <!-- የፊት ካርድ -->
+        <div class="id-card" id="frontCard">
+            <div class="card-side front">
+                <div>
+                    <div class="logo-row">
+                        <div class="left-title"><div class="amharic">የጋምቤላ ማጃንግ የጫካ ቡና</div><div class="english">Gambella Majang Forest Coffee Producer</div></div>
+                        <div class="logo-center"><img src="logo.jpg" alt="Logo" class="logo-img"></div>
+                        <div class="right-title"><div class="amharic">አምራችና ኤክስፖርተር አክሲዮን ማህበር</div></div>
+                    </div>
+                    <div class="photo-and-info">
+                        <div class="photo">
+                            <div class="member-photo" id="memberPhoto">👤</div>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="displayFullName">-</div></div>
+                            <div class="info-item"><div class="info-label">Member ID</div><div class="info-value" id="displayMemberId">-</div></div>
+                            <div class="info-item"><div class="info-label">Phone</div><div class="info-value" id="displayPhone">-</div></div>
+                            <div class="info-item"><div class="info-label">Shares</div><div class="info-value" id="displayShares">-</div></div>
+                        </div>
+                    </div>
+                    <div class="level-voting-row">
+                        <span class="member-level" id="tierBadge">MEMBER</span>
+                        <span class="voting-power-box">Voting: <span id="displayVotingPower">-</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- የኋላ ካርድ -->
+        <div class="id-card" id="backCard">
+            <div class="card-side back">
+                <div class="qr-section" style="text-align:center;">
+                    <div class="qr-wrapper">
+                        <div class="qr-placeholder">
+                            <div id="qrcode"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toolbar hidden" id="toolbar">
+        <button class="tool-btn" onclick="downloadAsImage()">📸 እንደ ምስል አውርድ</button>
+        <button class="tool-btn" onclick="printCard()">🖨️ ካርድ ማተም</button>
+    </div>
+</div>
 
-const app = express();
+<script>
+const API_BASE = window.location.origin + '/api';
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static(__dirname));
-
-// JWT Secret
-const JWT_SECRET = process.env.JWT_SECRET || 'gambella-secret-key-2024';
-
-// ==================== MONGODB SCHEMAS ====================
-
-// User Schema
-const UserSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    fullName: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'manager', 'staff', 'member'], default: 'staff' },
-    memberId: { type: String, default: null },
-    isActive: { type: Boolean, default: true },
-    lastLogin: { type: Date },
-    createdAt: { type: Date, default: Date.now }
-});
-
-UserSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
-});
-
-UserSchema.methods.comparePassword = async function(candidate) {
-    return await bcrypt.compare(candidate, this.password);
-};
-
-const User = mongoose.model('User', UserSchema);
-
-// Member Schema
-const MemberSchema = new mongoose.Schema({
-    memberId: { type: String, unique: true, sparse: true },
-    fullName: { type: String, required: true },
-    gender: { type: String, required: true },
-    age: { type: Number, required: true },
-    motherName: { type: String, required: true },
-    nationality: { type: String, default: 'ኢትዮጵያዊ' },
-    education: { type: String, default: '' },
-    address: { type: String, default: '' },
-    region: { type: String, default: '' },
-    zone: { type: String, default: '' },
-    district: { type: String, default: '' },
-    city: { type: String, default: '' },
-    kebele: { type: String, default: '' },
-    houseNumber: { type: String, default: '' },
-    phone: { type: String, required: true, unique: true },
-    taxId: { type: String, default: '' },
-    role: { type: String, required: true },
-    shareCount: { type: Number, default: 0 },
-    sharePercentage: { type: Number, default: 0 },
-    sharePrice: { type: Number, default: 10000 },
-    totalPayable: { type: Number, default: 0 },
-    sharePricePaid: { type: Number, default: 0 },
-    remainingBalance: { type: Number, default: 0 },
-    paymentStatus: { type: String, default: 'አልተከፈለም' },
-    year1Payment: { type: Number, default: 0 },
-    year2Payment: { type: Number, default: 0 },
-    year3Payment: { type: Number, default: 0 },
-    bankName: { type: String, default: '' },
-    bankBranch: { type: String, default: '' },
-    accountNumber: { type: String, default: '' },
-    accountName: { type: String, default: '' },
-    financialNotes: { type: String, default: '' },
-    beneficiaries: { type: Array, default: [] },
-    beneficiaryCount: { type: Number, default: 0 },
-    legalRepName: { type: String, default: '' },
-    legalRepAddress: { type: String, default: '' },
-    legalRepPhone: { type: String, default: '' },
-    powerOfAttorneyType: { type: String, default: '' },
-    powerOfAttorneyNumber: { type: String, default: '' },
-    powerOfAttorneyDate: { type: String, default: '' },
-    powerOfAttorneyIssuer: { type: String, default: '' },
-    powerOfAttorneyExpiry: { type: String, default: '' },
-    powerOfAttorneyNotes: { type: String, default: '' },
-    memberPhoto: { type: String, default: null },
-    memberTaxDoc: { type: String, default: null },
-    repPhoto: { type: String, default: null },
-    repTaxDoc: { type: String, default: null },
-    hardCopyForm: { type: String, default: null },
-    powerOfAttorneyPhoto: { type: String, default: null },
-    hardCopyDocumentPhoto: { type: String, default: null },
-    createdBy: { type: String, default: '' },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
-
-const Member = mongoose.model('Member', MemberSchema);
-
-// Sale Schema
-const SaleSchema = new mongoose.Schema({
-    memberId: { type: String, required: true },
-    memberName: { type: String },
-    collectionType: { type: String, default: 'member' },
-    nonMemberName: { type: String },
-    date: { type: Date, required: true },
-    productType: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    pricePerKg: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
-    paymentMethod: { type: String, required: true },
-    notes: { type: String },
-    receiptPhoto: { type: String },
-    recordedBy: { type: String },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Sale = mongoose.model('Sale', SaleSchema);
-
-// Transfer Schema
-const TransferSchema = new mongoose.Schema({
-    oldMemberId: { type: String, required: true },
-    oldMemberName: { type: String, required: true },
-    newMemberName: { type: String, required: true },
-    newMemberIdNumber: { type: String },
-    newMemberPhone: { type: String },
-    transferDate: { type: Date, required: true },
-    transferFee: { type: Number, default: 0 },
-    transferReason: { type: String },
-    transferDocument: { type: String },
-    status: { type: String, default: 'completed' },
-    processedBy: { type: String },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const Transfer = mongoose.model('Transfer', TransferSchema);
-
-// Trading Request Schema
-const TradingRequestSchema = new mongoose.Schema({
-    memberId: { type: String, required: true },
-    memberName: { type: String, required: true },
-    memberPhone: { type: String },
-    requestType: { type: String, enum: ['buy', 'sell'], required: true },
-    shareAmount: { type: Number, required: true },
-    pricePerShare: { type: Number, default: 10000 },
-    totalValue: { type: Number, required: true },
-    status: { type: String, default: 'pending' },
-    notes: { type: String },
-    rejectionReason: { type: String },
-    processedBy: { type: String },
-    processedAt: { type: Date },
-    createdAt: { type: Date, default: Date.now }
-});
-
-const TradingRequest = mongoose.model('TradingRequest', TradingRequestSchema);
-
-// ==================== HELPER FUNCTIONS ====================
-
-// Generate random password
-function generateRandomPassword() {
-    return "1234";
+// ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
+async function fetchMemberByMemberId(memberId) {
+    try {
+        const response = await fetch(`${API_BASE}/members`);
+        if (!response.ok) throw new Error('Failed to fetch members');
+        
+        const members = await response.json();
+        const member = members.find(m => m.member_id === memberId);
+        
+        if (member) return member;
+        
+        showError(`አባል ቁጥር "${memberId}" አልተገኘም!`);
+        return null;
+    } catch (error) {
+        console.error('Error:', error);
+        showError('የአገልጋይ ስህተት: ' + error.message);
+        return null;
+    }
 }
 
-// Generate unique Member ID (GMFC/YYYY/XXXX format)
-async function generateMemberId() {
-    const currentYear = new Date().getFullYear();
-    // Generate 4-digit random number (1000 to 9999)
-    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+async function loadCardByMemberId() {
+    let memberId = document.getElementById('memberIdInput').value.trim();
+    if (!memberId) { alert('እባክዎ የአባል Member ID ያስገቡ!'); return; }
     
-    const memberId = `GMFC/${currentYear}/${randomNum}`;
+    document.getElementById('loadingMessage').classList.remove('hidden');
+    document.getElementById('cardContainer').classList.add('hidden');
+    document.getElementById('errorMessage').classList.add('hidden');
     
-    // Check if ID already exists (rare but possible)
-    const existing = await Member.findOne({ memberId: memberId });
-    if (existing) {
-        // Recursively generate a new one
-        return generateMemberId();
+    const member = await fetchMemberByMemberId(memberId);
+    document.getElementById('loadingMessage').classList.add('hidden');
+    
+    if (member) {
+        updateCard(member);
+    } else {
+        document.getElementById('errorMessage').classList.remove('hidden');
     }
-    
-    return memberId;
 }
 
-// ==================== AUTH MIDDLEWARE ====================
-
-const authMiddleware = async (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ message: 'No token' });
+function updateCard(member) {
+    document.getElementById('displayFullName').textContent = member.full_name || '-';
+    document.getElementById('displayMemberId').textContent = member.member_id || '-';
+    document.getElementById('displayPhone').textContent = member.phone || '-';
+    document.getElementById('displayShares').textContent = member.share_count || '0';
     
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch {
-        res.status(401).json({ message: 'Invalid token' });
+    // ✅ የጎደለው የባክቲክ ምልክት (`) ተጨምሯል
+    const photoContainer = document.getElementById('memberPhoto');
+    if (member.memberPhoto || member.photo) {
+        photoContainer.innerHTML = `<img src="${member.memberPhoto || member.photo}" class="member-photo-img">`;
+    } else {
+        photoContainer.innerHTML = '👤';
     }
-};
-
-// ==================== AUTH ROUTES ====================
-
-app.post('/api/auth/login', async (req, res) => {
-    const { username, password } = req.body;
+    
+    // QR Code Generation
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    const portalUrl = `${window.location.origin}/member-portal.html`;
     
     try {
-        const user = await User.findOne({ username, role: 'admin' });
-        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-        
-        if (!await user.comparePassword(password)) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-        
-        user.lastLogin = new Date();
-        await user.save();
-        
-        const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        );
-        
-        res.json({
-            success: true,
-            token,
-            user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role }
+        new QRCode(qrContainer, { 
+            text: portalUrl, 
+            width: 140, 
+            height: 140, 
+            colorDark: "#1a3c0e", 
+            colorLight: "#ffffff"
         });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.post('/api/auth/member-login', async (req, res) => {
-    const { username, password } = req.body;
-    
-    try {
-        const user = await User.findOne({ username, role: 'member' });
-        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-        
-        if (!await user.comparePassword(password)) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-        
-        const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role, memberId: user.memberId },
-            JWT_SECRET,
-            { expiresIn: '30d' }
-        );
-        
-        res.json({
-            success: true,
-            token,
-            user: { id: user._id, username: user.username, fullName: user.fullName, role: user.role, memberId: user.memberId }
-        });
-    } catch (error) {
-        console.error('Member login error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/auth/me', authMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).select('-password');
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.put('/api/auth/update-profile', authMiddleware, async (req, res) => {
-    try {
-        const { oldPassword, fullName, username, email, newPassword } = req.body;
-        const user = await User.findById(req.user.id);
-        
-        if (!user) return res.status(404).json({ message: 'User not found' });
-        
-        const isMatch = await user.comparePassword(oldPassword);
-        if (!isMatch) return res.status(401).json({ message: 'Current password is incorrect' });
-        
-        if (fullName) user.fullName = fullName;
-        if (username) user.username = username;
-        if (email) user.email = email;
-        
-        if (newPassword && newPassword.length >= 6) {
-            user.password = newPassword;
-            await user.save();
-        } else {
-            await user.save();
-        }
-        
-        res.json({ success: true, message: 'Profile updated successfully' });
-    } catch (error) {
-        console.error('Update profile error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/auth/users', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
-    const users = await User.find({}, '-password');
-    res.json(users);
-});
-
-app.post('/api/auth/register', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
-    
-    const { username, email, password, fullName, role } = req.body;
-    
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
-    
-    const newUser = new User({ username, email, password, fullName, role: role || 'staff' });
-    await newUser.save();
-    
-    res.json({ success: true, user: { id: newUser._id, username, email, fullName, role } });
-});
-
-app.delete('/api/auth/users/:id', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
-    if (req.params.id === req.user.id) return res.status(400).json({ message: 'Cannot delete your own account' });
-    
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-});
-
-app.put('/api/auth/users/:id/reset-password', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
-    
-    const { newPassword } = req.body;
-    if (!newPassword || newPassword.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    } catch(e) {
+        qrContainer.innerHTML = `<div style="font-size:10px;">${member.member_id}</div>`;
     }
     
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    
-    user.password = newPassword;
-    await user.save();
-    
-    res.json({ success: true });
-});
+    document.getElementById('cardContainer').classList.remove('hidden');
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('successMessage').classList.remove('hidden');
+    setTimeout(() => document.getElementById('successMessage').classList.add('hidden'), 3000);
+}
 
-// ==================== MEMBER REGISTRATION ROUTE ====================
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `❌ ${message}`;
+    errorDiv.classList.remove('hidden');
+    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+}
 
-app.post('/api/members/register', async (req, res) => {
-    console.log("=".repeat(60));
-    console.log("📝 NEW MEMBER REGISTRATION");
-    console.log("=".repeat(60));
-    
+async function downloadAsImage() {
+    const front = document.getElementById('frontCard');
+    const back = document.getElementById('backCard');
     try {
-        // Remove any id fields
-        const { id, _id, ...cleanData } = req.body;
+        const fc = await html2canvas(front, { scale: 4, useCORS: true });
+        const bc = await html2canvas(back, { scale: 4, useCORS: true });
         
-        // Validate required fields
-        const requiredFields = ['fullName', 'gender', 'age', 'phone', 'role'];
-        const missingFields = requiredFields.filter(field => !cleanData[field]);
-        
-        if (missingFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: `Missing required fields: ${missingFields.join(', ')}`
-            });
-        }
-        
-        // Check if phone already exists
-        const existingMember = await Member.findOne({ phone: cleanData.phone });
-        if (existingMember) {
-            return res.status(400).json({
-                success: false,
-                message: `Phone number ${cleanData.phone} is already registered. Please use a DIFFERENT phone number.`,
-                field: 'phone'
-            });
-        }
-        
-        // Generate UNIQUE Member ID (GMFC/2026/5823 format)
-        const generatedMemberId = await generateMemberId();
-        console.log("📛 Generated Member ID:", generatedMemberId);
-        
-        // Username is the FULL Member ID
-        const username = generatedMemberId;
-        const plainPassword = "1234";
-        
-        // Check if username already exists
-        let finalUsername = username;
-        let counter = 1;
-        let existingUser = await User.findOne({ username: finalUsername });
-        while (existingUser) {
-            finalUsername = `${username}-${counter}`;
-            existingUser = await User.findOne({ username: finalUsername });
-            counter++;
-        }
-        
-        // Build address
-        let address = cleanData.address || '';
-        if (!address) {
-            const addressParts = [
-                cleanData.region, cleanData.zone, cleanData.district,
-                cleanData.city, cleanData.kebele, cleanData.houseNumber
-            ].filter(part => part && part.trim() !== '');
-            address = addressParts.join(', ');
-        }
-        
-        // Calculate financial values
-        const shareCount = parseInt(cleanData.shareCount) || 0;
-        const sharePricePaid = parseFloat(cleanData.sharePricePaid) || 0;
-        const totalPayable = shareCount * 10000;
-        const remainingBalance = totalPayable - sharePricePaid;
-        
-        let paymentStatus = 'አልተከፈለም';
-        if (remainingBalance <= 0) paymentStatus = 'ተከፍሏል';
-        else if (sharePricePaid > 0) paymentStatus = 'በከፊል ተከፍሏል';
-        
-        let bankName = cleanData.bankName || '';
-        if (bankName === 'ሌላ' && cleanData.otherBankName) {
-            bankName = cleanData.otherBankName;
-        }
-        
-        // Create member with custom memberId
-        const memberData = {
-            memberId: generatedMemberId,
-            fullName: cleanData.fullName,
-            gender: cleanData.gender,
-            age: parseInt(cleanData.age) || 0,
-            motherName: cleanData.motherName,
-            nationality: cleanData.nationality || 'ኢትዮጵያዊ',
-            education: cleanData.education || '',
-            address: address,
-            region: cleanData.region || '',
-            zone: cleanData.zone || '',
-            district: cleanData.district || '',
-            city: cleanData.city || '',
-            kebele: cleanData.kebele || '',
-            houseNumber: cleanData.houseNumber || '',
-            phone: cleanData.phone,
-            taxId: cleanData.taxId || '',
-            role: cleanData.role,
-            shareCount: shareCount,
-            sharePercentage: shareCount > 0 ? (shareCount / 25000) * 100 : 0,
-            sharePrice: 10000,
-            totalPayable: totalPayable,
-            sharePricePaid: sharePricePaid,
-            remainingBalance: remainingBalance,
-            paymentStatus: paymentStatus,
-            year1Payment: totalPayable * 0.3,
-            year2Payment: totalPayable * 0.4,
-            year3Payment: totalPayable * 0.3,
-            bankName: bankName,
-            bankBranch: cleanData.bankBranch || '',
-            accountNumber: cleanData.accountNumber || '',
-            accountName: cleanData.accountName || '',
-            financialNotes: cleanData.financialNotes || '',
-            beneficiaries: cleanData.beneficiaries || [],
-            beneficiaryCount: (cleanData.beneficiaries || []).length,
-            legalRepName: cleanData.legalRepName || '',
-            legalRepAddress: cleanData.legalRepAddress || '',
-            legalRepPhone: cleanData.legalRepPhone || '',
-            powerOfAttorneyType: cleanData.powerOfAttorneyType || '',
-            powerOfAttorneyNumber: cleanData.powerOfAttorneyNumber || '',
-            powerOfAttorneyDate: cleanData.powerOfAttorneyDate || '',
-            powerOfAttorneyIssuer: cleanData.powerOfAttorneyIssuer || '',
-            powerOfAttorneyExpiry: cleanData.powerOfAttorneyExpiry || '',
-            powerOfAttorneyNotes: cleanData.powerOfAttorneyNotes || '',
-            memberPhoto: cleanData.memberPhoto || null,
-            memberTaxDoc: cleanData.memberTaxDoc || null,
-            repPhoto: cleanData.repPhoto || null,
-            repTaxDoc: cleanData.repTaxDoc || null,
-            hardCopyForm: cleanData.hardCopyForm || null,
-            powerOfAttorneyPhoto: cleanData.powerOfAttorneyPhoto || null,
-            hardCopyDocumentPhoto: cleanData.hardCopyDocumentPhoto || null,
-            createdBy: cleanData.createdBy || 'system',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        
-        const newMember = new Member(memberData);
-        await newMember.save();
-        console.log(`✅ Member saved! Member ID: ${newMember.memberId}`);
-        
-        // Create user account with FULL Member ID as username
-        const email = `${finalUsername.replace(/\//g, '_')}@member.gambella.com`;
-        
-        const newUser = new User({
-            username: finalUsername,
-            email: email,
-            password: plainPassword,
-            fullName: newMember.fullName,
-            role: 'member',
-            memberId: newMember._id.toString(),
-            isActive: true
-        });
-        
-        await newUser.save();
-        console.log(`✅ User created! Username: ${finalUsername}, Password: ${plainPassword}`);
-        
-        // Send response
-        res.status(201).json({
-            success: true,
-            message: 'Member registered successfully!',
-            member: {
-                id: newMember._id,
-                memberId: newMember.memberId,
-                fullName: newMember.fullName,
-                phone: newMember.phone,
-                shareCount: newMember.shareCount
-            },
-            credentials: {
-                username: finalUsername,
-                password: plainPassword,
-                memberId: newMember.memberId
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Registration error:', error);
-        
-        if (error.code === 11000) {
-            const field = Object.keys(error.keyPattern)[0];
-            return res.status(400).json({
-                success: false,
-                message: `${field} already exists. Please use a different ${field}.`,
-                field: field
-            });
-        }
-        
-        res.status(500).json({
-            success: false,
-            message: 'Server error: ' + error.message
-        });
-    }
-});
+        let a = document.createElement('a'); a.download = 'card_front.png'; a.href = fc.toDataURL(); a.click();
+        setTimeout(() => {
+            let b = document.createElement('a'); b.download = 'card_back.png'; b.href = bc.toDataURL(); b.click();
+        }, 500);
+    } catch(e) { alert('ምስል ማውረድ አልተሳካም'); }
+}
 
-// ==================== GET ALL MEMBERS ====================
-
-app.get('/api/members', authMiddleware, async (req, res) => {
-    try {
-        // EXCLUDE all large photo fields from list view
-        const members = await Member.find()
-            .select('-memberPhoto -memberTaxDoc -repPhoto -repTaxDoc -powerOfAttorneyPhoto -hardCopyForm -hardCopyDocumentPhoto')
-            .sort({ createdAt: -1 });
-        
-        console.log(`✅ Found ${members.length} members (photos excluded)`);
-        res.json(members);
-    } catch (error) {
-        console.error('Error fetching members:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-// ==================== GET SINGLE MEMBER ====================
-
-app.get('/api/members/:id', authMiddleware, async (req, res) => {
-    try {
-        const member = await Member.findById(req.params.id);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
-        
-        if (req.user.role === 'member' && req.user.memberId !== req.params.id) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
-        
-        res.json(member);
-    } catch (error) {
-        console.error('Error fetching member:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== GET MEMBER BY MEMBER ID ====================
-
-app.get('/api/members/by-memberid/:memberId', authMiddleware, async (req, res) => {
-    try {
-        const member = await Member.findOne({ memberId: req.params.memberId });
-        if (!member) return res.status(404).json({ message: 'Member not found' });
-        res.json(member);
-    } catch (error) {
-        console.error('Error fetching member:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== UPDATE MEMBER ====================
-
-app.put('/api/members/:id', authMiddleware, async (req, res) => {
-    console.log("✏️ UPDATE MEMBER REQUEST");
-    console.log("Member ID:", req.params.id);
-    
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({
-                success: false,
-                message: 'Admin only. You do not have permission to update members.'
-            });
-        }
-        
-        const { _id, id, createdAt, __v, ...updateData } = req.body;
-        updateData.updatedAt = new Date();
-        
-        const member = await Member.findByIdAndUpdate(
-            req.params.id,
-            { $set: updateData },
-            { new: true, runValidators: true }
-        );
-        
-        if (!member) {
-            return res.status(404).json({
-                success: false,
-                message: 'Member not found'
-            });
-        }
-        
-        console.log(`✅ Member updated: ${member.fullName}`);
-        res.json({ success: true, message: 'Member updated successfully', member: member });
-        
-    } catch (error) {
-        console.error('❌ Update error:', error);
-        
-        if (error.code === 11000) {
-            const field = Object.keys(error.keyPattern)[0];
-            return res.status(400).json({
-                success: false,
-                message: `${field} already exists. Please use a different value.`,
-                field: field
-            });
-        }
-        
-        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
-    }
-});
-
-// ==================== DELETE MEMBER ====================
-
-app.delete('/api/members/:id', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        await Member.findByIdAndDelete(req.params.id);
-        await User.findOneAndDelete({ memberId: req.params.id });
-        
-        res.json({ message: 'Member deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting member:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== SEARCH MEMBERS ====================
-
-app.get('/api/members/search/:query', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const q = req.params.query;
-        const members = await Member.find({
-            $or: [
-                { fullName: { $regex: q, $options: 'i' } },
-                { phone: { $regex: q, $options: 'i' } },
-                { memberId: { $regex: q, $options: 'i' } }
-            ]
-        });
-        
-        res.json(members);
-    } catch (error) {
-        console.error('Error searching members:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== MEMBER COUNT ====================
-
-app.get('/api/members/count', authMiddleware, async (req, res) => {
-    try {
-        const count = await Member.countDocuments();
-        res.json({ count });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== GET MY PROFILE ====================
-
-app.get('/api/members/profile/my', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'member' || !req.user.memberId) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
-        
-        const member = await Member.findById(req.user.memberId);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
-        
-        res.json(member);
-    } catch (error) {
-        console.error('Error fetching member profile:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== SALE ROUTES ====================
-
-app.get('/api/sales', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        const sales = await Sale.find().sort({ date: -1 });
-        res.json(sales);
-    } catch (error) {
-        console.error('Error fetching sales:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/sales/member/:memberId', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role === 'member' && req.user.memberId !== req.params.memberId) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
-        
-        const sales = await Sale.find({ memberId: req.params.memberId }).sort({ date: -1 });
-        res.json(sales);
-    } catch (error) {
-        console.error('Error fetching member sales:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.post('/api/sales', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const sale = new Sale(req.body);
-        await sale.save();
-        res.status(201).json(sale);
-    } catch (error) {
-        console.error('Error adding sale:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-app.delete('/api/sales/:id', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        await Sale.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Sale deleted' });
-    } catch (error) {
-        console.error('Error deleting sale:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== TRANSFER ROUTES ====================
-
-app.get('/api/transfers', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        const transfers = await Transfer.find().sort({ createdAt: -1 });
-        res.json(transfers);
-    } catch (error) {
-        console.error('Error fetching transfers:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.post('/api/transfers', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const transfer = new Transfer(req.body);
-        await transfer.save();
-        res.status(201).json(transfer);
-    } catch (error) {
-        console.error('Error adding transfer:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-app.delete('/api/transfers/:id', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        await Transfer.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Transfer deleted' });
-    } catch (error) {
-        console.error('Error deleting transfer:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== TRADING ROUTES ====================
-
-app.post('/api/share-trading/request', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'member') {
-            return res.status(403).json({ message: 'Members only' });
-        }
-        
-        const { requestType, shareAmount, pricePerShare = 10000, notes } = req.body;
-        
-        if (!requestType || !shareAmount || shareAmount <= 0) {
-            return res.status(400).json({ message: 'Invalid request' });
-        }
-        
-        const member = await Member.findById(req.user.memberId);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
-        
-        if (requestType === 'sell' && (member.shareCount || 0) < shareAmount) {
-            return res.status(400).json({ 
-                message: `Insufficient shares. You have only ${member.shareCount || 0} shares.`
-            });
-        }
-        
-        const request = new TradingRequest({
-            memberId: req.user.memberId,
-            memberName: member.fullName,
-            memberPhone: member.phone,
-            requestType,
-            shareAmount,
-            pricePerShare,
-            totalValue: pricePerShare * shareAmount,
-            notes: notes || ''
-        });
-        
-        await request.save();
-        res.status(201).json({ success: true, request });
-    } catch (error) {
-        console.error('Error creating trading request:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-app.get('/api/share-trading/my-requests', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'member') {
-            return res.status(403).json({ message: 'Members only' });
-        }
-        
-        const requests = await TradingRequest.find({ memberId: req.user.memberId }).sort({ createdAt: -1 });
-        res.json(requests);
-    } catch (error) {
-        console.error('Error fetching my requests:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/share-trading/requests', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const requests = await TradingRequest.find().sort({ createdAt: -1 });
-        res.json(requests);
-    } catch (error) {
-        console.error('Error fetching all requests:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/share-trading/pending', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const requests = await TradingRequest.find({ status: 'pending' }).sort({ createdAt: -1 });
-        res.json(requests);
-    } catch (error) {
-        console.error('Error fetching pending requests:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.post('/api/share-trading/approve/:id', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const request = await TradingRequest.findById(req.params.id);
-        if (!request) return res.status(404).json({ message: 'Request not found' });
-        
-        if (request.status !== 'pending') {
-            return res.status(400).json({ message: 'Request already processed' });
-        }
-        
-        const member = await Member.findById(request.memberId);
-        if (!member) return res.status(404).json({ message: 'Member not found' });
-        
-        if (request.requestType === 'buy') {
-            member.shareCount = (member.shareCount || 0) + request.shareAmount;
-        } else if (request.requestType === 'sell') {
-            if ((member.shareCount || 0) < request.shareAmount) {
-                return res.status(400).json({ message: 'Insufficient shares' });
-            }
-            member.shareCount = (member.shareCount || 0) - request.shareAmount;
-        }
-        
-        await member.save();
-        
-        request.status = 'approved';
-        request.processedBy = req.user.id;
-        request.processedAt = new Date();
-        await request.save();
-        
-        res.json({ success: true, message: 'Request approved successfully' });
-    } catch (error) {
-        console.error('Error approving request:', error);
-        res.status(500).json({ message: 'Server error: ' + error.message });
-    }
-});
-
-app.post('/api/share-trading/reject/:id', authMiddleware, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Admin only' });
-        }
-        
-        const request = await TradingRequest.findById(req.params.id);
-        if (!request) return res.status(404).json({ message: 'Request not found' });
-        
-        if (request.status !== 'pending') {
-            return res.status(400).json({ message: 'Request already processed' });
-        }
-        
-        request.status = 'rejected';
-        request.processedBy = req.user.id;
-        request.processedAt = new Date();
-        request.rejectionReason = req.body.reason || 'No reason provided';
-        await request.save();
-        
-        res.json({ success: true, message: 'Request rejected' });
-    } catch (error) {
-        console.error('Error rejecting request:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-app.get('/api/share-trading/stats', authMiddleware, async (req, res) => {
-    try {
-        const members = await Member.find();
-        const requests = await TradingRequest.find();
-        
-        const totalShares = members.reduce((sum, m) => sum + (m.shareCount || 0), 0);
-        const pendingRequests = requests.filter(r => r.status === 'pending').length;
-        const approvedRequests = requests.filter(r => r.status === 'approved').length;
-        const totalBuyShares = requests.filter(r => r.requestType === 'buy').reduce((sum, r) => sum + r.shareAmount, 0);
-        const totalSellShares = requests.filter(r => r.requestType === 'sell').reduce((sum, r) => sum + r.shareAmount, 0);
-        
-        res.json({ totalShares, pendingRequests, approvedRequests, totalBuyShares, totalSellShares });
-    } catch (error) {
-        console.error('Error fetching trading stats:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// ==================== CREATE DEFAULT ADMIN ====================
-
-const createDefaultAdmin = async () => {
-    try {
-        const adminExists = await User.findOne({ username: 'admin' });
-        if (!adminExists) {
-            const admin = new User({
-                username: 'admin',
-                email: 'admin@gambellacoffee.com',
-                password: 'Admin123!',
-                fullName: 'System Administrator',
-                role: 'admin'
-            });
-            await admin.save();
-            console.log('✅ Default admin created!');
-            console.log('   Username: admin');
-            console.log('   Password: Admin123!');
-        } else {
-            console.log('✅ Admin user already exists');
-        }
-    } catch (error) {
-        console.error('Error creating admin:', error);
-    }
-};
-
-// ==================== SERVE FRONTEND ====================
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dashboard.html'));
-});
-
-app.get('/dashboard.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dashboard.html'));
-});
-
-app.get('/gmfc.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'gmfc.html'));
-});
-
-app.get('/member-portal.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'member-portal.html'));
-});
-
-app.get('/member_card.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'member_card.html'));
-});
-
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// ==================== START SERVER ====================
-
-const PORT = process.env.PORT || 10000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gambella_coffee_union';
-
-console.log('🚀 Starting server...');
-console.log(`📡 Port: ${PORT}`);
-
-mongoose.connect(MONGODB_URI)
-    .then(async () => {
-        console.log('✅ MongoDB connected successfully');
-        console.log(`📊 Database: ${mongoose.connection.name}`);
-        console.log(`📍 Host: ${mongoose.connection.host}`);
-        
-        await createDefaultAdmin();
-        
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log('='.repeat(50));
-            console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`📱 Admin Login: http://localhost:${PORT}`);
-            console.log(`👤 Username: admin`);
-            console.log(`🔐 Password: Admin123!`);
-            console.log('='.repeat(50));
-        });
-    })
-    .catch(err => {
-        console.error('❌ MongoDB connection error:', err.message);
-        process.exit(1);
-    });
+function printCard() { window.print(); }
+</script>
+</body>
+</html>
